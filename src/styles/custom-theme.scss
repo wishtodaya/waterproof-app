@@ -1,0 +1,84 @@
+/* custom-theme.scss */
+
+/* The Color of O2Team Brand */
+$color-brand: #2563eb;                      // 品牌主色
+$color-brand-light: #60a5fa;                // 品牌色-浅色
+$color-brand-dark: #1d4ed8;                 // 品牌色-深色
+$color-brand-disabled: #bfdbfe;             // 品牌色-禁用
+
+/* Color */
+$color-success: #22c55e;                    // 成功色
+$color-error: #ef4444;                      // 错误色
+$color-warning: #f59e0b;                    // 警告色
+$color-info: #78A4FA;
+
+/* Color Palette */
+$color-black-0: #000;
+$color-black-1: #333;
+$color-black-2: #7F7F7F;
+$color-black-3: #B2B2B2;
+
+$color-grey-0: #333;
+$color-grey-1: #666;
+$color-grey-2: #999;
+$color-grey-3: #CCC;
+$color-grey-4: #E5E5E5;
+$color-grey-5: #F0F0F0;
+$color-grey-6: #F7F7F7;
+
+$color-white: #FFF;
+
+/* Text Color */
+$color-text-base: #1e293b;                  // 基础文字色
+$color-text-base-inverse: #ffffff;          // 反色文字色
+$color-text-secondary: #475569;             // 次要文字色
+$color-text-placeholder: #94a3b8;           // 占位文字色
+$color-text-disabled: #cbd5e1;              // 禁用文字色
+$color-text-title: #2C405A;
+$color-text-paragraph: #3F536E;
+
+/* Link */
+$color-link: #6190E8;
+$color-link-hover: #79A1EB;
+$color-link-active: #4F7DE2;
+$color-link-disabled: #BFBFBF;
+
+/* 背景色 */
+$color-bg: #f8fafc;                         // 背景色
+$color-bg-base: #ffffff;                    // 组件背景色
+$color-bg-light: #f1f5f9;                   // 浅背景色
+$color-bg-dark: #e2e8f0;                    // 深背景色
+$color-bg-grey: #F7F7F7;
+
+/* 边框颜色 */
+$color-border-base: #e2e8f0;                // 基础边框色
+$color-border-split: tint($color-border-base, 20%); // 分割线
+$color-border-light: #f1f5f9;               // 浅边框色
+$color-border-dark: #cbd5e1;                // 深边框色
+$color-border-lighter: tint($color-border-base, 50%);
+$color-border-lightest: tint($color-border-base, 80%);
+$color-border-grey: #CCC;
+
+/* 图标颜色 */
+$color-icon-base: #CCC;
+
+/* 功能色相关 */
+// 成功色
+$color-success-light: #86efac;              // 成功色-浅色
+$color-success-dark: #16a34a;               // 成功色-深色
+$color-success-disabled: #bbf7d0;           // 成功色-禁用
+
+// 警告色
+$color-warning-light: #fcd34d;              // 警告色-浅色
+$color-warning-dark: #d97706;               // 警告色-深色
+$color-warning-disabled: #fde68a;           // 警告色-禁用
+
+// 错误色
+$color-error-light: #fca5a5;                // 错误色-浅色
+$color-error-dark: #dc2626;                 // 错误色-深色
+$color-error-disabled: #fecaca;             // 错误色-禁用
+ 
+ /**
+  * 引入Taro UI默认样式
+  */
+@import "~taro-ui/dist/style/index.scss";

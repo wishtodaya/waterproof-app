@@ -1,0 +1,11 @@
+// app.scss
+@import "./styles/custom-theme.scss";
+
+// 基础样式设置
+page {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+  font-size: 28px;
+  line-height: 1.5;
+  background: $color-bg;
+  color: $color-text-base;
+}
