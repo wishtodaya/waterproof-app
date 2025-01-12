@@ -1,0 +1,2805 @@
+📁 src
+  📄 app.config.ts
+  📄 app.scss
+  📄 app.ts
+  📁 components
+    📄 booking-modal.tsx
+    📄 case-detail-modal.tsx
+    📁 category-tabs
+      📄 index.scss
+      📄 index.tsx
+    📁 faq-section
+      📄 index.scss
+      📄 index.tsx
+    📁 process-steps
+      📄 index.scss
+      📄 index.tsx
+    📁 search-section
+      📄 index.scss
+      📄 index.tsx
+    📁 service-card
+      📄 index.scss
+      📄 index.tsx
+  📁 config
+    📄 index.ts
+  📄 index.html
+  📁 pages
+    📁 cases
+      📄 index.config.ts
+      📄 index.scss
+      📄 index.tsx
+    📁 contact
+      📄 index.config.ts
+      📄 index.scss
+      📄 index.tsx
+    📁 index
+      📄 index.config.ts
+      📄 index.scss
+      📄 index.tsx
+    📁 project
+      📄 index.config.ts
+      📄 index.scss
+      📄 index.tsx
+  📁 services
+    📄 index-api.ts
+    📄 index-mock-data.ts
+    📄 project-api.ts
+    📄 project-mock-data.ts
+  📁 store
+  📁 styles
+    📄 custom-theme.scss
+  📁 types
+    📄 index.ts
+  📁 utils
+    📄 error.ts
+
+===== File: app.config.ts =====
+// app.config.ts
+export default defineAppConfig({
+  pages: [
+    'pages/index/index',
+    'pages/project/index',
+    'pages/cases/index',
+    'pages/contact/index'
+  ],
+  window: {
+    backgroundTextStyle: 'light',
+    navigationBarBackgroundColor: '#ffffff',
+    navigationBarTitleText: '防水服务',
+    navigationBarTextStyle: 'black',
+    backgroundColor: '#f6f6f6'
+  },
+  tabBar: {
+    color: '#999999',
+    selectedColor: '#2563eb',
+    backgroundColor: '#ffffff',
+    borderStyle: 'white',
+    list: [
+      {
+        pagePath: 'pages/index/index',
+        text: '首页',
+        iconPath: 'assets/tab-bar/home.png',
+        selectedIconPath: 'assets/tab-bar/home-active.png'
+      },
+      {
+        pagePath: 'pages/project/index',
+        text: '服务',
+        iconPath: 'assets/tab-bar/service.png',
+        selectedIconPath: 'assets/tab-bar/service-active.png'
+      },
+      {
+        pagePath: 'pages/cases/index',
+        text: '案例',
+        iconPath: 'assets/tab-bar/case.png',
+        selectedIconPath: 'assets/tab-bar/case-active.png'
+      },
+      {
+        pagePath: 'pages/contact/index',
+        text: '联系我们',
+        iconPath: 'assets/tab-bar/contact.png',
+        selectedIconPath: 'assets/tab-bar/contact-active.png'
+      }
+    ]
+  }
+})
+===== End of File: app.config.ts =====
+
+
+===== File: app.scss =====
+// app.scss
+@import "./styles/custom-theme.scss";
+
+// 基础样式设置
+page {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+  font-size: 28px;
+  line-height: 1.5;
+  background: $color-bg;
+  color: $color-text-base;
+}
+===== End of File: app.scss =====
+
+
+===== File: app.ts =====
+// app.tsx
+import { PropsWithChildren } from 'react'
+import { useLaunch, useError, getStorageSync, setStorageSync, onNetworkStatusChange } from '@tarojs/taro'
+import './styles/custom-theme.scss'
+import './app.scss'
+
+function App({ children }: PropsWithChildren<any>) {
+  useLaunch(() => {
+    initApp()
+  })
+
+  useError((error) => {
+    console.error('App Error:', error)
+  })
+
+  const initApp = async () => {
+    try {
+      // 初始化日志
+      const logs = getStorageSync('logs') || []
+      logs.unshift(Date.now())
+      setStorageSync('logs', logs)
+
+      // 网络状态监听
+      onNetworkStatusChange((res) => {
+        console.log('network status:', res.isConnected)
+      })
+
+    } catch (error) {
+      console.error('App initialization failed:', error)
+    }
+  }
+
+  return children
+}
+
+export default App
+===== End of File: app.ts =====
+
+
+===== File: components\booking-modal.tsx =====
+import { memo, useState, useCallback } from 'react'
+import { Button } from '@tarojs/components'
+import { AtModal, AtModalHeader, AtModalContent, AtModalAction, AtForm, AtInput } from 'taro-ui'
+import Taro from '@tarojs/taro'
+import { api } from '../services/index-api'
+import { handleError, AppError } from '../utils/error'
+import type { BookingForm, FormErrors } from '../types'
+
+interface BookingModalProps {
+  isOpen: boolean
+  onClose: () => void
+}
+
+const initialForm: BookingForm = {
+  name: '',
+  phone: '',
+  address: '',
+  remark: ''
+}
+
+export const BookingModal = memo(function BookingModal({
+  isOpen,
+  onClose
+}: BookingModalProps) {
+  const [form, setForm] = useState<BookingForm>(initialForm)
+  const [errors, setErrors] = useState<FormErrors>({})
+  const [isSubmitting, setIsSubmitting] = useState(false)
+
+  const handleFormInput = useCallback((field: keyof BookingForm, value: string) => {
+    setForm(prev => ({ ...prev, [field]: value }))
+    setErrors(prev => ({ ...prev, [field]: undefined }))
+  }, [])
+
+  const validateForm = useCallback((form: BookingForm): FormErrors => {
+    const errors: FormErrors = {}
+
+    if (!form.name?.trim()) {
+      errors.name = '请输入姓名'
+    } else if (form.name.length > 20) {
+      errors.name = '姓名不能超过20个字符'
+    }
+
+    if (!form.phone?.trim()) {
+      errors.phone = '请输入手机号'
+    } else {
+      const phoneRegex = /^1[3-9]\d{9}$/
+      if (!phoneRegex.test(form.phone)) {
+        errors.phone = '请输入正确的手机号'
+      }
+    }
+
+    if (form.address && form.address.length > 100) {
+      errors.address = '地址不能超过100个字符'
+    }
+
+    if (form.remark && form.remark.length > 200) {
+      errors.remark = '备注不能超过200个字符'
+    }
+
+    return errors
+  }, [])
+
+  const handleSubmit = async () => {
+    const formErrors = validateForm(form)
+    
+    if (Object.keys(formErrors).length > 0) {
+      setErrors(formErrors)
+      const firstError = Object.values(formErrors)[0]
+      Taro.showToast({
+        title: firstError || '请检查输入',
+        icon: 'none'
+      })
+      return
+    }
+    
+    try {
+      setIsSubmitting(true)
+      const response = await api.submitBooking(form)
+    
+      if (response.code === 0) {
+        Taro.showToast({
+          title: '预约成功',
+          icon: 'success'
+        })
+        handleClose()
+      } else {
+        throw new AppError(response.code, response.message)
+      }
+    } catch (error) {
+      console.error('预约失败:', error)
+      Taro.showToast({
+        title: handleError(error),
+        icon: 'none'
+      })
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
+  const handleClose = useCallback(() => {
+    if (!isSubmitting) {
+      setForm(initialForm)
+      setErrors({})
+      onClose()
+    }
+  }, [isSubmitting, onClose])
+
+  return (
+    <AtModal
+      isOpened={isOpen}
+      onClose={handleClose}
+    >
+      <AtModalHeader>快速预约</AtModalHeader>
+      <AtModalContent>
+        <AtForm>
+          <AtInput
+            name='name'
+            title='姓名'
+            type='text'
+            placeholder='请输入姓名'
+            value={form.name}
+            onChange={(value) => handleFormInput('name', String(value))}
+            error={!!errors.name}
+            disabled={isSubmitting}
+            maxLength={20}
+          />
+          <AtInput
+            name='phone'
+            title='电话'
+            type='phone'
+            placeholder='请输入联系电话'
+            value={form.phone}
+            onChange={(value) => handleFormInput('phone', String(value))}
+            error={!!errors.phone}
+            disabled={isSubmitting}
+            maxLength={11}
+          />
+          <AtInput
+            name='address'
+            title='地址'
+            type='text'
+            placeholder='请输入服务地址（选填）'
+            value={form.address || ''}
+            onChange={(value) => handleFormInput('address', String(value))}
+            error={!!errors.address}
+            disabled={isSubmitting}
+            maxLength={100}
+          />
+          <AtInput
+            name='remark'
+            title='备注'
+            type='text'
+            placeholder='请输入备注信息（选填）'
+            value={form.remark || ''}
+            onChange={(value) => handleFormInput('remark', String(value))}
+            error={!!errors.remark}
+            disabled={isSubmitting}
+            maxLength={200}
+          />
+        </AtForm>
+      </AtModalContent>
+      <AtModalAction>
+        <Button onClick={handleClose} disabled={isSubmitting}>
+          取消
+        </Button>
+        <Button 
+          onClick={handleSubmit} 
+          disabled={isSubmitting}
+          className={`submit-btn ${isSubmitting ? 'opacity-50' : ''}`}
+        >
+          {isSubmitting ? '提交中...' : '提交'}
+        </Button>
+      </AtModalAction>
+    </AtModal>
+  )
+})
+===== End of File: components\booking-modal.tsx =====
+
+
+===== File: components\case-detail-modal.tsx =====
+import { memo } from 'react'
+import { View, Text, Image, Button } from '@tarojs/components'
+import { AtModal, AtModalHeader, AtModalContent, AtModalAction } from 'taro-ui'
+import type { ServiceCase } from '../types'
+
+interface CaseDetailModalProps {
+  isOpen: boolean
+  onClose: () => void
+  data: ServiceCase | null
+}
+
+export const CaseDetailModal = memo(function CaseDetailModal({
+  isOpen,
+  onClose,
+  data
+}: CaseDetailModalProps) {
+  if (!data) return null
+
+  return (
+    <AtModal
+      isOpened={isOpen}
+      onClose={onClose}
+    >
+      <AtModalHeader>{data.title}</AtModalHeader>
+      <AtModalContent>
+        <View className='case-detail'>
+          <Image
+            src={data.imageUrl}
+            mode='aspectFill'
+            className='case-detail__image'
+            lazyLoad
+          />
+          <View className='case-detail__content'>
+            <Text className='case-detail__desc'>{data.description}</Text>
+            {data.content && (
+              <View className='case-detail__full-content'>{data.content}</View>
+            )}
+            <View className='case-detail__meta'>
+              <Text className='case-detail__type'>类型：{data.type}</Text>
+              <Text className='case-detail__date'>日期：{data.date}</Text>
+              <Text className='case-detail__views'>浏览：{data.views}</Text>
+            </View>
+          </View>
+        </View>
+      </AtModalContent>
+      <AtModalAction>
+        <Button onClick={onClose}>关闭</Button>
+      </AtModalAction>
+    </AtModal>
+  )
+})
+===== End of File: components\case-detail-modal.tsx =====
+
+
+===== File: components\category-tabs\index.scss =====
+// components/category-tabs/index.scss
+@import "../../styles/custom-theme.scss";
+
+.category-tabs {
+  position: sticky;
+  top: 104px;
+  z-index: 99;
+  background: $color-bg-base;
+  border-bottom: 1px solid $color-border-light;
+  
+  .at-tabs__header {
+    background: $color-bg-base;
+  }
+
+  .at-tabs__item {
+    flex: 0 0 auto;
+    min-width: 160px;
+    height: 88px;
+    color: $color-text-secondary;
+    font-size: 28px;
+    padding: 0 32px;
+    transition: all 0.3s ease;
+    
+    &--active {
+      color: $color-brand;
+      font-weight: 500;
+    }
+
+    &-underline {
+      background-color: $color-brand;
+      height: 4px;
+      border-radius: 2px;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+  }
+
+  .category-tab {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 0;
+    
+    &.active {
+      .category-icon {
+        transform: scale(1.1);
+      }
+    }
+  }
+
+  .category-icon {
+    font-size: 40px;
+    margin-bottom: 8px;
+    transition: transform 0.3s ease;
+  }
+
+  .category-title {
+    font-size: 26px;
+    line-height: 1.2;
+  }
+}
+===== End of File: components\category-tabs\index.scss =====
+
+
+===== File: components\category-tabs\index.tsx =====
+// components/category-tabs/index.tsx
+import { memo } from 'react'
+import { View } from '@tarojs/components'
+import { AtTabs } from 'taro-ui'
+import type { ServiceCategory } from '../../types'
+import './index.scss'
+
+interface CategoryTabsProps {
+  categories: ServiceCategory[]
+  current: number
+  onChange: (index: number) => void
+}
+
+export const CategoryTabs = memo(function CategoryTabs({
+  categories,
+  current,
+  onChange
+}: CategoryTabsProps) {
+  return (
+    <View className='category-tabs'>
+      <AtTabs
+        current={current}
+        tabList={categories.map(cat => ({ title: cat.title }))}
+        onClick={onChange}
+        scroll
+      >
+        {categories.map((category, index) => (
+          <View 
+            key={category.value}
+            className={`category-tab ${current === index ? 'active' : ''}`}
+          >
+            {category.icon && (
+              <View className='category-icon'>{category.icon}</View>
+            )}
+            <View className='category-title'>{category.title}</View>
+          </View>
+        ))}
+      </AtTabs>
+    </View>
+  )
+})
+===== End of File: components\category-tabs\index.tsx =====
+
+
+===== File: components\faq-section\index.scss =====
+// components/faq-section/index.scss
+@import "../../styles/custom-theme.scss";
+
+.faq-section {
+  padding: 32px 24px;
+  background: $color-bg-base;
+
+  .section-title {
+    font-size: 32px;
+    font-weight: bold;
+    color: $color-text-base;
+    margin-bottom: 24px;
+    display: block;
+  }
+
+  .faq-list {
+    .faq-item {
+      border-bottom: 1px solid $color-border-light;
+      
+      &:first-child {
+        border-top: 1px solid $color-border-light;
+      }
+
+      .at-accordion__header {
+        font-size: 28px;
+        color: $color-text-base;
+        padding: 24px 0;
+      }
+
+      .at-accordion__arrow {
+        color: $color-text-secondary;
+        transition: transform 0.3s ease;
+      }
+
+      .at-accordion__content {
+        padding: 0 0 24px;
+      }
+    }
+  }
+
+  .faq-answer {
+    font-size: 26px;
+    color: $color-text-paragraph;
+    line-height: 1.6;
+    padding: 0 32px;
+    background: $color-bg-light;
+    border-radius: 12px;
+    padding: 20px;
+
+    .faq-category {
+      display: inline-block;
+      font-size: 24px;
+      color: $color-text-secondary;
+      background: rgba($color-text-secondary, 0.1);
+      padding: 4px 12px;
+      border-radius: 16px;
+      margin-top: 16px;
+    }
+  }
+}
+===== End of File: components\faq-section\index.scss =====
+
+
+===== File: components\faq-section\index.tsx =====
+// components/faq-section/index.tsx
+import { memo, useState } from 'react'
+import { View, Text } from '@tarojs/components'
+import { AtAccordion } from 'taro-ui'
+import type { FAQ } from '../../types'
+import './index.scss'
+
+interface FAQSectionProps {
+  faqs: FAQ[]
+}
+
+export const FAQSection = memo(function FAQSection({
+  faqs
+}: FAQSectionProps) {
+  const [openId, setOpenId] = useState<number | null>(null)
+
+  return (
+    <View className='faq-section'>
+      <Text className='section-title'>常见问题</Text>
+      <View className='faq-list'>
+        {faqs.map(faq => (
+          <AtAccordion
+            key={faq.id}
+            title={faq.question}
+            open={openId === faq.id}
+            onClick={() => setOpenId(openId === faq.id ? null : faq.id)}
+            className='faq-item'
+          >
+            <View className='faq-answer'>
+              <Text>{faq.answer}</Text>
+              {faq.category && (
+                <Text className='faq-category'>{faq.category}</Text>
+              )}
+            </View>
+          </AtAccordion>
+        ))}
+      </View>
+    </View>
+  )
+})
+===== End of File: components\faq-section\index.tsx =====
+
+
+===== File: components\process-steps\index.scss =====
+// components/process-steps/index.scss
+@import "../../styles/custom-theme.scss";
+
+.process-steps {
+  .section-title {
+    font-size: 30px;
+    font-weight: bold;
+    color: $color-text-base;
+    margin-bottom: 24px;
+    display: block;
+  }
+
+  .steps-container {
+    position: relative;
+    padding: 8px 0;
+  }
+
+  .step-item {
+    display: flex;
+    align-items: flex-start;
+    position: relative;
+    padding: 16px 0;
+    
+    &:last-child {
+      .step-connector {
+        display: none;
+      }
+    }
+  }
+
+  .step-number {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: $color-brand;
+    color: #fff;
+    font-size: 28px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    position: relative;
+    z-index: 1;
+    box-shadow: 0 2px 8px rgba($color-brand, 0.2);
+  }
+
+  .step-content {
+    flex: 1;
+    padding-left: 24px;
+    padding-right: 16px;
+  }
+
+  .step-title {
+    font-size: 28px;
+    font-weight: 500;
+    color: $color-text-title;
+    margin-bottom: 8px;
+    display: block;
+  }
+
+  .step-description {
+    font-size: 26px;
+    color: $color-text-paragraph;
+    line-height: 1.5;
+  }
+
+  .step-connector {
+    position: absolute;
+    left: 24px;
+    top: 64px;
+    bottom: 0;
+    width: 2px;
+    background: linear-gradient(180deg, 
+      rgba($color-brand, 0.3) 0%,
+      rgba($color-brand, 0.1) 100%
+    );
+  }
+}
+===== End of File: components\process-steps\index.scss =====
+
+
+===== File: components\process-steps\index.tsx =====
+// components/process-steps/index.tsx
+import { memo } from 'react'
+import { View, Text } from '@tarojs/components'
+import { AtIcon } from 'taro-ui'
+import type { ProcessStep } from '../../types'
+import './index.scss'
+
+interface ProcessStepsProps {
+  steps: ProcessStep[]
+}
+
+export const ProcessSteps = memo(function ProcessSteps({
+  steps
+}: ProcessStepsProps) {
+  return (
+    <View className='process-steps'>
+      <Text className='section-title'>服务流程</Text>
+      <View className='steps-container'>
+        {steps.map((step, index) => (
+          <View key={step.step} className='step-item'>
+            <View className='step-number'>
+              <Text>{step.step}</Text>
+            </View>
+            <View className='step-content'>
+              <Text className='step-title'>{step.title}</Text>
+              <Text className='step-description'>{step.description}</Text>
+            </View>
+            {index < steps.length - 1 && (
+              <View className='step-connector' />
+            )}
+          </View>
+        ))}
+      </View>
+    </View>
+  )
+})
+===== End of File: components\process-steps\index.tsx =====
+
+
+===== File: components\search-section\index.scss =====
+// components/search-section/index.scss
+@import "../../styles/custom-theme.scss";
+
+.search-section {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  padding: 16px 24px;
+  background: $color-bg-base;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+
+  .search-input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    background: $color-bg-light;
+    border-radius: 36px;
+    padding: 0 24px;
+    height: 72px;
+    transition: all 0.3s ease;
+
+    &:focus-within {
+      background: darken($color-bg-light, 2%);
+      box-shadow: 0 0 0 2px rgba($color-brand, 0.1);
+    }
+  }
+
+  .search-icon {
+    margin-right: 12px;
+    flex-shrink: 0;
+  }
+
+  .search-input {
+    flex: 1;
+    height: 100%;
+    font-size: 28px;
+    color: $color-text-base;
+    background: transparent;
+    
+    &::placeholder {
+      color: $color-text-placeholder;
+    }
+  }
+
+  .search-loading {
+    margin-left: 12px;
+    animation: rotating 1s linear infinite;
+  }
+}
+
+@keyframes rotating {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+===== End of File: components\search-section\index.scss =====
+
+
+===== File: components\search-section\index.tsx =====
+// components/search-section/index.tsx
+import { memo } from 'react'
+import { View, Input } from '@tarojs/components'
+import { AtIcon } from 'taro-ui'
+import './index.scss'
+
+interface SearchSectionProps {
+  value: string
+  onChange: (value: string) => void
+  placeholder?: string
+  loading?: boolean
+}
+
+export const SearchSection = memo(function SearchSection({
+  value,
+  onChange,
+  placeholder = '搜索服务',
+  loading = false
+}: SearchSectionProps) {
+  return (
+    <View className='search-section'>
+      <View className='search-input-wrapper'>
+        <AtIcon 
+          value='search' 
+          size='18' 
+          color='#94a3b8'
+          className='search-icon'
+        />
+        <Input
+          className='search-input'
+          type='text'
+          value={value}
+          placeholder={placeholder}
+          onInput={e => onChange(e.detail.value)}
+          placeholderClass='search-placeholder'
+          disabled={loading}
+        />
+        {loading && (
+          <View className='search-loading'>
+            <AtIcon value='loading-2' size='18' color='#94a3b8' />
+          </View>
+        )}
+      </View>
+    </View>
+  )
+})
+===== End of File: components\search-section\index.tsx =====
+
+
+===== File: components\service-card\index.scss =====
+// components/service-card/index.scss
+@import "../../styles/custom-theme.scss";
+
+.service-card {
+  background: $color-bg-base;
+  border-radius: 16px;
+  padding: 24px;
+  margin-bottom: 24px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+  transition: all 0.3s ease;
+
+  &.expanded {
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  }
+
+  .service-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 16px;
+  }
+
+  .service-title {
+    flex: 1;
+    font-size: 32px;
+    font-weight: bold;
+    color: $color-text-base;
+    margin-right: 16px;
+
+    .warranty-tag {
+      display: inline-block;
+      font-size: 24px;
+      font-weight: normal;
+      color: $color-brand;
+      background: rgba($color-brand, 0.1);
+      padding: 4px 12px;
+      border-radius: 32px;
+      margin-left: 12px;
+    }
+  }
+
+  .service-price {
+    text-align: right;
+    white-space: nowrap;
+
+    .price {
+      font-size: 36px;
+      font-weight: bold;
+      color: $color-brand;
+    }
+
+    .unit {
+      font-size: 24px;
+      color: $color-text-secondary;
+    }
+  }
+
+  .service-features {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 16px;
+
+    .feature-tag {
+      background: rgba($color-brand, 0.1);
+      color: $color-brand;
+      border: none;
+      border-radius: 6px;
+      font-size: 24px;
+      padding: 8px 16px;
+    }
+  }
+
+  .service-description {
+    font-size: 28px;
+    color: $color-text-paragraph;
+    line-height: 1.6;
+    margin-bottom: 24px;
+  }
+
+  .service-detail {
+    margin-top: 24px;
+    padding-top: 24px;
+    border-top: 1px solid $color-border-light;
+  }
+
+  .info-section {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 24px;
+    margin-bottom: 32px;
+
+    .info-item {
+      flex: 1;
+      min-width: 200px;
+      background: $color-bg-light;
+      padding: 16px;
+      border-radius: 12px;
+
+      .label {
+        font-size: 24px;
+        color: $color-text-secondary;
+        margin-bottom: 8px;
+        display: block;
+      }
+
+      .value {
+        font-size: 28px;
+        color: $color-text-base;
+        font-weight: 500;
+      }
+    }
+  }
+
+  .booking-btn {
+    margin-top: 32px;
+    height: 88px;
+    font-size: 32px;
+    background: $color-brand;
+    border: none;
+    border-radius: 44px;
+    box-shadow: 0 4px 12px rgba($color-brand, 0.2);
+    transition: all 0.3s ease;
+
+    &:active {
+      transform: translateY(2px);
+      box-shadow: 0 2px 6px rgba($color-brand, 0.15);
+    }
+  }
+}
+===== End of File: components\service-card\index.scss =====
+
+
+===== File: components\service-card\index.tsx =====
+// components/service-card/index.tsx
+import { memo } from 'react'
+import { View, Text } from '@tarojs/components'
+import { AtButton, AtTag } from 'taro-ui'
+import type { ServiceItem } from '../../types'
+import { ProcessSteps } from '../process-steps'
+import './index.scss'
+
+interface ServiceCardProps {
+  service: ServiceItem
+  expanded: boolean
+  onToggle: (id: number) => void
+  onBook: (service: ServiceItem) => void
+}
+
+export const ServiceCard = memo(function ServiceCard({
+  service,
+  expanded,
+  onToggle,
+  onBook
+}: ServiceCardProps) {
+  return (
+    <View 
+      className={`service-card ${expanded ? 'expanded' : ''}`}
+      onClick={() => onToggle(service.id)}
+    >
+      {/* Header */}
+      <View className='service-header'>
+        <View className='service-title'>
+          <Text>{service.title}</Text>
+          {service.warranty && (
+            <Text className='warranty-tag'>{service.warranty}</Text>
+          )}
+        </View>
+        <View className='service-price'>
+          <Text className='price'>¥{service.price}</Text>
+          <Text className='unit'>/{service.unit}</Text>
+        </View>
+      </View>
+
+      {/* Features */}
+      <View className='service-features'>
+        {service.features.map((feature, index) => (
+          <AtTag 
+            key={index}
+            size='small'
+            className='feature-tag'
+          >
+            {feature}
+          </AtTag>
+        ))}
+      </View>
+
+      {/* Description */}
+      <Text className='service-description'>{service.description}</Text>
+
+      {/* Expanded Content */}
+      {expanded && (
+        <View className='service-detail'>
+          {/* Service Info */}
+          <View className='info-section'>
+            {service.estimatedDuration && (
+              <View className='info-item'>
+                <Text className='label'>预计工期</Text>
+                <Text className='value'>{service.estimatedDuration}</Text>
+              </View>
+            )}
+            {service.minArea && service.maxArea && (
+              <View className='info-item'>
+                <Text className='label'>适用面积</Text>
+                <Text className='value'>
+                  {service.minArea}-{service.maxArea}㎡
+                </Text>
+              </View>
+            )}
+          </View>
+
+          {/* Process Steps */}
+          <ProcessSteps steps={service.process} />
+
+          {/* Booking Button */}
+          <AtButton
+            type='primary'
+            className='booking-btn'
+            onClick={(e) => {
+              e.stopPropagation()
+              onBook(service)
+            }}
+          >
+            立即预约
+          </AtButton>
+        </View>
+      )}
+    </View>
+  )
+})
+===== End of File: components\service-card\index.tsx =====
+
+
+===== File: config\index.ts =====
+import type { Config } from '../types'
+
+export const config: Config = {
+    ui: {
+      banner: {
+        interval: 3000,
+        duration: 500
+      },
+      cases: {
+        interval: 4000,
+        duration: 500,
+        displayCount: 0,
+        cardHeight: 0
+      }
+    },
+    contact: {
+      phone: '400-888-8888',
+      wechat: 'waterproof888'
+    }
+}
+===== End of File: config\index.ts =====
+
+
+===== File: index.html =====
+<!-- @ts-nocheck -->
+<!DOCTYPE html>
+<html>
+<head>
+  <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+  <meta content="width=device-width,initial-scale=1,user-scalable=no" name="viewport">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-touch-fullscreen" content="yes">
+  <meta name="format-detection" content="telephone=no,address=no">
+  <meta name="apple-mobile-web-app-status-bar-style" content="white">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>waterproof-app</title>
+  <script><%= htmlWebpackPlugin.options.script %></script>
+</head>
+<body>
+  <div id="app"></div>
+</body>
+</html>
+===== End of File: index.html =====
+
+
+===== File: pages\cases\index.config.ts =====
+// pages/cases/index.config.ts
+export default {
+    navigationBarTitleText: '工程案例'
+  }
+===== End of File: pages\cases\index.config.ts =====
+
+
+===== File: pages\cases\index.scss =====
+
+===== End of File: pages\cases\index.scss =====
+
+
+===== File: pages\cases\index.tsx =====
+// pages/contact/index.tsx
+import { View } from '@tarojs/components'
+import { useState } from 'react'
+import './index.scss'
+
+export default function Contact() {
+  const [loading, setLoading] = useState(false)
+
+  return (
+    <View className='contact'>
+      {/* 表单区域 */}
+      <View className='form-section'>
+      </View>
+
+      {/* 联系信息 */}
+      <View className='contact-info'>
+      </View>
+    </View>
+  )
+}
+===== End of File: pages\cases\index.tsx =====
+
+
+===== File: pages\contact\index.config.ts =====
+// pages/contact/index.config.ts 
+export default {
+    navigationBarTitleText: '联系我们'
+  }
+===== End of File: pages\contact\index.config.ts =====
+
+
+===== File: pages\contact\index.scss =====
+
+===== End of File: pages\contact\index.scss =====
+
+
+===== File: pages\contact\index.tsx =====
+// pages/cases/index.tsx
+import { View } from '@tarojs/components'
+import { useState } from 'react'
+import './index.scss'
+
+export default function Cases() {
+  const [loading, setLoading] = useState(false)
+
+  return (
+    <View className='cases'>
+      {/* 搜索区域 */}
+      <View className='search-section'>
+      </View>
+
+      {/* 分类筛选 */}
+      <View className='filter-section'>
+      </View>
+
+      {/* 案例列表 */}
+      <View className='case-list'>
+      </View>
+    </View>
+  )
+}
+===== End of File: pages\contact\index.tsx =====
+
+
+===== File: pages\index\index.config.ts =====
+// pages/index/index.config.ts
+export default {
+  navigationBarTitleText: '防水服务',
+  enablePullDownRefresh: true,
+  backgroundColor: '#f5f5f5',
+  backgroundTextStyle: 'dark',
+  navigationBarBackgroundColor: '#ffffff',
+  navigationBarTextStyle: 'black'
+}
+===== End of File: pages\index\index.config.ts =====
+
+
+===== File: pages\index\index.scss =====
+@import "../../styles/custom-theme.scss";
+
+.index {
+  min-height: 100vh;
+  background: $color-bg;
+  
+  // Loading & Error States
+  .loading,
+  .error {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 24px;
+    color: $color-text-secondary;
+    
+    .at-button {
+      width: 240px;
+    }
+  }
+
+  // Content Container
+  .content-container {
+    padding: 0 24px;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding-bottom: 40px;
+  }
+
+  // Banner Section
+  .banner {
+    height: 400px;
+    position: relative;
+    margin-bottom: 32px;
+    overflow: hidden;
+
+    .banner-item {
+      width: 100%;
+      height: 100%;
+    }
+
+    &-image {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    &-text {
+      position: absolute;
+      bottom: 48px;
+      left: 24px;
+      right: 24px;
+      z-index: 1;
+      color: #fff;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+      padding: 0 16px;
+      
+      &::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: -48px;
+        height: 150%;
+        background: linear-gradient(to top, rgba(0,0,0,0.7), transparent);
+        z-index: -1;
+      }
+    }
+
+    &-title {
+      font-size: 44px;
+      font-weight: bold;
+      margin-bottom: 16px;
+      line-height: 1.2;
+    }
+
+    &-subtitle {
+      font-size: 32px;
+      opacity: 0.95;
+      line-height: 1.4;
+    }
+  }
+
+  // Card Base Styles
+  .card {
+    background: $color-bg-base;
+    border-radius: 20px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+    padding: 32px;
+    margin-bottom: 32px;
+
+    &-title {
+      font-size: 36px;
+      font-weight: bold;
+      margin-bottom: 24px;
+      color: $color-text-base;
+      padding-bottom: 20px;
+      border-bottom: 1px solid $color-border-light;
+    }
+  }
+
+  // Service Introduction
+  .service-intro {
+    .btn-group {
+      display: flex;
+      gap: 24px;
+      margin-top: 32px;
+
+      .at-button {
+        flex: 1;
+        height: 96px;
+        font-size: 32px;
+        border-radius: 12px;
+
+        &--primary {
+          background: $color-brand;
+          box-shadow: 0 4px 12px rgba($color-brand, 0.2);
+          transition: all 0.3s ease;
+
+          &:active {
+            transform: translateY(2px);
+            box-shadow: 0 2px 6px rgba($color-brand, 0.15);
+          }
+        }
+
+        &--secondary {
+          background: rgba($color-brand, 0.1);
+          color: $color-brand;
+          border: 2px solid $color-brand;
+          transition: all 0.3s ease;
+
+          &:active {
+            background: rgba($color-brand, 0.15);
+            transform: translateY(2px);
+          }
+        }
+      }
+    }
+  }
+
+  // Cases Section
+  .cases {
+    .case-swiper {
+      height: 460px;
+      padding: 20px 0 40px;
+      box-sizing: border-box;
+      position: relative;
+    }
+
+    .case-item {
+      height: 400px;
+      margin: 0 12px;
+      background: $color-bg-base;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      transform: scale(0.9);
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      will-change: transform;
+
+      &::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.45);
+        opacity: 1;
+        transition: opacity 0.3s ease;
+        pointer-events: none;
+        z-index: 1;
+      }
+
+      &.active {
+        transform: scale(1);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
+        
+        &::after {
+          opacity: 0;
+        }
+      }
+    }
+
+    .case-image {
+      width: 100%;
+      height: 240px;
+      object-fit: cover;
+      flex-shrink: 0;
+      transform: translateZ(0);
+    }
+
+    .case-content {
+      flex: 1;
+      min-height: 0;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      background:  $color-bg-base;
+      position: relative;
+      border-top: 1px solid rgba(0, 0, 0, 0.06);
+      z-index: 2;
+    }
+
+    .case-title {
+      font-size: 28px;
+      font-weight: 600;
+      color: $color-text-title;
+      line-height: 1.4;
+      margin-bottom: 12px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+    }
+
+    .case-desc {
+      font-size: 26px;
+      color: $color-text-paragraph;
+      line-height: 1.5;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+    }
+  }
+
+  // Advantages Section
+  .advantages {
+    .advantage-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 24px;
+      margin-bottom: 40px;
+
+      @media screen and (min-width: 768px) {
+        grid-template-columns: repeat(4, 1fr);
+      }
+    }
+
+    .advantage-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      padding: 32px 24px;
+      background: $color-bg-light;
+      border-radius: 16px;
+      transition: all 0.3s ease;
+
+      &:hover {
+        transform: translateY(-4px);
+        background: lighten($color-brand, 45%);
+
+        .advantage-icon {
+          transform: scale(1.1);
+        }
+      }
+    }
+
+    .advantage-icon {
+      font-size: 56px;
+      margin-bottom: 20px;
+      transition: transform 0.3s ease;
+    }
+
+    .advantage-value {
+      font-size: 40px;
+      font-weight: bold;
+      color: $color-brand;
+      margin-bottom: 12px;
+      line-height: 1.2;
+    }
+
+    .advantage-label {
+      font-size: 28px;
+      color: $color-text-secondary;
+      line-height: 1.4;
+    }
+
+    .book-btn {
+      width: 100%;
+      height: 96px;
+      font-size: 32px;
+      margin-top: 32px;
+      background: $color-brand;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba($color-brand, 0.2);
+      transition: all 0.3s ease;
+
+      &:active {
+        transform: translateY(2px);
+        box-shadow: 0 2px 6px rgba($color-brand, 0.15);
+      }
+    }
+  }
+}
+
+// Small Screen Adaptations
+@media screen and (max-width: 375px) {
+  .index {
+    .content-container {
+      padding: 0 16px;
+    }
+
+    .banner {
+      height: 360px;
+
+      &-title {
+        font-size: 40px;
+      }
+
+      &-subtitle {
+        font-size: 28px;
+      }
+    }
+
+    .card {
+      padding: 24px;
+
+      &-title {
+        font-size: 32px;
+        margin-bottom: 20px;
+      }
+    }
+
+    .advantages {
+      .advantage-icon {
+        font-size: 48px;
+      }
+
+      .advantage-value {
+        font-size: 36px;
+      }
+
+      .advantage-label {
+        font-size: 26px;
+      }
+    }
+  }
+}
+===== End of File: pages\index\index.scss =====
+
+
+===== File: pages\index\index.tsx =====
+import { useEffect, useState, useCallback, useRef } from 'react'
+import { View, Text, Image, Swiper, SwiperItem } from '@tarojs/components'
+import type { SwiperProps } from '@tarojs/components'
+import { AtButton } from 'taro-ui'
+import Taro, { useDidShow } from '@tarojs/taro'
+import { api } from '../../services/index-api'
+import { config } from '../../config'
+import { handleError } from '../../utils/error'
+import { CaseDetailModal } from '../../components/case-detail-modal'
+import { BookingModal } from '../../components/booking-modal'
+import type { Banner, ServiceCase, ServiceAdvantage } from '../../types'
+import './index.scss'
+
+export default function Index() {
+  // State
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const [banners, setBanners] = useState<Banner[]>([])
+  const [cases, setCases] = useState<ServiceCase[]>([])
+  const [advantages, setAdvantages] = useState<ServiceAdvantage[]>([])
+  const [selectedCase, setSelectedCase] = useState<ServiceCase | null>(null)
+  const [showCaseModal, setShowCaseModal] = useState(false)
+  const [showBookingModal, setShowBookingModal] = useState(false)
+  const [currentCaseIndex, setCurrentCaseIndex] = useState(0)
+
+  // Refs for lifecycle management
+  const refreshing = useRef(false)
+  const mounted = useRef(false)
+
+  // 数据获取
+  const fetchData = useCallback(async (showLoading = true) => {
+    try {
+      if (showLoading) {
+        setLoading(true)
+      }
+      setError(null)
+
+      const results = await Promise.allSettled([
+        api.getBanners(),
+        api.getCases(),
+        api.getAdvantages()
+      ])
+
+      const errors = results
+        .filter((result): result is PromiseRejectedResult => result.status === 'rejected')
+        .map(result => result.reason)
+
+      if (errors.length > 0) {
+        console.error('数据加载错误:', errors)
+        throw new Error('部分数据加载失败')
+      }
+
+      const [bannerResult, caseResult, advantageResult] = results as PromiseFulfilledResult<any>[]
+
+      if (mounted.current) {
+        setBanners(bannerResult.value.data)
+        setCases(caseResult.value.data)
+        setAdvantages(advantageResult.value.data)
+      }
+    } catch (err) {
+      console.error('初始化数据失败:', err)
+      if (mounted.current) {
+        setError(handleError(err))
+      }
+    } finally {
+      if (showLoading && mounted.current) {
+        setLoading(false)
+      }
+      refreshing.current = false
+    }
+  }, [])
+
+  // Lifecycle
+  useEffect(() => {
+    mounted.current = true
+    fetchData()
+    return () => {
+      mounted.current = false
+    }
+  }, [fetchData])
+
+  useDidShow(() => {
+    if (!refreshing.current) {
+      fetchData(false)
+    }
+  })
+
+  // Event handlers
+  const handleRefresh = useCallback(async () => {
+    if (refreshing.current) return
+    refreshing.current = true
+    
+    try {
+      Taro.startPullDownRefresh()
+      await fetchData(false)
+      
+      Taro.showToast({
+        title: '刷新成功',
+        icon: 'success',
+        duration: 1500
+      })
+    } catch (error) {
+      console.error('刷新失败:', error)
+      Taro.showToast({
+        title: handleError(error),
+        icon: 'none',
+        duration: 2000
+      })
+    } finally {
+      Taro.stopPullDownRefresh()
+    }
+  }, [fetchData])
+
+  const handleCall = useCallback(() => {
+    Taro.makePhoneCall({
+      phoneNumber: config.contact.phone,
+      success: () => {
+        console.log('电话拨打成功')
+      },
+      fail: (err) => {
+        if (err.errMsg.includes('cancel')) return
+        
+        Taro.showToast({
+          title: '拨号失败，请稍后重试',
+          icon: 'none'
+        })
+      }
+    })
+  }, [])
+
+  const handleWechat = useCallback(() => {
+    try {
+      Taro.setClipboardData({
+        data: config.contact.wechat,
+        success: () => {
+          Taro.showToast({
+            title: '微信号已复制，请打开微信添加',
+            icon: 'none',
+            duration: 2500
+          })
+        },
+        fail: () => {
+          Taro.showToast({
+            title: '复制失败，请稍后重试',
+            icon: 'none'
+          })
+        }
+      })
+    } catch (error) {
+      console.error('复制异常:', error)
+      Taro.showToast({
+        title: handleError(error),
+        icon: 'none'
+      })
+    }
+  }, [])
+
+  const handleCaseClick = useCallback(async (caseItem: ServiceCase) => {
+    try {
+      setShowCaseModal(true)
+      const response = await api.getCaseDetail(caseItem.id)
+      if (mounted.current) {
+        setSelectedCase(response.data)
+      }
+    } catch (error) {
+      console.error('获取案例详情失败:', error)
+      Taro.showToast({
+        title: handleError(error),
+        icon: 'none'
+      })
+      setShowCaseModal(false)
+    }
+  }, [mounted])
+
+  const handleBooking = useCallback(() => {
+    setShowBookingModal(true)
+  }, [])
+
+  const handleCaseChange: SwiperProps['onChange'] = useCallback((e) => {
+    setCurrentCaseIndex(e.detail.current)
+  }, [])
+
+  // Loading state
+  if (loading) {
+    return (
+      <View className='loading'>
+        <Text>加载中...</Text>
+      </View>
+    )
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <View className='error'>
+        <Text>{error}</Text>
+        <AtButton type='primary' onClick={handleRefresh}>重试</AtButton>
+      </View>
+    )
+  }
+
+  return (
+    <View className='index'>
+      {/* Banner */}
+      <Swiper
+        className='banner'
+        circular
+        indicatorDots
+        autoplay
+        indicatorColor='rgba(255,255,255,0.6)'
+        indicatorActiveColor='#ffffff'
+        interval={config.ui.banner.interval}
+        duration={config.ui.banner.duration}
+      >
+        {banners.map(banner => (
+          <SwiperItem key={banner.id} className='banner-item'>
+            <Image 
+              src={banner.imageUrl}
+              className='banner-image'
+              mode='aspectFill'
+              lazyLoad
+            />
+            <View className='banner-text'>
+              <Text className='banner-title'>{banner.title}</Text>
+              <Text className='banner-subtitle'>{banner.subtitle}</Text>
+            </View>
+          </SwiperItem>
+        ))}
+      </Swiper>
+
+      <View className='content-container'>
+        {/* Service Introduction */}
+        <View className='service-intro card'>
+          <View className='card-title'>专业防水服务</View>
+          <View className='btn-group'>
+            <AtButton type='primary' onClick={handleCall}>电话咨询</AtButton>
+            <AtButton type='secondary' onClick={handleWechat}>微信咨询</AtButton>
+          </View>
+        </View>
+
+        {/* Cases */}
+        <View className='cases card'>
+          <View className='card-title'>精选案例</View>
+          <Swiper
+            className='case-swiper'
+            circular
+            autoplay={!showCaseModal}
+            interval={config.ui.cases.interval}
+            duration={400}
+            easingFunction='easeInOutCubic'
+            previousMargin='30px'
+            nextMargin='30px'
+            snapToEdge
+            onChange={handleCaseChange}
+          >
+            {cases.map((item, index) => (
+              <SwiperItem key={item.id}>
+                <View 
+                  className={`case-item ${index === currentCaseIndex ? 'active' : ''}`}
+                  onClick={() => handleCaseClick(item)}
+                >
+                  <Image 
+                    src={item.imageUrl}
+                    className='case-image'
+                    mode='aspectFill'
+                    lazyLoad
+                  />
+                  <View className='case-content'>
+                    <Text className='case-title'>{item.title}</Text>
+                    <Text className='case-desc'>{item.description}</Text>
+                  </View>
+                </View>
+              </SwiperItem>
+            ))}
+          </Swiper>
+        </View>
+
+        {/* Advantages */}
+        <View className='advantages card'>
+          <View className='card-title'>我们的优势</View>
+          <View className='advantage-grid'>
+            {advantages.map(item => (
+              <View key={item.id} className='advantage-item'>
+                <Text className='advantage-icon'>{item.icon}</Text>
+                <Text className='advantage-value'>{item.value}</Text>
+                <Text className='advantage-label'>{item.label}</Text>
+              </View>
+            ))}
+          </View>
+          <AtButton 
+            type='primary' 
+            className='book-btn'
+            onClick={handleBooking}
+          >
+            快速预约
+          </AtButton>
+        </View>
+      </View>
+
+      {/* Modals */}
+      <CaseDetailModal
+        isOpen={showCaseModal}
+        onClose={() => setShowCaseModal(false)}
+        data={selectedCase}
+      />
+      <BookingModal
+        isOpen={showBookingModal}
+        onClose={() => setShowBookingModal(false)}
+      />
+    </View>
+  )
+}
+===== End of File: pages\index\index.tsx =====
+
+
+===== File: pages\project\index.config.ts =====
+// pages/project/index.config.ts
+export default {
+    navigationBarTitleText: '服务项目'
+  }
+===== End of File: pages\project\index.config.ts =====
+
+
+===== File: pages\project\index.scss =====
+// pages/project/index.scss
+@import "../../styles/custom-theme.scss";
+
+.project {
+  min-height: 100vh;
+  background: $color-bg;
+  padding-bottom: env(safe-area-inset-bottom);
+  
+  // 内容区域
+  .content {
+    padding: 24px;
+    padding-top: 180px; // 为固定定位的头部留出空间
+  }
+
+  // 错误状态
+  .error-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 48px 24px;
+    
+    .error-message {
+      font-size: 28px;
+      color: $color-text-secondary;
+      margin-bottom: 24px;
+      text-align: center;
+    }
+
+    .at-button {
+      width: 240px;
+    }
+  }
+
+  // 空状态
+  .empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 48px 24px;
+    color: $color-text-secondary;
+    font-size: 28px;
+  }
+
+  // 服务列表动画
+  .service-list {
+    .service-card {
+      opacity: 0;
+      transform: translateY(20px);
+      animation: slideIn 0.3s ease forwards;
+
+      @for $i from 1 through 10 {
+        &:nth-child(#{$i}) {
+          animation-delay: #{$i * 0.1}s;
+        }
+      }
+    }
+  }
+}
+
+// 入场动画
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// 加载动画
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+// 展开/收起动画
+.service-detail {
+  overflow: hidden;
+  transition: max-height 0.3s ease-in-out;
+  max-height: 0;
+
+  &.expanded {
+    max-height: 2000px; // 根据实际内容调整
+  }
+}
+
+// 淡入动画
+.fade-in {
+  opacity: 0;
+  animation: fadeIn 0.3s ease forwards;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+// 下拉刷新动画
+.refreshing {
+  .service-list {
+    opacity: 0.5;
+    transition: opacity 0.3s ease;
+  }
+}
+
+// 搜索动画
+.search-section {
+  &.searching {
+    .search-icon {
+      animation: spin 1s linear infinite;
+    }
+  }
+}
+
+// 切换分类动画
+.category-tabs {
+  .category-tab {
+    transition: transform 0.3s ease;
+    
+    &.active {
+      transform: scale(1.05);
+    }
+  }
+}
+
+// 响应式适配
+@media screen and (max-width: 375px) {
+  .project {
+    .content {
+      padding: 16px;
+      padding-top: 160px;
+    }
+  }
+}
+===== End of File: pages\project\index.scss =====
+
+
+===== File: pages\project\index.tsx =====
+// pages/project/index.tsx
+import { useEffect, useState, useCallback, useRef } from 'react'
+import { View, Text } from '@tarojs/components'
+import Taro, { useDidShow } from '@tarojs/taro'
+import { AtButton } from 'taro-ui'
+import { SearchSection } from '../../components/search-section'
+import { CategoryTabs } from '../../components/category-tabs'
+import { ServiceCard } from '../../components/service-card'
+import { FAQSection } from '../../components/faq-section'
+import { BookingModal } from '../../components/booking-modal'
+import { projectApi } from '../../services/project-api'
+import { handleError } from '../../utils/error'
+import type { ServiceItem, ServiceCategory, FAQ, ServiceType } from '../../types'
+import './index.scss'
+
+const SERVICE_CATEGORIES: ServiceCategory[] = [
+  { title: '全部', value: 'all' },
+  { title: '家庭防水', value: 'home' },
+  { title: '室外防水', value: 'outdoor' },
+  { title: '工业防水', value: 'industrial' }
+]
+
+export default function Project() {
+  // 状态定义
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [services, setServices] = useState<ServiceItem[]>([])
+  const [faqs, setFaqs] = useState<FAQ[]>([])
+  const [searchText, setSearchText] = useState('')
+  const [currentTab, setCurrentTab] = useState(0)
+  const [expandedService, setExpandedService] = useState<number | null>(null)
+  const [showBookingModal, setShowBookingModal] = useState(false)
+  const [selectedService, setSelectedService] = useState<ServiceItem | null>(null)
+
+  // Refs
+  const searchTimer = useRef<NodeJS.Timeout>()
+  const mounted = useRef(false)
+
+  // 加载数据
+  const loadData = useCallback(async (showLoading = true) => {
+    try {
+      if (showLoading) {
+        setLoading(true)
+      }
+      setError(null)
+
+      const type = SERVICE_CATEGORIES[currentTab].value
+      const [servicesData, faqsData] = await Promise.all([
+        searchText 
+          ? projectApi.searchServices(searchText)
+          : projectApi.getServicesByType(type),
+        projectApi.getFaqs()
+      ])
+
+      if (mounted.current) {
+        setServices(servicesData.data)
+        setFaqs(faqsData.data)
+      }
+    } catch (err) {
+      console.error('加载数据失败:', err)
+      if (mounted.current) {
+        setError(handleError(err))
+      }
+    } finally {
+      if (mounted.current) {
+        setLoading(false)
+      }
+    }
+  }, [currentTab, searchText])
+
+  // 生命周期
+  useEffect(() => {
+    mounted.current = true
+    loadData()
+    return () => {
+      mounted.current = false
+      if (searchTimer.current) {
+        clearTimeout(searchTimer.current)
+      }
+    }
+  }, [loadData])
+
+  useDidShow(() => {
+    if (!loading) {
+      loadData()
+    }
+  })
+
+  // 下拉刷新处理
+  const handlePullDownRefresh = useCallback(async () => {
+    Taro.startPullDownRefresh()
+    try {
+      await loadData(false)
+    } finally {
+      Taro.stopPullDownRefresh()
+    }
+  }, [loadData])
+
+  // 搜索处理
+  const handleSearch = useCallback((value: string) => {
+    setSearchText(value)
+    if (searchTimer.current) {
+      clearTimeout(searchTimer.current)
+    }
+
+    searchTimer.current = setTimeout(() => {
+      loadData()
+    }, 500)
+  }, [loadData])
+
+  // 分类切换处理
+  const handleTabChange = useCallback((index: number) => {
+    setCurrentTab(index)
+    setExpandedService(null)
+    setSearchText('')
+    loadData()
+  }, [loadData])
+
+  // 展开/收起处理
+  const handleServiceExpand = useCallback((serviceId: number) => {
+    setExpandedService(prev => prev === serviceId ? null : serviceId)
+  }, [])
+
+  // 预约处理
+  const handleBooking = useCallback((service: ServiceItem) => {
+    setSelectedService(service)
+    setShowBookingModal(true)
+  }, [])
+
+  // 错误状态
+  if (error) {
+    return (
+      <View className='error-state'>
+        <Text className='error-message'>{error}</Text>
+        <AtButton type='primary' onClick={() => loadData()}>重试</AtButton>
+      </View>
+    )
+  }
+
+  // 主页面渲染
+  return (
+    <View className='project'>
+      <SearchSection
+        value={searchText}
+        onChange={handleSearch}
+        loading={loading}
+      />
+
+      <CategoryTabs
+        categories={SERVICE_CATEGORIES}
+        current={currentTab}
+        onChange={handleTabChange}
+      />
+
+      <View className='service-list'>
+        {services.map(service => (
+          <ServiceCard
+            key={service.id}
+            service={service}
+            expanded={expandedService === service.id}
+            onToggle={handleServiceExpand}
+            onBook={handleBooking}
+          />
+        ))}
+        {!loading && services.length === 0 && (
+          <View className='empty-state'>
+            <Text>没有找到相关服务</Text>
+          </View>
+        )}
+      </View>
+
+      {/* FAQ部分 */}
+      <FAQSection faqs={faqs} />
+
+      {/* 预约弹窗 */}
+      <BookingModal
+        isOpen={showBookingModal}
+        onClose={() => {
+          setShowBookingModal(false)
+          setSelectedService(null)
+        }}
+        // service={selectedService}
+      />
+    </View>
+  )
+}
+===== End of File: pages\project\index.tsx =====
+
+
+===== File: services\index-api.ts =====
+import type { Banner, ServiceCase, ServiceAdvantage, BookingForm, ApiResponse } from '../types'
+import { AppError } from '../utils/error'
+import { mockBanners, mockCases, mockAdvantages } from './index-mock-data'
+
+async function mockRequest<T>(data: T, delay = 500): Promise<T> {
+  await new Promise(resolve => setTimeout(resolve, delay))
+  return data
+}
+
+export const api = {
+  getBanners(): Promise<ApiResponse<Banner[]>> {
+    return mockRequest({ code: 0, message: 'success', data: mockBanners })
+  },
+
+  getCases(): Promise<ApiResponse<ServiceCase[]>> {
+    return mockRequest({ code: 0, message: 'success', data: mockCases })
+  },
+
+  getCaseDetail(id: number): Promise<ApiResponse<ServiceCase>> {
+    const caseItem = mockCases.find(item => item.id === id)
+    if (!caseItem) {
+      throw new AppError(404, '案例不存在')
+    }
+    return mockRequest({ code: 0, message: 'success', data: caseItem })
+  },
+
+  getAdvantages(): Promise<ApiResponse<ServiceAdvantage[]>> {
+    return mockRequest({ code: 0, message: 'success', data: mockAdvantages })
+  },
+
+  async submitBooking(form: BookingForm): Promise<ApiResponse<{ id: number }>> {
+    // Validate required fields
+    if (!form.name?.trim()) {
+      throw new AppError(400, '请输入姓名')
+    }
+    if (!form.phone?.trim()) {
+      throw new AppError(400, '请输入手机号')
+    }
+
+    // Validate phone format
+    const phoneRegex = /^1[3-9]\d{9}$/
+    if (!phoneRegex.test(form.phone)) {
+      throw new AppError(400, '请输入正确的手机号')
+    }
+
+    // Validate field lengths
+    if (form.name.length > 20) {
+      throw new AppError(400, '姓名不能超过20个字符')
+    }
+    if (form.address && form.address.length > 100) {
+      throw new AppError(400, '地址不能超过100个字符')
+    }
+    if (form.remark && form.remark.length > 200) {
+      throw new AppError(400, '备注不能超过200个字符')
+    }
+
+    // Simulate API call
+    return mockRequest({ 
+      code: 0, 
+      message: 'success', 
+      data: { id: Date.now() } 
+    }, 1000)
+  }
+}
+===== End of File: services\index-api.ts =====
+
+
+===== File: services\index-mock-data.ts =====
+import type { Banner, ServiceCase, ServiceAdvantage } from '../types'
+
+export const mockBanners: Banner[] = [
+  {
+    id: 1,
+    title: '品质服务保障',
+    subtitle: '十年质保 终身维护',
+    imageUrl: require('../assets/banner/banner1.png')
+  },
+  {
+    id: 2,
+    title: '专业防水服务',
+    subtitle: '一站式解决您的渗漏问题',
+    imageUrl: require('../assets/banner/banner2.png')
+  }
+]
+
+export const mockCases: ServiceCase[] = [
+  {
+    id: 1,
+    title: '地铁站防水工程',
+    description: '为北京新建地铁站提供防水保护',
+    imageUrl: require('../assets/case/case1.png'),
+    content: '本项目是为北京市政新建地铁站提供的整体防水解决方案。采用了最新的防水材料和工艺，确保地铁站在使用寿命内不会出现渗漏问题。项目包括防水设计、材料选型、施工和验收等全过程服务。',
+    type: '基础设施',
+    date: '2024-01-06',
+    views: 1280
+  },
+  {
+    id: 2,
+    title: '商业建筑防水工程',
+    description: '为上海某商业建筑提供全面防水解决方案',
+    imageUrl: require('../assets/case/case2.png'),
+    content: '该项目是为上海某大型商业综合体提供的防水维护服务。主要解决了建筑外墙渗水、地下车库渗漏等问题。采用了环保型防水材料，确保了防水效果的同时也保护了环境。',
+    type: '商业建筑',
+    date: '2024-01-05',
+    views: 960
+  },
+  {
+    id: 3,
+    title: '住宅小区防水工程',
+    description: '为广州某高档住宅小区提供屋面防水服务',
+    imageUrl: require('../assets/case/case2.png'),
+    content: '本项目为广州某高档住宅小区提供整体屋面防水服务。采用了先进的防水技术和材料，解决了房屋渗漏问题，提高了居民的生活质量。项目获得了业主的一致好评。',
+    type: '住宅建筑',
+    date: '2024-01-04',
+    views: 756
+  }
+]
+
+export const mockAdvantages: ServiceAdvantage[] = [
+  {
+    id: 1,
+    icon: '🏅',
+    value: '100+',
+    label: '专业认证'
+  },
+  {
+    id: 2,
+    icon: '⏱️',
+    value: '30分钟',
+    label: '快速响应'
+  },
+  {
+    id: 3,
+    icon: '📊',
+    value: '1000+',
+    label: '成功案例'
+  },
+  {
+    id: 4,
+    icon: '😊',
+    value: '99%',
+    label: '客户满意'
+  }
+]
+===== End of File: services\index-mock-data.ts =====
+
+
+===== File: services\project-api.ts =====
+// services/project-api.ts
+import type { ServiceItem, FAQ, ServiceType, ApiResponse } from '../types'
+import { AppError } from '../utils/error'
+import { mockServices, mockFaqs } from './project-mock-data'
+
+async function mockRequest<T>(data: T): Promise<ApiResponse<T>> {
+  await new Promise(resolve => setTimeout(resolve, 500))
+  return {
+    code: 0,
+    message: 'success',
+    data
+  }
+}
+
+export const projectApi = {
+  // 服务相关
+  getServices(): Promise<ApiResponse<ServiceItem[]>> {
+    return mockRequest(mockServices)
+  },
+
+  getServiceDetail(id: number): Promise<ApiResponse<ServiceItem>> {
+    const service = mockServices.find(s => s.id === id)
+    if (!service) {
+      throw new AppError(404, '服务不存在')
+    }
+    return mockRequest(service)
+  },
+
+  getServicesByType(type: ServiceType): Promise<ApiResponse<ServiceItem[]>> {
+    const filtered = type === 'all'
+      ? mockServices
+      : mockServices.filter(service => service.type === type)
+    return mockRequest(filtered)
+  },
+
+  searchServices(keyword: string): Promise<ApiResponse<ServiceItem[]>> {
+    const filtered = mockServices.filter(service =>
+      service.title.includes(keyword) ||
+      service.description.includes(keyword)
+    )
+    return mockRequest(filtered)
+  },
+
+  // FAQ相关
+  getFaqs(): Promise<ApiResponse<FAQ[]>> {
+    return mockRequest(mockFaqs)
+  }
+}
+===== End of File: services\project-api.ts =====
+
+
+===== File: services\project-mock-data.ts =====
+// services/mock-data.ts
+import type { Banner, ServiceCase, ServiceAdvantage, ServiceType, ServiceItem, FAQ } from '../types'
+
+export const mockBanners: Banner[] = [
+  {
+    id: 1,
+    title: '品质服务保障',
+    subtitle: '十年质保 终身维护',
+    imageUrl: 'path/to/banner1.jpg'
+  },
+  {
+    id: 2,
+    title: '专业防水服务',
+    subtitle: '一站式解决您的渗漏问题',
+    imageUrl: 'path/to/banner2.jpg'
+  }
+]
+
+export const mockCases: ServiceCase[] = [
+  {
+    id: 1,
+    title: '地铁站防水工程',
+    description: '为北京新建地铁站提供防水保护',
+    imageUrl: 'path/to/case1.jpg',
+    type: '基础设施',
+    date: '2024-01-06',
+    views: 1280,
+    content: '本项目是为北京市政新建地铁站提供的整体防水解决方案。'
+  }
+]
+
+export const mockServices: ServiceItem[] = [
+  {
+    id: 1,
+    title: '卫生间防水',
+    price: 100,
+    unit: '平米起',
+    type: 'home' as ServiceType,
+    description: '专业卫生间防水施工，解决渗漏问题',
+    features: ['耐候耐磨', '持久防护', '无缝施工'],
+    process: [
+      { step: 1, title: '问题诊断', description: '专业检测漏水原因' },
+      { step: 2, title: '制定方案', description: '根据具体情况定制解决方案' },
+      { step: 3, title: '规范施工', description: '按标准流程进行施工' },
+      { step: 4, title: '成效检验', description: '严格验收确保效果' }
+    ],
+    estimatedDuration: '1-2天',
+    minArea: 1,
+    maxArea: 20,
+    warranty: '十年质保'
+  },
+  {
+    id: 2,
+    title: '外墙防水',
+    price: 150,
+    unit: '平米起',
+    type: 'outdoor' as ServiceType,
+    description: '高层外墙防水补漏服务',
+    features: ['高空作业', '全面防护', '抗老化'],
+    process: [
+      { step: 1, title: '外墙检查', description: '专业评估渗漏点' },
+      { step: 2, title: '方案制定', description: '针对性解决方案' },
+      { step: 3, title: '防水施工', description: '专业团队施工' },
+      { step: 4, title: '效果检测', description: '全面验收' }
+    ],
+    estimatedDuration: '3-5天',
+    minArea: 50,
+    maxArea: 1000,
+    warranty: '三年质保'
+  }
+]
+
+export const mockAdvantages: ServiceAdvantage[] = [
+  {
+    id: 1,
+    icon: '🏅',
+    value: '100+',
+    label: '专业认证'
+  },
+  {
+    id: 2,
+    icon: '⏱️',
+    value: '30分钟',
+    label: '快速响应'
+  }
+]
+
+export const mockFaqs: FAQ[] = [
+  {
+    id: 1,
+    question: '防水工程需要多久才能完工？',
+    answer: '工期取决于面积和施工难度，一般小面积(20㎡内)1-2天，大面积3-7天。',
+    category: '施工周期'
+  }
+]
+===== End of File: services\project-mock-data.ts =====
+
+
+===== File: styles\custom-theme.scss =====
+/* custom-theme.scss */
+
+/* The Color of O2Team Brand */
+$color-brand: #2563eb;                      // 品牌主色
+$color-brand-light: #60a5fa;                // 品牌色-浅色
+$color-brand-dark: #1d4ed8;                 // 品牌色-深色
+$color-brand-disabled: #bfdbfe;             // 品牌色-禁用
+
+/* Color */
+$color-success: #22c55e;                    // 成功色
+$color-error: #ef4444;                      // 错误色
+$color-warning: #f59e0b;                    // 警告色
+$color-info: #78A4FA;
+
+/* Color Palette */
+$color-black-0: #000;
+$color-black-1: #333;
+$color-black-2: #7F7F7F;
+$color-black-3: #B2B2B2;
+
+$color-grey-0: #333;
+$color-grey-1: #666;
+$color-grey-2: #999;
+$color-grey-3: #CCC;
+$color-grey-4: #E5E5E5;
+$color-grey-5: #F0F0F0;
+$color-grey-6: #F7F7F7;
+
+$color-white: #FFF;
+
+/* Text Color */
+$color-text-base: #1e293b;                  // 基础文字色
+$color-text-base-inverse: #ffffff;          // 反色文字色
+$color-text-secondary: #475569;             // 次要文字色
+$color-text-placeholder: #94a3b8;           // 占位文字色
+$color-text-disabled: #cbd5e1;              // 禁用文字色
+$color-text-title: #2C405A;
+$color-text-paragraph: #3F536E;
+
+/* Link */
+$color-link: #6190E8;
+$color-link-hover: #79A1EB;
+$color-link-active: #4F7DE2;
+$color-link-disabled: #BFBFBF;
+
+/* 背景色 */
+$color-bg: #f8fafc;                         // 背景色
+$color-bg-base: #ffffff;                    // 组件背景色
+$color-bg-light: #f1f5f9;                   // 浅背景色
+$color-bg-dark: #e2e8f0;                    // 深背景色
+$color-bg-grey: #F7F7F7;
+
+/* 边框颜色 */
+$color-border-base: #e2e8f0;                // 基础边框色
+$color-border-split: tint($color-border-base, 20%); // 分割线
+$color-border-light: #f1f5f9;               // 浅边框色
+$color-border-dark: #cbd5e1;                // 深边框色
+$color-border-lighter: tint($color-border-base, 50%);
+$color-border-lightest: tint($color-border-base, 80%);
+$color-border-grey: #CCC;
+
+/* 图标颜色 */
+$color-icon-base: #CCC;
+
+/* 功能色相关 */
+// 成功色
+$color-success-light: #86efac;              // 成功色-浅色
+$color-success-dark: #16a34a;               // 成功色-深色
+$color-success-disabled: #bbf7d0;           // 成功色-禁用
+
+// 警告色
+$color-warning-light: #fcd34d;              // 警告色-浅色
+$color-warning-dark: #d97706;               // 警告色-深色
+$color-warning-disabled: #fde68a;           // 警告色-禁用
+
+// 错误色
+$color-error-light: #fca5a5;                // 错误色-浅色
+$color-error-dark: #dc2626;                 // 错误色-深色
+$color-error-disabled: #fecaca;             // 错误色-禁用
+ 
+ /**
+  * 引入Taro UI默认样式
+  */
+@import "~taro-ui/dist/style/index.scss";
+===== End of File: styles\custom-theme.scss =====
+
+
+===== File: types\index.ts =====
+// types/index.ts
+
+// API Response Types
+export interface ApiResponse<T> {
+  code: number;
+  message: string;
+  data: T;
+}
+
+// Service Types
+export type ServiceType = 'home' | 'outdoor' | 'industrial' | 'all';
+
+export interface ProcessStep {
+  step: number;
+  title: string;
+  description: string;
+}
+
+export interface ServiceItem {
+  id: number;
+  title: string;
+  price: number;
+  unit: string;
+  type: ServiceType;
+  description: string;
+  features: string[];
+  process: ProcessStep[];
+  estimatedDuration?: string;
+  minArea?: number;
+  maxArea?: number;
+  warranty?: string;
+  imageUrl?: string;
+}
+
+// Banner Types
+export interface Banner {
+  id: number;
+  title: string;
+  subtitle: string;
+  imageUrl: string;
+}
+
+// Case Types
+export interface ServiceCase {
+  id: number;
+  title: string;
+  description: string;
+  imageUrl: string;
+  type: string;
+  date: string;
+  views: number;
+  content?: string;
+}
+
+// Advantage Types
+export interface ServiceAdvantage {
+  id: number;
+  icon: string;
+  value: string;
+  label: string;
+}
+
+// Form Types
+export interface BookingForm {
+  name: string;
+  phone: string;
+  address?: string;
+  remark?: string;
+  serviceId?: number;
+  expectedArea?: number;
+  preferredTime?: string;
+}
+
+export interface FormErrors {
+  [key: string]: string | undefined;
+}
+
+// Component Props Types
+export interface BookingModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  service: ServiceItem | null;
+}
+
+export interface SearchSectionProps {
+  value: string;
+  onChange: (value: string) => void;
+  loading?: boolean;
+}
+
+export interface CategoryTabsProps {
+  categories: ServiceCategory[];
+  current: number;
+  onChange: (index: number) => void;
+}
+
+export interface ServiceCardProps {
+  service: ServiceItem;
+  expanded: boolean;
+  onToggle: (id: number) => void;
+  onBook: (service: ServiceItem) => void;
+}
+
+export interface FAQProps {
+  faqs: FAQ[];
+}
+
+export interface ServiceCategory {
+  title: string;
+  value: ServiceType;
+  icon?: string;
+}
+
+export interface FAQ {
+  id: number;
+  question: string;
+  answer: string;
+  category?: string;
+}
+
+// Config Types
+export interface Config {
+  ui: {
+    banner: {
+      interval: number;
+      duration: number;
+    };
+    cases: {
+      interval: number;
+      duration: number;
+      displayCount: number;
+      cardHeight: number;
+    };
+    services: {
+      pageSize: number;
+      cardHeight: number;
+      searchDebounce: number;
+    };
+  };
+  contact: {
+    phone: string;
+    wechat: string;
+  };
+  booking: {
+    minArea: number;
+    maxArea: number;
+    allowedTimeRange: {
+      start: string;
+      end: string;
+    };
+  };
+}
+===== End of File: types\index.ts =====
+
+
+===== File: utils\error.ts =====
+export class AppError extends Error {
+  constructor(
+    public code: number,
+    message: string
+  ) {
+    super(message)
+    this.name = 'AppError'
+  }
+}
+
+export function isAppError(error: unknown): error is AppError {
+  return error instanceof AppError
+}
+
+export function handleError(error: unknown): string {
+  if (isAppError(error)) {
+    return error.message
+  }
+  if (error instanceof Error) {
+    return error.message
+  }
+  return '操作失败，请稍后重试'
+}
+===== End of File: utils\error.ts =====
+

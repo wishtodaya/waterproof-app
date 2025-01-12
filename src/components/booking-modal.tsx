@@ -1,5 +1,5 @@
 import { memo, useState, useCallback } from 'react'
-import { View, Button } from '@tarojs/components'
+import { Button } from '@tarojs/components'
 import { AtModal, AtModalHeader, AtModalContent, AtModalAction, AtForm, AtInput } from 'taro-ui'
 import Taro from '@tarojs/taro'
 import { api } from '../services/index-api'

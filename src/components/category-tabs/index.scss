@@ -1,0 +1,93 @@
+// components/category-tabs/index.scss
+@import "../../styles/custom-theme.scss";
+
+.category-tabs {
+  position: fixed;
+  top: 88px;
+  left: 0;
+  right: 0;
+  z-index: 99;
+  background: $color-bg-base;
+  border-bottom: 1px solid $color-border-light;
+  
+  .category-container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 16px 24px;
+  }
+
+  .category-scroll {
+    position: relative;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    
+    &::-webkit-scrollbar {
+      display: none;
+    }
+  }
+
+  .category-content {
+    display: flex;
+    align-items: center;
+    padding: 0 4px;
+    gap: 12px;
+    transition: justify-content 0.3s ease;
+    
+    // 内容少时居中
+    &.centered {
+      justify-content: center;
+    }
+
+    // 内容多时靠左对齐并可滚动
+    &:not(.centered) {
+      justify-content: flex-start;
+    }
+  }
+
+  .category-item {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 64px;
+    padding: 0 32px;
+    font-size: 30px;
+    color: $color-text-secondary;
+    background: $color-bg-light;
+    border-radius: 32px;
+    transition: all 0.25s ease;
+    white-space: nowrap;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    flex-shrink: 0;
+    
+    &.active {
+      color: #fff;
+      background: $color-brand;
+      font-weight: 500;
+      box-shadow: 0 4px 12px rgba($color-brand, 0.15);
+    }
+
+    &:not(.active):hover {
+      background: darken($color-bg-light, 2%);
+    }
+
+    // 点击效果
+    &::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      background: transparent;
+      transition: background-color 0.2s ease;
+      pointer-events: none;
+    }
+
+    &:active::before {
+      background-color: rgba(0, 0, 0, 0.05);
+    }
+  }
+
+  .category-title {
+    line-height: 1;
+  }
+}

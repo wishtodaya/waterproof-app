@@ -1,0 +1,115 @@
+// pages/project/index.scss
+@import "../../styles/custom-theme.scss";
+
+.project {
+  min-height: 100vh;
+  background: $color-bg;
+  
+  .main-content {
+    padding-top: 180px;
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  .service-list {
+    padding: 0 24px;
+    margin-bottom: 24px;
+  }
+
+  // 骨架屏
+  .skeleton-list {
+    padding: 0 24px;
+
+    .skeleton-item {
+      background: $color-bg-base;
+      border-radius: 16px;
+      padding: 24px;
+      margin-bottom: 24px;
+      
+      .skeleton-header {
+        height: 32px;
+        background: $color-bg-light;
+        border-radius: 8px;
+        margin-bottom: 16px;
+      }
+
+      .skeleton-content {
+        .skeleton-line {
+          height: 20px;
+          background: $color-bg-light;
+          border-radius: 4px;
+          margin-bottom: 12px;
+
+          &.short {
+            width: 60%;
+          }
+        }
+      }
+    }
+  }
+
+  // 错误状态
+  .error-state {
+    padding: 48px 24px;
+    text-align: center;
+    background: $color-bg-base;
+    border-radius: 16px;
+    margin: 0 24px 24px;
+
+    .error-message {
+      font-size: 28px;
+      color: $color-text-secondary;
+      margin-bottom: 24px;
+    }
+
+    .retry-btn {
+      display: inline-block;
+      padding: 12px 32px;
+      background: $color-brand;
+      color: #fff;
+      font-size: 28px;
+      border-radius: 8px;
+      
+      &:active {
+        opacity: 0.9;
+      }
+    }
+  }
+
+  // 空状态
+  .empty-state {
+    padding: 48px 24px;
+    text-align: center;
+    background: $color-bg-base;
+    border-radius: 16px;
+    margin: 0 24px 24px;
+
+    .empty-text {
+      font-size: 28px;
+      color: $color-text-secondary;
+    }
+  }
+}
+
+// 响应式处理
+@media screen and (max-width: 375px) {
+  .project {
+    .main-content {
+      padding-top: 184px;
+    }
+
+    .service-list,
+    .skeleton-list,
+    .error-state,
+    .empty-state {
+      padding-left: 16px;
+      padding-right: 16px;
+      margin-left: 16px;
+      margin-right: 16px;
+    }
+
+    .error-state,
+    .empty-state {
+      padding: 32px 16px;
+    }
+  }
+}

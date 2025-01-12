@@ -1,0 +1,155 @@
+// components/service-card/index.scss
+@import "../../styles/custom-theme.scss";
+
+.service-card {
+  background: $color-bg-base;
+  border-radius: 16px;
+  padding: 24px;
+  margin-bottom: 24px;
+  position: relative;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+  transition: all 0.3s ease;
+  will-change: transform, box-shadow;
+
+  &:active {
+    transform: scale(0.995);
+  }
+
+  &.expanded {
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  }
+
+  .service-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 16px;
+    position: relative;
+  }
+
+  .service-title {
+    flex: 1;
+    font-size: 32px;
+    font-weight: bold;
+    color: $color-text-base;
+    margin-right: 16px;
+
+    .warranty-tag {
+      display: inline-block;
+      font-size: 24px;
+      font-weight: normal;
+      color: $color-brand;
+      background: rgba($color-brand, 0.1);
+      padding: 4px 12px;
+      border-radius: 32px;
+      margin-left: 12px;
+      transform: translateY(-2px);
+    }
+  }
+
+  .service-price {
+    text-align: right;
+    white-space: nowrap;
+
+    .price {
+      font-size: 36px;
+      font-weight: bold;
+      color: $color-brand;
+    }
+
+    .unit {
+      font-size: 24px;
+      color: $color-text-secondary;
+    }
+  }
+
+  .service-features {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 16px;
+  
+    .feature-tag {
+      display: inline-flex;    // 改为 inline-flex
+      align-items: center;     // 垂直居中
+      justify-content: center; // 水平居中
+      background: rgba($color-brand, 0.1);
+      color: $color-brand;
+      border: none;
+      border-radius: 6px;
+      font-size: 24px;
+      padding: 8px 16px;
+      height: 40px;           // 固定高度以确保一致性
+      line-height: 1;         // 重置行高
+    }
+  }
+
+  .service-description {
+    font-size: 28px;
+    color: $color-text-paragraph;
+    line-height: 1.6;
+    margin-bottom: 24px;
+  }
+
+  .service-detail {
+    height: 0;
+    opacity: 0;
+    overflow: hidden;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    margin-top: 24px;
+    padding-top: 24px;
+    border-top: 1px solid $color-border-light;
+    transform: translateY(-12px);
+    will-change: transform, opacity, height;
+
+    &.expanded {
+      height: auto;
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .info-section {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 24px;
+    margin-bottom: 32px;
+
+    .info-item {
+      flex: 1;
+      min-width: 200px;
+      background: $color-bg-light;
+      padding: 16px;
+      border-radius: 12px;
+
+      .label {
+        font-size: 24px;
+        color: $color-text-secondary;
+        margin-bottom: 8px;
+        display: block;
+      }
+
+      .value {
+        font-size: 28px;
+        color: $color-text-base;
+        font-weight: 500;
+      }
+    }
+  }
+
+  .booking-btn {
+    margin-top: 32px;
+    height: 88px;
+    font-size: 32px;
+    background: $color-brand;
+    border: none;
+    border-radius: 44px;
+    box-shadow: 0 4px 12px rgba($color-brand, 0.2);
+    transition: all 0.3s ease;
+
+    &:active {
+      transform: translateY(2px);
+      box-shadow: 0 2px 6px rgba($color-brand, 0.15);
+    }
+  }
+}

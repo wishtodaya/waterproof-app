@@ -1,7 +1,8 @@
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState, useCallback, useRef } from 'react'
 import { View, Text, Image, Swiper, SwiperItem } from '@tarojs/components'
+import type { SwiperProps } from '@tarojs/components'
 import { AtButton } from 'taro-ui'
-import Taro from '@tarojs/taro'
+import Taro, { useDidShow } from '@tarojs/taro'
 import { api } from '../../services/index-api'
 import { config } from '../../config'
 import { handleError } from '../../utils/error'
@@ -20,11 +21,18 @@ export default function Index() {
   const [selectedCase, setSelectedCase] = useState<ServiceCase | null>(null)
   const [showCaseModal, setShowCaseModal] = useState(false)
   const [showBookingModal, setShowBookingModal] = useState(false)
+  const [currentCaseIndex, setCurrentCaseIndex] = useState(0)
 
-  // Data fetching
-  const fetchData = useCallback(async () => {
+  // Refs for lifecycle management
+  const refreshing = useRef(false)
+  const mounted = useRef(false)
+
+  // 数据获取
+  const fetchData = useCallback(async (showLoading = true) => {
     try {
-      setLoading(true)
+      if (showLoading) {
+        setLoading(true)
+      }
       setError(null)
 
       const results = await Promise.allSettled([
@@ -44,26 +52,60 @@ export default function Index() {
 
       const [bannerResult, caseResult, advantageResult] = results as PromiseFulfilledResult<any>[]
 
-      setBanners(bannerResult.value.data)
-      setCases(caseResult.value.data)
-      setAdvantages(advantageResult.value.data)
+      if (mounted.current) {
+        setBanners(bannerResult.value.data)
+        setCases(caseResult.value.data)
+        setAdvantages(advantageResult.value.data)
+      }
     } catch (err) {
       console.error('初始化数据失败:', err)
-      setError(handleError(err))
+      if (mounted.current) {
+        setError(handleError(err))
+      }
     } finally {
-      setLoading(false)
+      if (showLoading && mounted.current) {
+        setLoading(false)
+      }
+      refreshing.current = false
     }
   }, [])
 
+  // Lifecycle
   useEffect(() => {
+    mounted.current = true
     fetchData()
+    return () => {
+      mounted.current = false
+    }
   }, [fetchData])
+
+  useDidShow(() => {
+    if (!refreshing.current) {
+      fetchData(false)
+    }
+  })
 
   // Event handlers
   const handleRefresh = useCallback(async () => {
+    if (refreshing.current) return
+    refreshing.current = true
+    
     try {
       Taro.startPullDownRefresh()
-      await fetchData()
+      await fetchData(false)
+      
+      Taro.showToast({
+        title: '刷新成功',
+        icon: 'success',
+        duration: 1500
+      })
+    } catch (error) {
+      console.error('刷新失败:', error)
+      Taro.showToast({
+        title: handleError(error),
+        icon: 'none',
+        duration: 2000
+      })
     } finally {
       Taro.stopPullDownRefresh()
     }
@@ -76,18 +118,12 @@ export default function Index() {
         console.log('电话拨打成功')
       },
       fail: (err) => {
-        // 用户取消不提示错误
-        if (err.errMsg.includes('fail cancel')) {
-          return
-        }
-        // 其他错误才提示
+        if (err.errMsg.includes('cancel')) return
+        
         Taro.showToast({
           title: '拨号失败，请稍后重试',
           icon: 'none'
         })
-      },
-      complete: () => {
-        console.log('电话拨打操作结束')
       }
     })
   }, [])
@@ -98,9 +134,9 @@ export default function Index() {
         data: config.contact.wechat,
         success: () => {
           Taro.showToast({
-            title: `微信号"${config.contact.wechat}"已复制，请打开微信添加`,
+            title: '微信号已复制，请打开微信添加',
             icon: 'none',
-            duration: 3000
+            duration: 2500
           })
         },
         fail: () => {
@@ -121,16 +157,27 @@ export default function Index() {
 
   const handleCaseClick = useCallback(async (caseItem: ServiceCase) => {
     try {
-      const response = await api.getCaseDetail(caseItem.id)
-      setSelectedCase(response.data)
       setShowCaseModal(true)
+      const response = await api.getCaseDetail(caseItem.id)
+      if (mounted.current) {
+        setSelectedCase(response.data)
+      }
     } catch (error) {
       console.error('获取案例详情失败:', error)
       Taro.showToast({
         title: handleError(error),
         icon: 'none'
       })
+      setShowCaseModal(false)
     }
+  }, [mounted])
+
+  const handleBooking = useCallback(() => {
+    setShowBookingModal(true)
+  }, [])
+
+  const handleCaseChange: SwiperProps['onChange'] = useCallback((e) => {
+    setCurrentCaseIndex(e.detail.current)
   }, [])
 
   // Loading state
@@ -147,7 +194,7 @@ export default function Index() {
     return (
       <View className='error'>
         <Text>{error}</Text>
-        <AtButton onClick={handleRefresh}>重试</AtButton>
+        <AtButton type='primary' onClick={handleRefresh}>重试</AtButton>
       </View>
     )
   }
@@ -160,11 +207,13 @@ export default function Index() {
         circular
         indicatorDots
         autoplay
+        indicatorColor='rgba(255,255,255,0.6)'
+        indicatorActiveColor='#ffffff'
         interval={config.ui.banner.interval}
         duration={config.ui.banner.duration}
       >
         {banners.map(banner => (
-          <SwiperItem key={banner.id}>
+          <SwiperItem key={banner.id} className='banner-item'>
             <Image 
               src={banner.imageUrl}
               className='banner-image'
@@ -183,7 +232,6 @@ export default function Index() {
         {/* Service Introduction */}
         <View className='service-intro card'>
           <View className='card-title'>专业防水服务</View>
-          <View className='card-desc'>一站式解决您的渗漏问题</View>
           <View className='btn-group'>
             <AtButton type='primary' onClick={handleCall}>电话咨询</AtButton>
             <AtButton type='secondary' onClick={handleWechat}>微信咨询</AtButton>
@@ -196,16 +244,19 @@ export default function Index() {
           <Swiper
             className='case-swiper'
             circular
-            autoplay
+            autoplay={!showCaseModal}
             interval={config.ui.cases.interval}
-            duration={config.ui.cases.duration}
+            duration={400}
+            easingFunction='easeInOutCubic'
             previousMargin='30px'
             nextMargin='30px'
+            snapToEdge
+            onChange={handleCaseChange}
           >
-            {cases.map(item => (
+            {cases.map((item, index) => (
               <SwiperItem key={item.id}>
                 <View 
-                  className='case-item'
+                  className={`case-item ${index === currentCaseIndex ? 'active' : ''}`}
                   onClick={() => handleCaseClick(item)}
                 >
                   <Image 
@@ -217,10 +268,6 @@ export default function Index() {
                   <View className='case-content'>
                     <Text className='case-title'>{item.title}</Text>
                     <Text className='case-desc'>{item.description}</Text>
-                    <View className='case-meta'>
-                      <Text>{item.type}</Text>
-                      <Text>{item.date}</Text>
-                    </View>
                   </View>
                 </View>
               </SwiperItem>
@@ -243,7 +290,7 @@ export default function Index() {
           <AtButton 
             type='primary' 
             className='book-btn'
-            onClick={() => setShowBookingModal(true)}
+            onClick={handleBooking}
           >
             快速预约
           </AtButton>
@@ -263,4 +310,3 @@ export default function Index() {
     </View>
   )
 }
-

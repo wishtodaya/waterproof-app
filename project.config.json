@@ -1,7 +1,7 @@
 {
   "miniprogramRoot": "./dist",
   "projectname": "waterproof-app",
-  "description": "",
+  "description": "防水服务小程序",
   "appid": "touristappid",
   "setting": {
     "urlCheck": true,

@@ -1,0 +1,130 @@
+// components/faq-section/index.scss
+@import "../../styles/custom-theme.scss";
+
+.faq-section {
+  padding: 32px 24px;
+  background: $color-bg-base;
+  border-radius: 16px;
+  margin-top: 24px;
+
+  .section-title {
+    font-size: 32px;
+    font-weight: bold;
+    color: $color-text-base;
+    margin-bottom: 24px;
+    display: block;
+  }
+
+  .faq-list {
+    .faq-item {
+      position: relative;
+      border-bottom: 1px solid $color-border-light;
+      
+      &:first-child {
+        border-top: 1px solid $color-border-light;
+      }
+
+      &:active {
+        background: rgba($color-brand, 0.02);
+      }
+    }
+  }
+
+  .faq-header {
+    position: relative;
+    padding: 24px 48px 24px 16px;
+    cursor: pointer;
+  }
+
+  .question-wrap {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding-right: 32px;
+  }
+
+  .faq-question {
+    font-size: 28px;
+    color: $color-text-base;
+    line-height: 1.5;
+  }
+
+  .faq-category {
+    flex-shrink: 0;
+    font-size: 24px;
+    color: $color-brand;
+    background: rgba($color-brand, 0.1);
+    padding: 4px 16px;
+    border-radius: 16px;
+    line-height: 1.4;
+  }
+
+  .expand-icon {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    width: 12px;
+    height: 12px;
+    border-right: 2px solid $color-text-secondary;
+    border-bottom: 2px solid $color-text-secondary;
+    transform: translateY(-75%) rotate(45deg);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .faq-content {
+    height: 0;
+    opacity: 0;
+    overflow: hidden;
+    transform: translateY(-12px);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    will-change: transform, opacity, height;
+  }
+
+  .faq-answer {
+    display: block;
+    font-size: 26px;
+    color: $color-text-paragraph;
+    line-height: 1.6;
+    background: $color-bg-light;
+    border-radius: 12px;
+    padding: 20px;
+    margin: 0 0 24px;
+  }
+
+  .expanded {
+    .expand-icon {
+      transform: translateY(-25%) rotate(-135deg);
+    }
+
+    .faq-content {
+      height: auto;
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+}
+
+// 响应式适配
+@media screen and (max-width: 375px) {
+  .faq-section {
+    padding: 24px 16px;
+
+    .section-title {
+      font-size: 28px;
+    }
+
+    .faq-question {
+      font-size: 26px;
+    }
+
+    .faq-category {
+      font-size: 22px;
+      padding: 4px 12px;
+    }
+
+    .faq-answer {
+      font-size: 24px;
+      padding: 16px;
+    }
+  }
+}
