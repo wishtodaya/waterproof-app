@@ -52,11 +52,11 @@ $color-bg-grey: #F7F7F7;
 
 /* 边框颜色 */
 $color-border-base: #e2e8f0;                // 基础边框色
-$color-border-split: tint($color-border-base, 20%); // 分割线
+$color-border-split: #edf2f7;               // 分割线 (原tint 20%)
 $color-border-light: #f1f5f9;               // 浅边框色
 $color-border-dark: #cbd5e1;                // 深边框色
-$color-border-lighter: tint($color-border-base, 50%);
-$color-border-lightest: tint($color-border-base, 80%);
+$color-border-lighter: #f7fafc;             // 更浅边框色 (原tint 50%)
+$color-border-lightest: #fcfdfe;            // 最浅边框色 (原tint 80%)
 $color-border-grey: #CCC;
 
 /* 图标颜色 */
@@ -77,8 +77,8 @@ $color-warning-disabled: #fde68a;           // 警告色-禁用
 $color-error-light: #fca5a5;                // 错误色-浅色
 $color-error-dark: #dc2626;                 // 错误色-深色
 $color-error-disabled: #fecaca;             // 错误色-禁用
- 
- /**
-  * 引入Taro UI默认样式
-  */
+
+/**
+ * 引入Taro UI默认样式
+ */
 @import "~taro-ui/dist/style/index.scss";

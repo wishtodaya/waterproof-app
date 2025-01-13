@@ -1,152 +1,214 @@
 // types/index.ts
 
-// API Response Types
+// API 基础类型
 export interface ApiResponse<T> {
-  code: number;
-  message: string;
-  data: T;
+  code: number
+  message: string
+  data: T
 }
 
-// Service Types
-export type ServiceType = 'home' | 'outdoor' | 'industrial' | 'all';
+// 分页相关
+export interface PaginationParams {
+  page: number
+  pageSize: number
+}
+
+export interface PaginatedResponse<T> extends ApiResponse<T> {
+  pagination: {
+    total: number
+    totalPages: number
+    currentPage: number
+    pageSize: number
+  }
+}
+
+// 服务类型
+export type ServiceType = 'all' | 'home' | 'outdoor' | 'industrial'
 
 export interface ProcessStep {
-  step: number;
-  title: string;
-  description: string;
+  step: number
+  title: string
+  description: string
+  status?: 'pending' | 'processing' | 'completed' | 'error'
 }
 
 export interface ServiceItem {
-  id: number;
-  title: string;
-  price: number;
-  unit: string;
-  type: ServiceType;
-  description: string;
-  features: string[];
-  process: ProcessStep[];
-  estimatedDuration?: string;
-  minArea?: number;
-  maxArea?: number;
-  warranty?: string;
-  imageUrl?: string;
+  id: number
+  title: string
+  price: number
+  unit: string
+  type: ServiceType
+  description: string
+  features: string[]
+  process: ProcessStep[]
+  estimatedDuration?: string
+  minArea?: number
+  maxArea?: number
+  warranty?: string
+  imageUrl?: string
+  updatedAt?: string
+  createdAt?: string
 }
 
-// Banner Types
-export interface Banner {
-  id: number;
-  title: string;
-  subtitle: string;
-  imageUrl: string;
+// 搜索相关
+export interface SearchOptions {
+  sortBy?: 'relevance' | 'price' | 'createdAt'
+  sortOrder?: 'asc' | 'desc'
+  minPrice?: number
+  maxPrice?: number
+  minArea?: number
+  maxArea?: number
 }
 
-// Case Types
-export interface ServiceCase {
-  id: number;
-  title: string;
-  description: string;
-  imageUrl: string;
-  type: string;
-  date: string;
-  views: number;
-  content?: string;
+// FAQ 相关
+export interface FAQ {
+  id: number
+  question: string
+  answer: string
+  category: string
+  order?: number
+  isHot?: boolean
 }
 
-// Advantage Types
-export interface ServiceAdvantage {
-  id: number;
-  icon: string;
-  value: string;
-  label: string;
-}
-
-// Form Types
-export interface BookingForm {
-  name: string;
-  phone: string;
-  address?: string;
-  remark?: string;
-  serviceId?: number;
-  expectedArea?: number;
-  preferredTime?: string;
-}
-
-export interface FormErrors {
-  [key: string]: string | undefined;
-}
-
-// Component Props Types
-export interface BookingModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  service: ServiceItem | null;
-}
-
-export interface SearchSectionProps {
-  value: string;
-  onChange: (value: string) => void;
-  loading?: boolean;
-}
-
-export interface CategoryTabsProps {
-  categories: ServiceCategory[];
-  current: number;
-  onChange: (index: number) => void;
+// 组件 Props 类型
+export interface SearchBarProps {
+  value: string
+  placeholder?: string
+  className?: string
+  loading?: boolean
+  delay?: number
+  maxLength?: number
+  showAction?: boolean
+  actionText?: string
+  onChange: (value: string) => void
+  onSearch?: (value: string) => void
+  onFocus?: () => void
+  onBlur?: () => void
+  onClear?: () => void
 }
 
 export interface ServiceCardProps {
-  service: ServiceItem;
-  expanded: boolean;
-  onToggle: (id: number) => void;
-  onBook: (service: ServiceItem) => void;
+  service: ServiceItem
+  expanded?: boolean
+  loading?: boolean
+  className?: string
+  showAction?: boolean
+  onToggle?: (id: number) => void
+  onBook?: (service: ServiceItem) => void
 }
 
-export interface FAQProps {
-  faqs: FAQ[];
+export interface FAQSectionProps {
+  faqs: FAQ[]
+  title?: string
+  className?: string
+  emptyText?: string
+  onFAQClick?: (faq: FAQ) => void
 }
 
-export interface ServiceCategory {
-  title: string;
-  value: ServiceType;
-  icon?: string;
+// 状态管理类型
+export interface ProjectPageState {
+  loading: boolean
+  services: ServiceItem[]
+  faqs: FAQ[]
+  searchValue: string
+  currentTab: number
+  expandedService: number | null
+  error: string | null
+  initialized: boolean
+  searchHistory: string[]
+  filter: SearchOptions
 }
 
-export interface FAQ {
-  id: number;
-  question: string;
-  answer: string;
-  category?: string;
+// 通用组件类型
+export interface LoadingProps {
+  size?: 'small' | 'normal' | 'large'
+  color?: string
+  className?: string
+  text?: string
 }
 
-// Config Types
-export interface Config {
-  ui: {
-    banner: {
-      interval: number;
-      duration: number;
-    };
-    cases: {
-      interval: number;
-      duration: number;
-      displayCount: number;
-      cardHeight: number;
-    };
-    services: {
-      pageSize: number;
-      cardHeight: number;
-      searchDebounce: number;
-    };
-  };
-  contact: {
-    phone: string;
-    wechat: string;
-  };
-  booking: {
-    minArea: number;
-    maxArea: number;
-    allowedTimeRange: {
-      start: string;
-      end: string;
-    };
-  };
+export interface EmptyProps {
+  text?: string
+  image?: string
+  className?: string
+  children?: React.ReactNode
+}
+
+export interface ErrorProps {
+  text?: string
+  code?: number
+  className?: string
+  onRetry?: () => void
+}
+
+// 错误相关
+export interface AppErrorType extends Error {
+  code: number
+  details?: any
+}
+
+// Tab 相关
+export interface TabItem {
+  title: string
+  value: ServiceType
+  badge?: number | string
+}
+
+export interface TabsProps {
+  items: TabItem[]
+  value: string | number
+  className?: string
+  onChange: (value: string | number) => void
+}
+
+// 过滤器相关
+export interface FilterOption {
+  label: string
+  value: string | number
+  disabled?: boolean
+}
+
+export interface FilterGroupProps {
+  title: string
+  options: FilterOption[]
+  value: string | number | (string | number)[]
+  multiple?: boolean
+  className?: string
+  onChange: (value: string | number | (string | number)[]) => void
+}
+
+// 业务类型
+export interface ServiceBooking {
+  id: number
+  serviceId: number
+  userId: string
+  status: 'pending' | 'confirmed' | 'cancelled' | 'completed'
+  area?: number
+  address?: string
+  contactName: string
+  contactPhone: string
+  appointmentTime?: string
+  remark?: string
+  createdAt: string
+}
+
+export interface ServiceComment {
+  id: number
+  serviceId: number
+  userId: string
+  rating: number
+  content: string
+  images?: string[]
+  reply?: string
+  createdAt: string
+}
+
+// 配置类型
+export interface ProjectConfig {
+  searchDebounceDelay: number
+  maxSearchHistory: number
+  defaultPageSize: number
+  imageBaseUrl: string
+  priceUnit: string
+  areaUnit: string
 }

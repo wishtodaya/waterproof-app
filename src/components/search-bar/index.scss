@@ -1,0 +1,239 @@
+// components/search-bar/index.scss
+@import "../../styles/custom-theme.scss";
+
+.search-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  background: $color-bg-base;
+
+  .search-input-wrap {
+    flex: 1;
+    height: 72px;
+    background: $color-bg-light;
+    border-radius: 36px;
+    padding: 0 16px;
+    display: flex;
+    align-items: center;
+    position: relative;
+    transition: all 0.25s ease;
+  }
+
+  &.is-focused .search-input-wrap {
+    background: darken($color-bg-light, 2%);
+    box-shadow: inset 0 0 0 1px rgba($color-brand, 0.1);
+  }
+
+  &.is-loading {
+    .search-input-wrap {
+      opacity: 0.8;
+    }
+
+    .loading-icon {
+      width: 20px;
+      height: 20px;
+      border: 2px solid $color-text-secondary;
+      border-top-color: transparent;
+      border-radius: 50%;
+      animation: search-loading 0.8s linear infinite;
+    }
+  }
+
+  .search-icon {
+    width: 40px;
+    height: 40px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0.5;
+
+    .icon-circle {
+      position: absolute;
+      left: 8px;
+      top: 8px;
+      width: 16px;
+      height: 16px;
+      border: 2px solid $color-text-secondary;
+      border-radius: 50%;
+    }
+
+    .icon-line {
+      position: absolute;
+      left: 22px;
+      top: 22px;
+      width: 10px;
+      height: 2px;
+      background: $color-text-secondary;
+      transform: rotate(45deg);
+      transform-origin: 0 50%;
+    }
+  }
+
+  .search-input {
+    flex: 1;
+    height: 100%;
+    font-size: 28px;
+    color: $color-text-base;
+    padding: 0 8px;
+    background: transparent;
+    
+    &:disabled {
+      opacity: 0.7;
+    }
+  }
+
+  .placeholder {
+    color: $color-text-placeholder;
+  }
+
+  .clear-btn {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: -8px;
+    opacity: 0.7;
+    transition: opacity 0.2s ease;
+
+    &:active {
+      opacity: 0.5;
+    }
+
+    .clear-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: rgba($color-text-secondary, 0.2);
+      position: relative;
+
+      &::before,
+      &::after {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 16px;
+        height: 2px;
+        background: #fff;
+      }
+
+      &::before {
+        transform: translate(-50%, -50%) rotate(45deg);
+      }
+
+      &::after {
+        transform: translate(-50%, -50%) rotate(-45deg);
+      }
+    }
+  }
+
+  .search-btn {
+    font-size: 28px;
+    color: $color-text-secondary;
+    padding: 0 8px;
+    height: 72px;
+    line-height: 72px;
+    transition: all 0.25s ease;
+    user-select: none;
+
+    &.active {
+      color: $color-brand;
+      font-weight: 500;
+    }
+
+    &:active {
+      opacity: 0.7;
+    }
+
+    &.disabled {
+      opacity: 0.5;
+      pointer-events: none;
+    }
+  }
+}
+
+// 加载动画
+@keyframes search-loading {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+// 深色模式适配
+@media (prefers-color-scheme: dark) {
+  .search-bar {
+    .search-input-wrap {
+      background: rgba($color-bg-light, 0.08);
+    }
+
+    &.is-focused .search-input-wrap {
+      background: rgba($color-bg-light, 0.12);
+      box-shadow: inset 0 0 0 1px rgba($color-brand, 0.2);
+    }
+
+    .clear-btn .clear-icon {
+      background: rgba($color-text-secondary, 0.3);
+    }
+  }
+}
+
+// 小屏适配
+@media screen and (max-width: 375px) {
+  .search-bar {
+    padding: 10px 12px;
+    gap: 8px;
+
+    .search-input-wrap {
+      height: 64px;
+    }
+
+    .search-icon {
+      width: 36px;
+      height: 36px;
+
+      .icon-circle {
+        left: 7px;
+        top: 7px;
+        width: 14px;
+        height: 14px;
+      }
+
+      .icon-line {
+        left: 20px;
+        top: 20px;
+        width: 8px;
+      }
+    }
+
+    .search-input {
+      font-size: 26px;
+    }
+
+    .clear-btn {
+      width: 36px;
+      height: 36px;
+
+      .clear-icon {
+        width: 28px;
+        height: 28px;
+
+        &::before,
+        &::after {
+          width: 14px;
+        }
+      }
+    }
+
+    .search-btn {
+      font-size: 26px;
+      height: 64px;
+      line-height: 64px;
+    }
+  }
+}

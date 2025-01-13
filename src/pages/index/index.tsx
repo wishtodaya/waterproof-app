@@ -7,7 +7,6 @@ import { api } from '../../services/index-api'
 import { config } from '../../config'
 import { handleError } from '../../utils/error'
 import { CaseDetailModal } from '../../components/case-detail-modal'
-import { BookingModal } from '../../components/booking-modal'
 import type { Banner, ServiceCase, ServiceAdvantage } from '../../types'
 import './index.scss'
 
@@ -20,7 +19,6 @@ export default function Index() {
   const [advantages, setAdvantages] = useState<ServiceAdvantage[]>([])
   const [selectedCase, setSelectedCase] = useState<ServiceCase | null>(null)
   const [showCaseModal, setShowCaseModal] = useState(false)
-  const [showBookingModal, setShowBookingModal] = useState(false)
   const [currentCaseIndex, setCurrentCaseIndex] = useState(0)
 
   // Refs for lifecycle management
@@ -113,13 +111,9 @@ export default function Index() {
 
   const handleCall = useCallback(() => {
     Taro.makePhoneCall({
-      phoneNumber: config.contact.phone,
-      success: () => {
-        console.log('电话拨打成功')
-      },
-      fail: (err) => {
-        if (err.errMsg.includes('cancel')) return
-        
+      phoneNumber: config.contact.phone
+    }).catch(err => {
+      if (!err.errMsg?.includes('cancel')) {
         Taro.showToast({
           title: '拨号失败，请稍后重试',
           icon: 'none'
@@ -173,7 +167,15 @@ export default function Index() {
   }, [mounted])
 
   const handleBooking = useCallback(() => {
-    setShowBookingModal(true)
+    Taro.switchTab({
+      url: '/pages/contact/index'
+    }).catch(err => {
+      console.error('切换页面失败:', err)
+      Taro.showToast({
+        title: '页面跳转失败，请稍后重试',
+        icon: 'none'
+      })
+    })
   }, [])
 
   const handleCaseChange: SwiperProps['onChange'] = useCallback((e) => {
@@ -302,10 +304,6 @@ export default function Index() {
         isOpen={showCaseModal}
         onClose={() => setShowCaseModal(false)}
         data={selectedCase}
-      />
-      <BookingModal
-        isOpen={showBookingModal}
-        onClose={() => setShowBookingModal(false)}
       />
     </View>
   )

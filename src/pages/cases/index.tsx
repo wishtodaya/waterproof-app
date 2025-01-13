@@ -1,11 +1,9 @@
 
 // pages/contact/index.tsx
 import { View } from '@tarojs/components'
-import { useState } from 'react'
 import './index.scss'
 
 export default function Contact() {
-  const [loading, setLoading] = useState(false)
 
   return (
     <View className='contact'>

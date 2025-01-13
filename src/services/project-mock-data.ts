@@ -1,5 +1,7 @@
 // services/project-mock-data.ts
-export const mockServices = [
+import type { ServiceItem, FAQ } from '../types'
+
+export const mockServices: ServiceItem[] = [
   {
     id: 1,
     title: '卫生间防水',
@@ -57,10 +59,9 @@ export const mockServices = [
     maxArea: 2000,
     warranty: '八年质保'
   }
-  // ... 更多服务
-];
+]
 
-export const mockFaqs = [
+export const mockFaqs: FAQ[] = [
   {
     id: 1,
     question: '防水工程需要多久才能完工？',
@@ -70,7 +71,7 @@ export const mockFaqs = [
   {
     id: 2,
     question: '防水材料有哪些品牌可以选择？',
-    answer: '我们使用国际知名品牌防水材料，包括XX、YY等，可根据需求选择。',
+    answer: '我们使用国际知名品牌防水材料，包括东方雨虹、科顺等，可根据需求选择。',
     category: '材料选择'
   },
   {
@@ -85,5 +86,4 @@ export const mockFaqs = [
     answer: '根据不同项目提供5-10年不等的质保服务，具体以合同约定为准。',
     category: '售后保障'
   }
-  // ... 更多FAQ
-];
+]

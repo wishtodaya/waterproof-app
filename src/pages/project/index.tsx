@@ -1,233 +1,274 @@
 // pages/project/index.tsx
-import { useEffect, useState, useCallback, useRef } from 'react'
-import { View, Text } from '@tarojs/components'
-import Taro, { useDidShow } from '@tarojs/taro'
-import { SearchSection } from '../../components/search-section'
-import { CategoryTabs } from '../../components/category-tabs'
+import {Text, View } from '@tarojs/components'
+import Taro, { useDidShow, useLoad, usePullDownRefresh } from '@tarojs/taro'
+import { SearchBar } from '../../components/search-bar'
 import { ServiceCard } from '../../components/service-card'
 import { FAQSection } from '../../components/faq-section'
-import { BookingModal } from '../../components/booking-modal'
 import { projectApi } from '../../services/project-api'
 import { handleError } from '../../utils/error'
-import type { ServiceItem, ServiceCategory, FAQ } from '../../types'
+import type { ServiceItem, FAQ, ServiceType } from '../../types'
+import { useState, useCallback, useRef, useEffect } from 'react'
 import './index.scss'
 
-const SERVICE_CATEGORIES: ServiceCategory[] = [
+const TAB_LIST = [
   { title: '全部', value: 'all' },
   { title: '家庭防水', value: 'home' },
   { title: '室外防水', value: 'outdoor' },
   { title: '工业防水', value: 'industrial' }
-]
+] as const
 
-export default function Project() {
-  // 基础状态
-  const [loading, setLoading] = useState(true)
-  const [searching, setSearching] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-  
-  // 数据状态
-  const [services, setServices] = useState<ServiceItem[]>([])
-  const [faqs, setFaqs] = useState<FAQ[]>([])
-  
-  // UI 状态
-  const [searchText, setSearchText] = useState('')
-  const [currentTab, setCurrentTab] = useState(0)
-  const [expandedService, setExpandedService] = useState<number | null>(null)
-  const [showBookingModal, setShowBookingModal] = useState(false)
-  const [selectedService, setSelectedService] = useState<ServiceItem | null>(null)
+interface State {
+  loading: boolean
+  services: ServiceItem[]
+  faqs: FAQ[]
+  searchValue: string
+  currentTab: number
+  expandedService: number | null
+  error: string | null
+  initialized: boolean
+}
 
-  // Refs
-  const searchTimer = useRef<NodeJS.Timeout>()
+const initialState: State = {
+  loading: false,
+  services: [],
+  faqs: [],
+  searchValue: '',
+  currentTab: 0,
+  expandedService: null,
+  error: null,
+  initialized: false
+}
+
+export default function ProjectPage() {
+  const [state, setState] = useState<State>(initialState)
   const mounted = useRef(false)
+  const searchTimer = useRef<NodeJS.Timeout>()
+  const requestCount = useRef(0)
 
-  // 数据加载
-  const loadData = useCallback(async (showLoading = true) => {
+  // 状态更新函数
+  const updateState = useCallback((updates: Partial<State>) => {
+    setState(prev => ({ ...prev, ...updates }))
+  }, [])
+
+  // 加载服务数据
+  const loadServices = useCallback(async (showLoading = true) => {
+    const currentRequest = ++requestCount.current
+    
     try {
       if (showLoading) {
-        setLoading(true)
+        updateState({ loading: true, error: null })
       }
-      setError(null)
 
-      const type = SERVICE_CATEGORIES[currentTab].value
-      const [servicesData, faqsData] = await Promise.all([
-        searchText 
-          ? projectApi.searchServices(searchText)
-          : projectApi.getServicesByType(type),
-        projectApi.getFaqs()
-      ])
+      const type = TAB_LIST[state.currentTab].value as ServiceType
+      const response = await projectApi.searchServices(
+        state.searchValue,
+        type
+      )
 
-      if (mounted.current) {
-        setServices(servicesData.data)
-        setFaqs(faqsData.data)
+      // 确保是最新请求
+      if (currentRequest === requestCount.current && mounted.current) {
+        updateState({ services: response.data })
       }
     } catch (err) {
-      console.error('加载数据失败:', err)
-      if (mounted.current) {
-        setError(handleError(err))
+      console.error('加载服务失败:', err)
+      if (currentRequest === requestCount.current && mounted.current) {
+        const errorMsg = handleError(err)
+        updateState({ error: errorMsg })
+        Taro.showToast({ title: errorMsg, icon: 'none' })
       }
     } finally {
-      if (mounted.current) {
-        setLoading(false)
-        setSearching(false)
+      if (currentRequest === requestCount.current && mounted.current) {
+        updateState({ loading: false })
       }
     }
-  }, [currentTab, searchText])
+  }, [state.currentTab, state.searchValue])
+
+  // 加载FAQ数据
+  const loadFaqs = useCallback(async () => {
+    try {
+      const response = await projectApi.getFaqs()
+      if (mounted.current) {
+        updateState({ faqs: response.data })
+      }
+    } catch (err) {
+      console.error('加载FAQ失败:', err)
+    }
+  }, [])
+
+  // 初始化加载
+  const initializeData = useCallback(async () => {
+    if (!state.initialized) {
+      await Promise.all([loadServices(), loadFaqs()])
+      updateState({ initialized: true })
+    }
+  }, [state.initialized, loadServices, loadFaqs])
 
   // 搜索处理
   const handleSearch = useCallback((value: string) => {
-    setSearchText(value)
-    setSearching(true)
-    setExpandedService(null)
+    updateState({ searchValue: value })
 
     if (searchTimer.current) {
       clearTimeout(searchTimer.current)
     }
 
-    if (!value.trim()) {
-      setSearching(false)
-      loadData(false)
-      return
-    }
-
     searchTimer.current = setTimeout(() => {
-      loadData(false)
+      loadServices()
     }, 500)
-  }, [loadData])
+  }, [loadServices])
 
-  // 分类切换
+  // Tab切换处理
   const handleTabChange = useCallback((index: number) => {
-    if (index === currentTab) return
-    
-    setCurrentTab(index)
-    setExpandedService(null)
-    // 如果有搜索内容，清空搜索
-    if (searchText) {
-      setSearchText('')
+    if (state.currentTab !== index) {
+      updateState({
+        currentTab: index,
+        expandedService: null // 只重置展开状态
+      })
+      loadServices()
     }
-    setLoading(true)
-    
-    loadData()
-  }, [currentTab, searchText, loadData])
+  }, [state.currentTab, loadServices])
 
-  // 服务展开/收起
-  const handleServiceExpand = useCallback((serviceId: number) => {
-    if (loading || searching) return
-    
-    setExpandedService(prev => prev === serviceId ? null : serviceId)
-  }, [loading, searching])
+  // 服务展开处理
+  const handleServiceToggle = useCallback((id: number) => {
+    updateState({
+      expandedService: state.expandedService === id ? null : id
+    })
+  }, [state.expandedService])
 
   // 预约处理
   const handleBooking = useCallback((service: ServiceItem) => {
-    try {
-      setSelectedService(service)
-      setShowBookingModal(true)
-    } catch (error) {
-      console.error('预约失败:', error)
-      Taro.showToast({
-        title: '预约失败，请重试',
-        icon: 'none'
-      })
-    }
+    Taro.switchTab({
+      url: '/pages/contact/index',
+      success: () => {
+        Taro.setStorage({
+          key: 'selected_service',
+          data: {
+            id: service.id,
+            title: service.title,
+            price: service.price,
+            unit: service.unit
+          }
+        })
+      }
+    })
   }, [])
 
   // 生命周期
-  useEffect(() => {
+  useLoad(() => {
     mounted.current = true
-    loadData()
-    
+    initializeData()
+  })
+
+  useDidShow(() => {
+    if (state.initialized && !state.loading) {
+      loadServices(false)
+    }
+  })
+
+  // 下拉刷新
+  usePullDownRefresh(() => {
+    Promise.all([loadServices(false), loadFaqs()]).finally(() => {
+      Taro.stopPullDownRefresh()
+    })
+  })
+
+  // 清理副作用
+  useEffect(() => {
     return () => {
       mounted.current = false
       if (searchTimer.current) {
         clearTimeout(searchTimer.current)
       }
     }
-  }, [loadData])
-
-  useDidShow(() => {
-    if (!loading && !searching) {
-      loadData(false)
-    }
-  })
+  }, [])
 
   return (
     <View className='project'>
-      {/* 搜索区域 */}
-      <SearchSection
-        value={searchText}
-        onChange={handleSearch}
-        loading={searching}
-      />
+      <View className='header'>
+        <SearchBar
+          value={state.searchValue}
+          onChange={handleSearch}
+          onSearch={handleSearch}
+          loading={state.loading}
+          placeholder='搜索服务项目'
+        />
 
-      {/* 分类标签 */}
-      <CategoryTabs
-        categories={SERVICE_CATEGORIES}
-        current={currentTab}
-        onChange={handleTabChange}
-      />
+        <View className='tabs'>
+          {TAB_LIST.map((tab, index) => (
+            <View
+              key={tab.value}
+              className={`tab-item ${state.currentTab === index ? 'active' : ''}`}
+              onClick={() => handleTabChange(index)}
+            >
+              {tab.title}
+            </View>
+          ))}
+        </View>
+      </View>
 
-      <View className='main-content'>
+      <View className='content'>
         {/* 加载状态 */}
-        {loading && (
-          <View className='skeleton-list'>
-            {Array(3).fill(null).map((_, index) => (
-              <View key={index} className='skeleton-item'>
-                <View className='skeleton-header' />
-                <View className='skeleton-content'>
-                  <View className='skeleton-line' />
-                  <View className='skeleton-line' />
-                  <View className='skeleton-line short' />
-                </View>
-              </View>
-            ))}
-          </View>
-        )}
+        {state.loading && (
+        <View className='loading-state'>
+          {Array(3).fill(null).map((_, index) => (
+            <ServiceCard 
+              key={`skeleton-${index}`}
+              loading 
+              className='skeleton-card'
+            />
+          ))}
+        </View>
+      )}
 
         {/* 错误状态 */}
-        {!loading && error && (
-          <View className='error-state'>
-            <View className='error-message'>
-              <Text>{error}</Text>
-            </View>
-            <View className='retry-btn' onClick={() => loadData()}>
-              <Text>重试</Text>
-            </View>
-          </View>
-        )}
+        {!state.loading && !state.error && state.services.length > 0 && (
+      <View className='service-list'>
+        {state.services.map(service => (
+          <ServiceCard
+            key={service.id}
+            service={service}
+            expanded={state.expandedService === service.id}
+            onToggle={handleServiceToggle}
+            onBook={handleBooking}
+          />
+        ))}
+      </View>
+    )}
 
         {/* 空状态 */}
-        {!loading && !error && services.length === 0 && (
+        {!state.loading && !state.error && state.services.length === 0 && (
           <View className='empty-state'>
-            <Text className='empty-text'>没有找到相关服务</Text>
+            <Text className='empty-text'>
+              {state.searchValue ? '未找到相关服务' : '暂无服务内容'}
+            </Text>
           </View>
         )}
 
         {/* 服务列表 */}
-        {!loading && !error && services.length > 0 && (
-          <View className='service-list'>
-            {services.map(service => (
-              <ServiceCard
-                key={service.id}
-                service={service}
-                expanded={expandedService === service.id}
-                onToggle={handleServiceExpand}
-                onBook={handleBooking}
+        {!state.loading && !state.error && state.services.length > 0 && (
+          <>
+            <View className='service-list'>
+              {state.services.map(service => (
+                <ServiceCard
+                  key={service.id}
+                  service={service}
+                  expanded={state.expandedService === service.id}
+                  onToggle={handleServiceToggle}
+                  onBook={handleBooking}
+                />
+              ))}
+            </View>
+
+            {/* FAQ部分 */}
+            {state.faqs.length > 0 && (
+              <FAQSection 
+                faqs={state.faqs}
+                title='常见问题'
+                className='faq-section'
               />
-            ))}
-          </View>
+            )}
+          </>
         )}
-
-        {/* FAQ部分 */}
-        {!loading && !error && <FAQSection faqs={faqs} />}
       </View>
-
-      {/* 预约弹窗 */}
-      <BookingModal
-        isOpen={showBookingModal}
-        onClose={() => {
-          setShowBookingModal(false)
-          setSelectedService(null)
-        }}
-      />
     </View>
   )
 }

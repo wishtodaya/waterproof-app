@@ -1,61 +1,83 @@
-// pages/project/index.scss
 @import "../../styles/custom-theme.scss";
 
 .project {
   min-height: 100vh;
   background: $color-bg;
-  
-  .main-content {
-    padding-top: 180px;
-    padding-bottom: env(safe-area-inset-bottom);
+  padding-bottom: env(safe-area-inset-bottom);
+
+  /* 头部区域 */
+  .header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    background: $color-bg-base;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
   }
 
-  .service-list {
-    padding: 0 24px;
-    margin-bottom: 24px;
+  /* 分类标签 */
+  .tabs {
+    display: flex;
+    align-items: center;
+    padding: 0 16px;
+    height: 88px;
+    border-bottom: 1PX solid $color-border-light;
+    background: $color-bg-base;
   }
 
-  // 骨架屏
-  .skeleton-list {
-    padding: 0 24px;
+  .tab-item {
+    flex: 1;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    color: $color-text-secondary;
+    position: relative;
+    transition: all 0.3s ease;
 
-    .skeleton-item {
-      background: $color-bg-base;
-      border-radius: 16px;
-      padding: 24px;
-      margin-bottom: 24px;
-      
-      .skeleton-header {
-        height: 32px;
-        background: $color-bg-light;
-        border-radius: 8px;
-        margin-bottom: 16px;
+    &.active {
+      color: $color-brand;
+      font-weight: 500;
+
+      &::after {
+        content: '';
+        position: absolute;
+        left: 50%;
+        bottom: 0;
+        width: 40px;
+        height: 3px;
+        background: $color-brand;
+        border-radius: 2px;
+        transform: translateX(-50%);
+        transition: width 0.3s ease;
       }
+    }
 
-      .skeleton-content {
-        .skeleton-line {
-          height: 20px;
-          background: $color-bg-light;
-          border-radius: 4px;
-          margin-bottom: 12px;
-
-          &.short {
-            width: 60%;
-          }
-        }
-      }
+    &:active {
+      opacity: 0.7;
     }
   }
 
-  // 错误状态
+  /* 内容区域 */
+  .content {
+    margin-top: 180px;
+    padding: 24px 16px;
+    min-height: calc(100vh - 180px);
+  }
+
+  /* 加载状态 */
+  .loading-state {
+    animation: fade-in 0.3s ease;
+  }
+
+  /* 错误状态 */
   .error-state {
     padding: 48px 24px;
     text-align: center;
-    background: $color-bg-base;
-    border-radius: 16px;
-    margin: 0 24px 24px;
 
-    .error-message {
+    .error-text {
       font-size: 28px;
       color: $color-text-secondary;
       margin-bottom: 24px;
@@ -64,52 +86,205 @@
     .retry-btn {
       display: inline-block;
       padding: 12px 32px;
-      background: $color-brand;
-      color: #fff;
       font-size: 28px;
-      border-radius: 8px;
-      
+      color: $color-brand;
+      border: 1px solid $color-brand;
+      border-radius: 32px;
+      transition: all 0.3s ease;
+
       &:active {
-        opacity: 0.9;
+        background: rgba($color-brand, 0.1);
       }
     }
   }
 
-  // 空状态
+  /* 空状态 */
   .empty-state {
-    padding: 48px 24px;
+    padding: 120px 24px;
     text-align: center;
-    background: $color-bg-base;
-    border-radius: 16px;
-    margin: 0 24px 24px;
 
     .empty-text {
       font-size: 28px;
       color: $color-text-secondary;
+      line-height: 1.5;
+    }
+  }
+
+  /* 服务列表 */
+  .service-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-bottom: 48px;
+    animation: fade-in 0.3s ease;
+  }
+
+  /* FAQ 部分 */
+  .faq-section {
+    margin-top: 48px;
+    padding: 0 8px;
+    animation: slide-up 0.3s ease;
+  }
+
+  /* 回到顶部按钮 */
+  .back-to-top {
+    position: fixed;
+    right: 24px;
+    bottom: calc(24px + env(safe-area-inset-bottom));
+    width: 80px;
+    height: 80px;
+    background: $color-bg-base;
+    border-radius: 50%;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    opacity: 0;
+    transform: translateY(100px);
+
+    &.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .icon-arrow {
+      width: 24px;
+      height: 24px;
+      border-left: 3px solid $color-text-secondary;
+      border-top: 3px solid $color-text-secondary;
+      transform: rotate(45deg);
+      margin-top: 8px;
+    }
+
+    &:active {
+      transform: translateY(2px);
     }
   }
 }
 
-// 响应式处理
+/* 动画 */
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 深色模式适配 */
+@media (prefers-color-scheme: dark) {
+  .project {
+    .header {
+      background: rgba($color-bg-base, 0.95);
+      backdrop-filter: blur(10px);
+      box-shadow: none;
+    }
+
+    .tabs {
+      border-bottom-color: rgba($color-border-light, 0.1);
+    }
+
+    .back-to-top {
+      background: rgba($color-bg-base, 0.8);
+      backdrop-filter: blur(10px);
+    }
+  }
+}
+
+/* 小屏适配 */
 @media screen and (max-width: 375px) {
   .project {
-    .main-content {
-      padding-top: 184px;
+    .tabs {
+      height: 80px;
+      padding: 0 12px;
     }
 
-    .service-list,
-    .skeleton-list,
-    .error-state,
-    .empty-state {
-      padding-left: 16px;
-      padding-right: 16px;
-      margin-left: 16px;
-      margin-right: 16px;
+    .tab-item {
+      font-size: 26px;
+
+      &.active::after {
+        width: 36px;
+      }
+    }
+
+    .content {
+      margin-top: 165px;
+      padding: 20px 12px;
+    }
+
+    .service-list {
+      gap: 12px;
+      margin-bottom: 40px;
     }
 
     .error-state,
     .empty-state {
-      padding: 32px 16px;
+      padding: 40px 20px;
+    }
+
+    .error-state {
+      .error-text {
+        font-size: 26px;
+      }
+
+      .retry-btn {
+        font-size: 26px;
+        padding: 10px 28px;
+      }
+    }
+
+    .empty-state .empty-text {
+      font-size: 26px;
+    }
+
+    .faq-section {
+      margin-top: 40px;
+      padding: 0 4px;
+    }
+
+    .back-to-top {
+      right: 20px;
+      bottom: calc(20px + env(safe-area-inset-bottom));
+      width: 72px;
+      height: 72px;
+
+      .icon-arrow {
+        width: 20px;
+        height: 20px;
+      }
+    }
+  }
+}
+
+/* 大屏适配 */
+@media screen and (min-width: 768px) {
+  .project {
+    .content {
+      padding: 24px;
+      max-width: 1200px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .service-list {
+      gap: 24px;
+    }
+
+    .faq-section {
+      padding: 0;
     }
   }
 }

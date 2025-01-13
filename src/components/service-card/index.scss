@@ -4,152 +4,341 @@
 .service-card {
   background: $color-bg-base;
   border-radius: 16px;
-  padding: 24px;
   margin-bottom: 24px;
-  position: relative;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
-  transition: all 0.3s ease;
-  will-change: transform, box-shadow;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
 
-  &:active {
-    transform: scale(0.995);
+  // 加载态样式
+  &.is-loading {
+    .skeleton-content {
+      padding: 24px;
+      
+      .skeleton-line {
+        height: 24px;
+        background: $color-bg-light;
+        border-radius: 4px;
+        margin-bottom: 16px;
+        animation: skeleton-loading 1.5s ease-in-out infinite;
+
+        &:last-child {
+          margin-bottom: 0;
+        }
+      }
+    }
   }
 
-  &.expanded {
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  // 卡片主体
+  .card-main {
+    position: relative;
+    padding: 24px;
+    transition: background-color 0.2s ease;
+    
+    &:active {
+      background: rgba($color-brand, 0.02);
+    }
   }
 
-  .service-header {
+  // 头部区域
+  .card-header {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
     margin-bottom: 16px;
-    position: relative;
   }
 
-  .service-title {
+  .title-wrap {
     flex: 1;
+    margin-right: 16px;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .title {
     font-size: 32px;
     font-weight: bold;
     color: $color-text-base;
-    margin-right: 16px;
-
-    .warranty-tag {
-      display: inline-block;
-      font-size: 24px;
-      font-weight: normal;
-      color: $color-brand;
-      background: rgba($color-brand, 0.1);
-      padding: 4px 12px;
-      border-radius: 32px;
-      margin-left: 12px;
-      transform: translateY(-2px);
-    }
+    line-height: 1.4;
   }
 
-  .service-price {
+  .warranty {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 12px;
+    font-size: 24px;
+    color: $color-brand;
+    background: rgba($color-brand, 0.1);
+    border-radius: 32px;
+    line-height: 1.2;
+  }
+
+  .price-wrap {
+    flex-shrink: 0;
     text-align: right;
-    white-space: nowrap;
-
-    .price {
-      font-size: 36px;
-      font-weight: bold;
-      color: $color-brand;
-    }
-
-    .unit {
-      font-size: 24px;
-      color: $color-text-secondary;
-    }
   }
 
-  .service-features {
+  .price {
+    font-size: 36px;
+    font-weight: bold;
+    color: $color-brand;
+    line-height: 1.2;
+  }
+
+  .unit {
+    font-size: 24px;
+    color: $color-text-secondary;
+  }
+
+  // 特点标签
+  .features {
     display: flex;
     flex-wrap: wrap;
     gap: 12px;
     margin-bottom: 16px;
-  
-    .feature-tag {
-      display: inline-flex;    // 改为 inline-flex
-      align-items: center;     // 垂直居中
-      justify-content: center; // 水平居中
-      background: rgba($color-brand, 0.1);
-      color: $color-brand;
-      border: none;
-      border-radius: 6px;
-      font-size: 24px;
-      padding: 8px 16px;
-      height: 40px;           // 固定高度以确保一致性
-      line-height: 1;         // 重置行高
+  }
+
+  .feature-tag {
+    padding: 8px 16px;
+    font-size: 24px;
+    color: $color-text-secondary;
+    background: $color-bg-light;
+    border-radius: 6px;
+    line-height: 1.2;
+  }
+
+  // 简介
+  .description {
+    font-size: 28px;
+    color: $color-text-secondary;
+    line-height: 1.6;
+    padding-right: 48px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  // 展开图标
+  .expand-icon {
+    position: absolute;
+    right: 24px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: $color-bg-light;
+    transition: all 0.3s ease;
+    
+    .icon-arrow {
+      width: 12px;
+      height: 12px;
+      border-right: 2px solid $color-text-secondary;
+      border-bottom: 2px solid $color-text-secondary;
+      transform: rotate(45deg);
+      transition: transform 0.3s ease;
+      margin-top: -4px;
+    }
+
+    &.expanded .icon-arrow {
+      transform: rotate(-135deg);
+      margin-top: 4px;
     }
   }
 
-  .service-description {
-    font-size: 28px;
-    color: $color-text-paragraph;
-    line-height: 1.6;
-    margin-bottom: 24px;
-  }
-
-  .service-detail {
+  // 展开区域
+  .card-expand {
     height: 0;
     opacity: 0;
     overflow: hidden;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    margin-top: 24px;
-    padding-top: 24px;
-    border-top: 1px solid $color-border-light;
-    transform: translateY(-12px);
-    will-change: transform, opacity, height;
+    border-top: 1PX solid $color-border-light;
 
     &.expanded {
       height: auto;
       opacity: 1;
-      transform: translateY(0);
     }
   }
 
-  .info-section {
+  // 服务信息
+  .info-box {
     display: flex;
-    flex-wrap: wrap;
     gap: 24px;
-    margin-bottom: 32px;
+    padding: 24px;
+  }
 
-    .info-item {
-      flex: 1;
-      min-width: 200px;
-      background: $color-bg-light;
-      padding: 16px;
-      border-radius: 12px;
+  .info-item {
+    flex: 1;
+    padding: 16px;
+    background: $color-bg-light;
+    border-radius: 12px;
+    text-align: center;
 
-      .label {
-        font-size: 24px;
-        color: $color-text-secondary;
-        margin-bottom: 8px;
-        display: block;
-      }
+    .label {
+      display: block;
+      font-size: 24px;
+      color: $color-text-secondary;
+      margin-bottom: 8px;
+    }
 
-      .value {
-        font-size: 28px;
-        color: $color-text-base;
-        font-weight: 500;
-      }
+    .value {
+      display: block;
+      font-size: 28px;
+      color: $color-text-base;
+      font-weight: 500;
     }
   }
 
-  .booking-btn {
-    margin-top: 32px;
-    height: 88px;
-    font-size: 32px;
+  // 服务流程
+  .process-box {
+    padding: 24px;
+    border-top: 1PX solid $color-border-light;
+  }
+
+  .process-title {
+    font-size: 28px;
+    font-weight: bold;
+    color: $color-text-base;
+    margin-bottom: 32px;
+  }
+
+  .process-steps {
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+    
+    &::before {
+      content: '';
+      position: absolute;
+      top: 24px;
+      left: 60px;
+      right: 60px;
+      height: 2px;
+      background: $color-border-base;
+      z-index: 0;
+    }
+  }
+
+  .step-item {
+    position: relative;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    z-index: 1;
+  }
+
+  .step-number {
+    width: 48px;
+    height: 48px;
     background: $color-brand;
-    border: none;
-    border-radius: 44px;
+    color: #fff;
+    font-size: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 16px;
     box-shadow: 0 4px 12px rgba($color-brand, 0.2);
+  }
+
+  .step-content {
+    max-width: 200px;
+    padding: 0 12px;
+  }
+
+  .step-title {
+    display: block;
+    font-size: 28px;
+    color: $color-text-base;
+    margin-bottom: 8px;
+    font-weight: 500;
+  }
+
+  .step-desc {
+    display: block;
+    font-size: 26px;
+    color: $color-text-secondary;
+    line-height: 1.4;
+  }
+
+  // 预约按钮
+  .book-btn {
+    margin: 0 24px 24px;
+    height: 88px;
+    line-height: 88px;
+    text-align: center;
+    font-size: 32px;
+    color: #fff;
+    background: $color-brand;
+    border-radius: 44px;
     transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba($color-brand, 0.2);
 
     &:active {
       transform: translateY(2px);
       box-shadow: 0 2px 6px rgba($color-brand, 0.15);
+    }
+  }
+}
+
+// 加载动画
+@keyframes skeleton-loading {
+  0% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 0.3;
+  }
+  100% {
+    opacity: 0.6;
+  }
+}
+
+// 小屏适配
+@media screen and (max-width: 375px) {
+  .service-card {
+    .card-main {
+      padding: 20px;
+    }
+
+    .title {
+      font-size: 30px;
+    }
+
+    .warranty {
+      font-size: 22px;
+      padding: 4px 10px;
+    }
+
+    .price {
+      font-size: 34px;
+    }
+
+    .feature-tag {
+      font-size: 22px;
+      padding: 6px 12px;
+    }
+
+    .description {
+      font-size: 26px;
+    }
+
+    .info-box,
+    .process-box {
+      padding: 20px;
+    }
+
+    .book-btn {
+      margin: 0 20px 20px;
+      height: 80px;
+      line-height: 80px;
+      font-size: 30px;
     }
   }
 }

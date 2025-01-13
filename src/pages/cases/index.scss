@@ -1,0 +1,48 @@
+// pages/cases/index.scss
+@import "../../styles/custom-theme.scss";
+
+.cases {
+  min-height: 100vh;
+  background: $color-bg;
+  padding: 24px;
+
+  // 搜索区域
+  .search-section {
+    margin-bottom: 24px;
+    padding: 16px;
+    background: $color-bg-base;
+    border-radius: 16px;
+  }
+
+  // 筛选区域
+  .filter-section {
+    margin-bottom: 24px;
+    
+    .filter-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+
+      .tag-item {
+        padding: 8px 16px;
+        color: $color-text-secondary;
+        background: $color-bg-light;
+        border-radius: 20px;
+        font-size: 26px;
+        transition: all 0.3s ease;
+
+        &.active {
+          color: $color-text-base-inverse;
+          background: $color-brand;
+        }
+      }
+    }
+  }
+
+  // 案例列表
+  .case-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 24px;
+  }
+}
