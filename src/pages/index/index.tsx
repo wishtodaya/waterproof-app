@@ -201,7 +201,6 @@ export default function Index() {
                     src={item.imageUrl}
                     className='index__case-image'
                     mode='aspectFill'
-                    lazyLoad
                   />
                   <View className='index__case-content'>
                     <Text className='index__case-title'>{item.title}</Text>

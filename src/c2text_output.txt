@@ -1,0 +1,1398 @@
+📁 src
+  📄 app.config.ts
+  📄 app.scss
+  📄 app.ts
+  📁 config
+    📄 index.ts
+  📄 index.html
+  📁 pages
+    📁 index
+      📄 index.config.ts
+      📄 index.scss
+      📄 index.tsx
+  📁 services
+    📄 index-api.ts
+    📄 index-mock-data.ts
+  📁 styles
+    📄 custom-theme.scss
+  📁 types
+    📄 index.ts
+  📁 utils
+    📄 error.ts
+
+===== File: app.config.ts =====
+// app.config.ts
+export default defineAppConfig({
+  pages: [
+    'pages/index/index',
+    'pages/project/index',
+    'pages/cases/index',
+    'pages/contact/index'
+  ],
+  window: {
+    backgroundTextStyle: 'light',
+    navigationBarBackgroundColor: '#ffffff',
+    navigationBarTitleText: '防水服务',
+    navigationBarTextStyle: 'black',
+    backgroundColor: '#f6f6f6'
+  },
+  tabBar: {
+    color: '#999999',
+    selectedColor: '#2563eb',
+    backgroundColor: '#ffffff',
+    borderStyle: 'white',
+    list: [
+      {
+        pagePath: 'pages/index/index',
+        text: '首页',
+        iconPath: 'assets/tab-bar/home.png',
+        selectedIconPath: 'assets/tab-bar/home-active.png'
+      },
+      {
+        pagePath: 'pages/project/index',
+        text: '服务',
+        iconPath: 'assets/tab-bar/service.png',
+        selectedIconPath: 'assets/tab-bar/service-active.png'
+      },
+      {
+        pagePath: 'pages/cases/index',
+        text: '案例',
+        iconPath: 'assets/tab-bar/case.png',
+        selectedIconPath: 'assets/tab-bar/case-active.png'
+      },
+      {
+        pagePath: 'pages/contact/index',
+        text: '联系我们',
+        iconPath: 'assets/tab-bar/contact.png',
+        selectedIconPath: 'assets/tab-bar/contact-active.png'
+      }
+    ]
+  }
+})
+===== End of File: app.config.ts =====
+
+
+===== File: app.scss =====
+// app.scss
+@import "./styles/custom-theme.scss";
+
+// 基础样式设置
+page {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+  font-size: 28px;
+  line-height: 1.5;
+  background: $color-bg;
+  color: $color-text-base;
+}
+===== End of File: app.scss =====
+
+
+===== File: app.ts =====
+// app.tsx
+import { PropsWithChildren } from 'react'
+import { useLaunch, useError, getStorageSync, setStorageSync, onNetworkStatusChange } from '@tarojs/taro'
+import './styles/custom-theme.scss'
+import './app.scss'
+
+function App({ children }: PropsWithChildren<any>) {
+  useLaunch(() => {
+    initApp()
+  })
+
+  useError((error) => {
+    console.error('App Error:', error)
+  })
+
+  const initApp = async () => {
+    try {
+      // 初始化日志
+      const logs = getStorageSync('logs') || []
+      logs.unshift(Date.now())
+      setStorageSync('logs', logs)
+
+      // 网络状态监听
+      onNetworkStatusChange((res) => {
+        console.log('network status:', res.isConnected)
+      })
+
+    } catch (error) {
+      console.error('App initialization failed:', error)
+    }
+  }
+
+  return children
+}
+
+export default App
+===== End of File: app.ts =====
+
+
+===== File: config\index.ts =====
+import type { Config } from '../types'
+
+export const config: Config = {
+    ui: {
+      banner: {
+        interval: 3000,
+        duration: 500
+      },
+      cases: {
+        interval: 4000,
+        duration: 500,
+        displayCount: 0,
+        cardHeight: 0
+      }
+    },
+    contact: {
+      phone: '400-888-8888',
+      wechat: 'waterproof888'
+    }
+}
+===== End of File: config\index.ts =====
+
+
+===== File: index.html =====
+<!-- @ts-nocheck -->
+<!DOCTYPE html>
+<html>
+<head>
+  <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+  <meta content="width=device-width,initial-scale=1,user-scalable=no" name="viewport">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-touch-fullscreen" content="yes">
+  <meta name="format-detection" content="telephone=no,address=no">
+  <meta name="apple-mobile-web-app-status-bar-style" content="white">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>waterproof-app</title>
+  <script><%= htmlWebpackPlugin.options.script %></script>
+</head>
+<body>
+  <div id="app"></div>
+</body>
+</html>
+===== End of File: index.html =====
+
+
+===== File: pages\index\index.config.ts =====
+// pages/index/index.config.ts
+export default {
+  navigationBarTitleText: '防水服务',
+  enablePullDownRefresh: true,
+  backgroundColor: '#f5f5f5',
+  backgroundTextStyle: 'dark',
+  navigationBarBackgroundColor: '#ffffff',
+  navigationBarTextStyle: 'black'
+}
+===== End of File: pages\index\index.config.ts =====
+
+
+===== File: pages\index\index.scss =====
+// index.scss
+@import "../../styles/custom-theme.scss";
+
+.index {
+  position: relative;
+  z-index: 0;
+  min-height: 100vh;
+  background: $color-bg;
+  box-sizing: border-box;
+
+  &__header {
+    position: relative;
+    z-index: 0;
+    width: 100%;
+    height: 320px;
+    overflow: hidden;
+
+    :global {
+      .swiper {
+        width: 100%;
+        height: 320px;
+        
+        .swiper-item {
+          width: 100%;
+          height: 100%;
+          overflow: hidden;
+        }
+
+        .wx-swiper-dots {
+          bottom: 12px;
+          
+          .wx-swiper-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 4px;
+            transition: all 0.3s;
+            
+            &.wx-swiper-dot-active {
+              width: 16px;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  &__banner-item {
+    position: relative;
+    width: 100%;
+    height: 320px;
+    overflow: hidden; 
+  }
+
+  &__banner-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  &__banner-text {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1;
+    padding: 64px 24px 40px;
+    background: linear-gradient(
+      180deg,
+      transparent 0%,
+      rgba(0, 0, 0, 0.6) 30%,
+      rgba(0, 0, 0, 0.85) 100%
+    );
+    pointer-events: none; 
+  }
+
+  &__banner-title {
+    display: block; 
+    font-size: 40px;
+    font-weight: bold;
+    line-height: 1.2;
+    color: $color-white;
+    margin-bottom: 12px;
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+  }
+
+  &__banner-subtitle {
+    display: block;
+    font-size: 28px;
+    line-height: 1.4;
+    color: rgba($color-white, 0.95);
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+  }
+
+  &__content {
+    position: relative;
+    z-index: 1;
+    padding: 8px 16px;
+  }
+
+  &__service-intro {
+    margin-bottom: 12px;
+    padding: 24px;
+    background: $color-bg-base;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    height: 320px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  &__title {
+    font-size: 36px;
+    font-weight: bold;
+    margin-bottom: 32px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid $color-border-base;
+    color: $color-text-title;
+    flex-shrink: 0;
+  }
+
+  &__btn-group {
+    display: flex;
+    gap: 16px;
+    height: 130px;
+    align-items: center;
+    margin-top: 24px;
+
+    :global {
+      .at-button {
+        flex: 1;
+        height: 130px;
+        font-size: 34px;
+        border-radius: 12px;
+        justify-content: center;
+        gap: 12px; 
+        padding: 16px 8px;
+        
+        &--primary {
+          background: $color-brand;
+          box-shadow: 0 4px 12px rgba($color-brand, 0.2);
+        }
+        
+        &--secondary {
+          background: rgba($color-brand, 0.1);
+          border: 2px solid $color-brand;
+          color: $color-brand;
+          font-weight: 500;
+        }
+      }
+    }
+  }
+
+  &__cases {
+    margin-bottom: 12px;
+    padding: 24px;
+    background: $color-bg-base;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  }
+
+  &__case-swiper {
+    height: 460px;
+    padding: 20px 0;
+  }
+
+  &__case-item {
+    height: 420px;
+    margin: 0 12px;
+    background: $color-bg-base;
+    border-radius: 12px;
+    overflow: hidden;
+    transform: scale(0.92);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+
+    &::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.35);
+      opacity: 1;
+      transition: opacity 0.3s ease;
+      z-index: 1;
+    }
+
+    &--active {
+      transform: scale(1);
+
+      &::after {
+        opacity: 0;
+      }
+    }
+  }
+
+  &__case-image {
+    width: 100%;
+    height: 240px;
+    object-fit: cover;
+  }
+
+  &__case-content {
+    position: relative;
+    z-index: 2;
+    height: 180px;
+    padding: 20px;
+    background: $color-bg-base;
+  }
+
+  &__case-title {
+    font-size: 28px;
+    font-weight: 600;
+    line-height: 1.4;
+    color: $color-text-title;
+    margin-bottom: 12px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  &__case-desc {
+    font-size: 26px;
+    line-height: 1.5;
+    color: $color-text-secondary;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  &__advantages {
+    padding: 24px;
+    background: $color-bg-base;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  }
+
+  &__advantage-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+
+  &__advantage-item {
+    min-height: 160px;
+    padding: 24px 20px;
+    background: rgba($color-brand, 0.04);
+    border-radius: 12px;
+    text-align: center;
+    transition: transform 0.2s ease;
+  }
+
+  &__advantage-icon {
+    display: block;
+    font-size: 56px;
+    margin-bottom: 16px;
+  }
+
+  &__advantage-value {
+    font-size: 36px;
+    font-weight: bold;
+    color: $color-brand;
+    margin-bottom: 8px;
+  }
+
+  &__advantage-label {
+    font-size: 26px;
+    color: $color-text-secondary;
+    line-height: 1.4;
+  }
+
+  &__book-btn {
+    width: 100%;
+    height: 108px;
+    font-size: 34px;
+    margin-top: 24px;
+    border-radius: 12px;
+    background: $color-brand;
+    box-shadow: 0 4px 12px rgba($color-brand, 0.2);
+  }
+}
+
+.loading,
+.error {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  color: $color-text-secondary;
+  
+  :global {
+    .at-button {
+      width: 240px;
+    }
+  }
+}
+
+@media screen and (max-width: 375px) {
+  .index {
+    &__content {
+      padding: 4px 12px;
+    }
+
+    &__header,
+    :global(.swiper),
+    &__banner-item {
+      height: 280px;
+    }
+
+    &__service-intro {
+      height: 280px;
+    }
+
+    &__banner-title {
+      font-size: 36px;
+    }
+
+    &__banner-subtitle {
+      font-size: 24px;
+    }
+
+    &__title {
+      font-size: 32px;
+      margin-bottom: 24px;
+    }
+
+    &__service-intro,
+    &__cases,
+    &__advantages {
+      padding: 20px;
+    }
+
+    &__btn-group {
+      height: 120px;
+      font-size: 32px;
+    }
+
+    &__book-btn {
+      height: 96px;
+      font-size: 32px;
+    }
+  }
+}
+===== End of File: pages\index\index.scss =====
+
+
+===== File: pages\index\index.tsx =====
+import { useEffect, useState, useCallback, useRef } from 'react'
+import { View, Text, Image, Swiper, SwiperItem } from '@tarojs/components'
+import type { SwiperProps } from '@tarojs/components'
+import { AtButton } from 'taro-ui'
+import Taro, { useDidShow } from '@tarojs/taro'
+import { api } from '../../services/index-api'
+import { config } from '../../config'
+import { handleError } from '../../utils/error'
+import { CaseDetailModal } from '../../components/case-detail-modal'
+import type { Banner, ServiceCase, ServiceAdvantage } from '../../types'
+import './index.scss'
+
+export default function Index() {
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const [banners, setBanners] = useState<Banner[]>([])
+  const [cases, setCases] = useState<ServiceCase[]>([])
+  const [advantages, setAdvantages] = useState<ServiceAdvantage[]>([])
+  const [selectedCase, setSelectedCase] = useState<ServiceCase | null>(null)
+  const [showCaseModal, setShowCaseModal] = useState(false)
+  const [currentCaseIndex, setCurrentCaseIndex] = useState(0)
+
+  const refreshing = useRef(false)
+  const mounted = useRef(false)
+
+  const fetchData = useCallback(async (showLoading = true) => {
+    try {
+      if (showLoading) {
+        setLoading(true)
+      }
+      setError(null)
+
+      const [bannerRes, caseRes, advantageRes] = await Promise.all([
+        api.getBanners(),
+        api.getCases(),
+        api.getAdvantages()
+      ])
+
+      if (mounted.current) {
+        setBanners(bannerRes.data)
+        setCases(caseRes.data)
+        setAdvantages(advantageRes.data)
+      }
+    } catch (err) {
+      console.error('初始化数据失败:', err)
+      if (mounted.current) {
+        setError(handleError(err))
+      }
+    } finally {
+      if (showLoading && mounted.current) {
+        setLoading(false)
+      }
+      refreshing.current = false
+    }
+  }, [])
+
+  useEffect(() => {
+    mounted.current = true
+    fetchData()
+    return () => {
+      mounted.current = false
+    }
+  }, [fetchData])
+
+  useDidShow(() => {
+    if (!refreshing.current) {
+      fetchData(false)
+    }
+  })
+
+  const handleRefresh = useCallback(async () => {
+    if (refreshing.current) return
+    refreshing.current = true
+    
+    try {
+      await fetchData(false)
+      Taro.showToast({ title: '刷新成功', icon: 'success' })
+    } catch (error) {
+      console.error('刷新失败:', error)
+      Taro.showToast({
+        title: handleError(error),
+        icon: 'none'
+      })
+    } finally {
+      Taro.stopPullDownRefresh()
+    }
+  }, [fetchData])
+
+  const handleCall = useCallback(() => {
+    Taro.makePhoneCall({
+      phoneNumber: config.contact.phone
+    }).catch(err => {
+      if (!err.errMsg?.includes('cancel')) {
+        Taro.showToast({ title: '拨号失败', icon: 'none' })
+      }
+    })
+  }, [])
+
+  const handleWechat = useCallback(() => {
+    Taro.setClipboardData({
+      data: config.contact.wechat,
+      success: () => {
+        Taro.showToast({
+          title: '微信号已复制',
+          icon: 'none'
+        })
+      }
+    })
+  }, [])
+
+  const handleCaseClick = useCallback((caseItem: ServiceCase) => {
+    setSelectedCase(caseItem)
+    setShowCaseModal(true)
+  }, [])
+
+  const handleBooking = useCallback(() => {
+    Taro.switchTab({ url: '/pages/contact/index' })
+  }, [])
+
+  const handleCaseChange: SwiperProps['onChange'] = useCallback((e) => {
+    setCurrentCaseIndex(e.detail.current)
+  }, [])
+
+  if (loading) {
+    return (
+      <View className='loading'>
+        <Text>加载中...</Text>
+      </View>
+    )
+  }
+
+  if (error) {
+    return (
+      <View className='error'>
+        <Text>{error}</Text>
+        <AtButton type='primary' onClick={handleRefresh}>重试</AtButton>
+      </View>
+    )
+  }
+
+  return (
+    <View className='index'>
+      <View className='index__header'>
+        <Swiper
+          className='swiper'
+          circular
+          autoplay
+          interval={3000}
+          duration={500}
+          indicatorDots
+          indicatorColor='rgba(255, 255, 255, 0.4)'
+          indicatorActiveColor='#ffffff'
+        >
+          {banners.map(banner => (
+            <SwiperItem key={banner.id} className='swiper-item'>
+              <View className='index__banner-item'>
+                <Image 
+                  src={banner.imageUrl}
+                  className='index__banner-image'
+                  mode='aspectFill'
+                  lazyLoad
+                />
+                <View className='index__banner-text'>
+                  <Text className='index__banner-title'>{banner.title}</Text>
+                  <Text className='index__banner-subtitle'>{banner.subtitle}</Text>
+                </View>
+              </View>
+            </SwiperItem>
+          ))}
+        </Swiper>
+      </View>
+
+      <View className='index__content'>
+        <View className='index__service-intro'>
+          <View className='index__title'>专业防水服务</View>
+          <View className='index__btn-group'>
+            <AtButton type='primary' onClick={handleCall}>📞电话咨询</AtButton>
+            <AtButton type='secondary' onClick={handleWechat}>💬微信咨询</AtButton>
+          </View>
+        </View>
+
+        <View className='index__cases'>
+          <View className='index__title'>精选案例</View>
+          <Swiper
+            className='index__case-swiper'
+            circular
+            autoplay={!showCaseModal}
+            interval={4000}
+            duration={500}
+            previousMargin='30px'
+            nextMargin='30px'
+            onChange={handleCaseChange}
+          >
+            {cases.map((item, index) => (
+              <SwiperItem key={item.id}>
+                <View 
+                  className={`index__case-item ${index === currentCaseIndex ? 'index__case-item--active' : ''}`}
+                  onClick={() => handleCaseClick(item)}
+                >
+                  <Image 
+                    src={item.imageUrl}
+                    className='index__case-image'
+                    mode='aspectFill'
+                    lazyLoad
+                  />
+                  <View className='index__case-content'>
+                    <Text className='index__case-title'>{item.title}</Text>
+                    <Text className='index__case-desc'>{item.description}</Text>
+                  </View>
+                </View>
+              </SwiperItem>
+            ))}
+          </Swiper>
+        </View>
+
+        <View className='index__advantages'>
+          <View className='index__title'>我们的优势</View>
+          <View className='index__advantage-grid'>
+            {advantages.map(item => (
+              <View key={item.id} className='index__advantage-item'>
+                <Text className='index__advantage-icon'>{item.icon}</Text>
+                <Text className='index__advantage-value'>{item.value}</Text>
+                <Text className='index__advantage-label'>{item.label}</Text>
+              </View>
+            ))}
+          </View>
+          <AtButton 
+            type='primary'
+            className='index__book-btn'
+            onClick={handleBooking}
+          >
+            快速预约
+          </AtButton>
+        </View>
+      </View>
+
+      <CaseDetailModal
+        isOpen={showCaseModal}
+        onClose={() => setShowCaseModal(false)}
+        data={selectedCase}
+      />
+    </View>
+  )
+}
+===== End of File: pages\index\index.tsx =====
+
+
+===== File: services\index-api.ts =====
+import type { Banner, ServiceCase, ServiceAdvantage, BookingForm, ApiResponse } from '../types'
+import { AppError } from '../utils/error'
+import { mockBanners, mockCases, mockAdvantages } from './index-mock-data'
+
+async function mockRequest<T>(data: T, delay = 500): Promise<T> {
+  await new Promise(resolve => setTimeout(resolve, delay))
+  return data
+}
+
+export const api = {
+  getBanners(): Promise<ApiResponse<Banner[]>> {
+    return mockRequest({ code: 0, message: 'success', data: mockBanners })
+  },
+
+  getCases(): Promise<ApiResponse<ServiceCase[]>> {
+    return mockRequest({ code: 0, message: 'success', data: mockCases })
+  },
+
+  getCaseDetail(id: number): Promise<ApiResponse<ServiceCase>> {
+    const caseItem = mockCases.find(item => item.id === id)
+    if (!caseItem) {
+      throw new AppError(404, '案例不存在')
+    }
+    return mockRequest({ code: 0, message: 'success', data: caseItem })
+  },
+
+  getAdvantages(): Promise<ApiResponse<ServiceAdvantage[]>> {
+    return mockRequest({ code: 0, message: 'success', data: mockAdvantages })
+  },
+
+  async submitBooking(form: BookingForm): Promise<ApiResponse<{ id: number }>> {
+    // Validate required fields
+    if (!form.name?.trim()) {
+      throw new AppError(400, '请输入姓名')
+    }
+    if (!form.phone?.trim()) {
+      throw new AppError(400, '请输入手机号')
+    }
+
+    // Validate phone format
+    const phoneRegex = /^1[3-9]\d{9}$/
+    if (!phoneRegex.test(form.phone)) {
+      throw new AppError(400, '请输入正确的手机号')
+    }
+
+    // Validate field lengths
+    if (form.name.length > 20) {
+      throw new AppError(400, '姓名不能超过20个字符')
+    }
+    if (form.address && form.address.length > 100) {
+      throw new AppError(400, '地址不能超过100个字符')
+    }
+    if (form.remark && form.remark.length > 200) {
+      throw new AppError(400, '备注不能超过200个字符')
+    }
+
+    // Simulate API call
+    return mockRequest({ 
+      code: 0, 
+      message: 'success', 
+      data: { id: Date.now() } 
+    }, 1000)
+  }
+}
+===== End of File: services\index-api.ts =====
+
+
+===== File: services\index-mock-data.ts =====
+import type { Banner, ServiceCase, ServiceAdvantage } from '../types'
+
+export const mockBanners: Banner[] = [
+  {
+    id: 1,
+    title: '品质服务保障',
+    subtitle: '十年质保 终身维护',
+    imageUrl: require('../assets/banner/banner1.png')
+  },
+  {
+    id: 2,
+    title: '专业防水服务',
+    subtitle: '一站式解决您的渗漏问题',
+    imageUrl: require('../assets/banner/banner2.png')
+  }
+]
+
+export const mockCases: ServiceCase[] = [
+  {
+    id: 1,
+    title: '地铁站防水工程',
+    description: '为北京新建地铁站提供防水保护',
+    imageUrl: require('../assets/case/case1.png'),
+    content: '本项目是为北京市政新建地铁站提供的整体防水解决方案。采用了最新的防水材料和工艺，确保地铁站在使用寿命内不会出现渗漏问题。项目包括防水设计、材料选型、施工和验收等全过程服务。',
+    type: '基础设施',
+    date: '2024-01-06',
+    views: 1280
+  },
+  {
+    id: 2,
+    title: '商业建筑防水工程',
+    description: '为上海某商业建筑提供全面防水解决方案',
+    imageUrl: require('../assets/case/case2.png'),
+    content: '该项目是为上海某大型商业综合体提供的防水维护服务。主要解决了建筑外墙渗水、地下车库渗漏等问题。采用了环保型防水材料，确保了防水效果的同时也保护了环境。',
+    type: '商业建筑',
+    date: '2024-01-05',
+    views: 960
+  },
+  {
+    id: 3,
+    title: '住宅小区防水工程',
+    description: '为广州某高档住宅小区提供屋面防水服务',
+    imageUrl: require('../assets/case/case2.png'),
+    content: '本项目为广州某高档住宅小区提供整体屋面防水服务。采用了先进的防水技术和材料，解决了房屋渗漏问题，提高了居民的生活质量。项目获得了业主的一致好评。',
+    type: '住宅建筑',
+    date: '2024-01-04',
+    views: 756
+  }
+]
+
+export const mockAdvantages: ServiceAdvantage[] = [
+  {
+    id: 1,
+    icon: '🏅',
+    value: '100+',
+    label: '专业认证'
+  },
+  {
+    id: 2,
+    icon: '⏱️',
+    value: '30分钟',
+    label: '快速响应'
+  },
+  {
+    id: 3,
+    icon: '📊',
+    value: '1000+',
+    label: '成功案例'
+  },
+  {
+    id: 4,
+    icon: '😊',
+    value: '99%',
+    label: '客户满意'
+  }
+]
+===== End of File: services\index-mock-data.ts =====
+
+
+===== File: styles\custom-theme.scss =====
+/* custom-theme.scss */
+
+/* The Color of O2Team Brand */
+$color-brand: #2563eb;                      // 品牌主色
+$color-brand-light: #60a5fa;                // 品牌色-浅色
+$color-brand-dark: #1d4ed8;                 // 品牌色-深色
+$color-brand-disabled: #bfdbfe;             // 品牌色-禁用
+
+/* Color */
+$color-success: #22c55e;                    // 成功色
+$color-error: #ef4444;                      // 错误色
+$color-warning: #f59e0b;                    // 警告色
+$color-info: #78A4FA;
+
+/* Color Palette */
+$color-black-0: #000;
+$color-black-1: #333;
+$color-black-2: #7F7F7F;
+$color-black-3: #B2B2B2;
+
+$color-grey-0: #333;
+$color-grey-1: #666;
+$color-grey-2: #999;
+$color-grey-3: #CCC;
+$color-grey-4: #E5E5E5;
+$color-grey-5: #F0F0F0;
+$color-grey-6: #F7F7F7;
+
+$color-white: #FFF;
+
+/* Text Color */
+$color-text-base: #1e293b;                  // 基础文字色
+$color-text-base-inverse: #ffffff;          // 反色文字色
+$color-text-secondary: #475569;             // 次要文字色
+$color-text-placeholder: #94a3b8;           // 占位文字色
+$color-text-disabled: #cbd5e1;              // 禁用文字色
+$color-text-title: #2C405A;
+$color-text-paragraph: #3F536E;
+
+/* Link */
+$color-link: #6190E8;
+$color-link-hover: #79A1EB;
+$color-link-active: #4F7DE2;
+$color-link-disabled: #BFBFBF;
+
+/* 背景色 */
+$color-bg: #f8fafc;                         // 背景色
+$color-bg-base: #ffffff;                    // 组件背景色
+$color-bg-light: #f1f5f9;                   // 浅背景色
+$color-bg-dark: #e2e8f0;                    // 深背景色
+$color-bg-grey: #F7F7F7;
+
+/* 边框颜色 */
+$color-border-base: #e2e8f0;                // 基础边框色
+$color-border-split: #edf2f7;               // 分割线 (原tint 20%)
+$color-border-light: #f1f5f9;               // 浅边框色
+$color-border-dark: #cbd5e1;                // 深边框色
+$color-border-lighter: #f7fafc;             // 更浅边框色 (原tint 50%)
+$color-border-lightest: #fcfdfe;            // 最浅边框色 (原tint 80%)
+$color-border-grey: #CCC;
+
+/* 图标颜色 */
+$color-icon-base: #CCC;
+
+/* 功能色相关 */
+// 成功色
+$color-success-light: #86efac;              // 成功色-浅色
+$color-success-dark: #16a34a;               // 成功色-深色
+$color-success-disabled: #bbf7d0;           // 成功色-禁用
+
+// 警告色
+$color-warning-light: #fcd34d;              // 警告色-浅色
+$color-warning-dark: #d97706;               // 警告色-深色
+$color-warning-disabled: #fde68a;           // 警告色-禁用
+
+// 错误色
+$color-error-light: #fca5a5;                // 错误色-浅色
+$color-error-dark: #dc2626;                 // 错误色-深色
+$color-error-disabled: #fecaca;             // 错误色-禁用
+
+/**
+ * 引入Taro UI默认样式
+ */
+@import "~taro-ui/dist/style/index.scss";
+===== End of File: styles\custom-theme.scss =====
+
+
+===== File: types\index.ts =====
+// types/index.ts
+
+// API 基础类型
+export interface ApiResponse<T> {
+  code: number
+  message: string
+  data: T
+}
+
+// 分页相关
+export interface PaginationParams {
+  page: number
+  pageSize: number
+}
+
+export interface PaginatedResponse<T> extends ApiResponse<T> {
+  pagination: {
+    total: number
+    totalPages: number
+    currentPage: number
+    pageSize: number
+  }
+}
+
+//主页
+
+// Banner相关
+export interface Banner {
+  id: number
+  title: string
+  subtitle: string
+  imageUrl: string
+}
+
+// 服务案例相关
+export interface ServiceCase {
+  id: number
+  title: string
+  description: string
+  imageUrl: string
+  content?: string
+  type: string
+  date: string
+  views: number
+}
+
+// 服务优势相关
+export interface ServiceAdvantage {
+  id: number
+  icon: string
+  value: string
+  label: string
+}
+
+// 预约表单相关
+export interface BookingForm {
+  name: string
+  phone: string
+  address?: string
+  remark?: string
+}
+
+// 服务类型
+export type ServiceType = 'all' | 'home' | 'outdoor' | 'industrial'
+
+export interface ProcessStep {
+  step: number
+  title: string
+  description: string
+  status?: 'pending' | 'processing' | 'completed' | 'error'
+}
+
+export interface ServiceItem {
+  id: number
+  title: string
+  price: number
+  unit: string
+  type: ServiceType
+  description: string
+  features: string[]
+  process: ProcessStep[]
+  estimatedDuration?: string
+  minArea?: number
+  maxArea?: number
+  warranty?: string
+  imageUrl?: string
+  updatedAt?: string
+  createdAt?: string
+}
+
+// 搜索相关
+export interface SearchOptions {
+  sortBy?: 'relevance' | 'price' | 'createdAt'
+  sortOrder?: 'asc' | 'desc'
+  minPrice?: number
+  maxPrice?: number
+  minArea?: number
+  maxArea?: number
+}
+
+// FAQ 相关
+export interface FAQ {
+  id: number
+  question: string
+  answer: string
+  category: string
+  order?: number
+  isHot?: boolean
+}
+
+// 组件 Props 类型
+export interface SearchBarProps {
+  value: string
+  placeholder?: string
+  className?: string
+  loading?: boolean
+  delay?: number
+  maxLength?: number
+  showAction?: boolean
+  actionText?: string
+  onChange: (value: string) => void
+  onSearch?: (value: string) => void
+  onFocus?: () => void
+  onBlur?: () => void
+  onClear?: () => void
+}
+
+export interface ServiceCardProps {
+  service: ServiceItem
+  expanded?: boolean
+  loading?: boolean
+  className?: string
+  showAction?: boolean
+  onToggle?: (id: number) => void
+  onBook?: (service: ServiceItem) => void
+}
+
+export interface FAQSectionProps {
+  faqs: FAQ[]
+  title?: string
+  className?: string
+  emptyText?: string
+  onFAQClick?: (faq: FAQ) => void
+}
+
+// 状态管理类型
+export interface ProjectPageState {
+  loading: boolean
+  services: ServiceItem[]
+  faqs: FAQ[]
+  searchValue: string
+  currentTab: number
+  expandedService: number | null
+  error: string | null
+  initialized: boolean
+  searchHistory: string[]
+  filter: SearchOptions
+}
+
+// 通用组件类型
+export interface LoadingProps {
+  size?: 'small' | 'normal' | 'large'
+  color?: string
+  className?: string
+  text?: string
+}
+
+export interface EmptyProps {
+  text?: string
+  image?: string
+  className?: string
+  children?: React.ReactNode
+}
+
+export interface ErrorProps {
+  text?: string
+  code?: number
+  className?: string
+  onRetry?: () => void
+}
+
+// 错误相关
+export interface AppErrorType extends Error {
+  code: number
+  details?: any
+}
+
+// Tab 相关
+export interface TabItem {
+  title: string
+  value: ServiceType
+  badge?: number | string
+}
+
+export interface TabsProps {
+  items: TabItem[]
+  value: string | number
+  className?: string
+  onChange: (value: string | number) => void
+}
+
+// 过滤器相关
+export interface FilterOption {
+  label: string
+  value: string | number
+  disabled?: boolean
+}
+
+export interface FilterGroupProps {
+  title: string
+  options: FilterOption[]
+  value: string | number | (string | number)[]
+  multiple?: boolean
+  className?: string
+  onChange: (value: string | number | (string | number)[]) => void
+}
+
+// 业务类型
+export interface ServiceBooking {
+  id: number
+  serviceId: number
+  userId: string
+  status: 'pending' | 'confirmed' | 'cancelled' | 'completed'
+  area?: number
+  address?: string
+  contactName: string
+  contactPhone: string
+  appointmentTime?: string
+  remark?: string
+  createdAt: string
+}
+
+export interface ServiceComment {
+  id: number
+  serviceId: number
+  userId: string
+  rating: number
+  content: string
+  images?: string[]
+  reply?: string
+  createdAt: string
+}
+
+// 配置类型
+export interface ProjectConfig {
+  searchDebounceDelay: number
+  maxSearchHistory: number
+  defaultPageSize: number
+  imageBaseUrl: string
+  priceUnit: string
+  areaUnit: string
+}
+===== End of File: types\index.ts =====
+
+
+===== File: utils\error.ts =====
+// utils/error.ts
+
+// 自定义应用错误类
+export class AppError extends Error {
+  constructor(
+    public code: number,
+    message: string
+  ) {
+    super(message)
+    this.name = 'AppError'
+  }
+}
+
+// 类型保护：判断是否为 AppError
+export function isAppError(error: unknown): error is AppError {
+  return error instanceof AppError
+}
+
+// 通用错误处理函数
+export function handleError(error: unknown): string {
+  // 如果是应用自定义错误
+  if (isAppError(error)) {
+    return error.message
+  }
+
+  // 如果是标准 Error 对象
+  if (error instanceof Error) {
+    return error.message
+  }
+
+  // 其他未知错误类型
+  return '操作失败，请稍后重试'
+}
+
+// 业务错误码映射
+export const ErrorCodeMap: Record<number, string> = {
+  400: '请求参数错误',
+  401: '未登录或登录已过期',
+  403: '没有操作权限',
+  404: '请求的资源不存在',
+  500: '服务器内部错误',
+  502: '网关错误',
+  503: '服务不可用',
+  504: '网关超时'
+}
+
+// HTTP 错误处理
+export function handleHttpError(code: number): string {
+  return ErrorCodeMap[code] || '网络请求失败，请稍后重试'
+}
+
+// 表单错误处理
+export function handleFormError(error: unknown): { 
+  [key: string]: string 
+} {
+  if (isAppError(error)) {
+    try {
+      // 尝试解析错误信息是否为 JSON 格式的字段错误
+      const fieldsError = JSON.parse(error.message)
+      if (typeof fieldsError === 'object') {
+        return fieldsError
+      }
+    } catch {
+      // 解析失败则返回通用错误
+      return { _error: error.message }
+    }
+  }
+  return { _error: handleError(error) }
+}
+
+// 网络错误判断
+export function isNetworkError(error: unknown): boolean {
+  if (error instanceof Error) {
+    return error.message.toLowerCase().includes('network') || 
+           error.message.toLowerCase().includes('timeout') ||
+           error.message.toLowerCase().includes('connection')
+  }
+  return false
+}
+
+// 超时错误判断
+export function isTimeoutError(error: unknown): boolean {
+  if (error instanceof Error) {
+    return error.message.toLowerCase().includes('timeout')
+  }
+  return false
+}
+
+// 创建业务错误
+export function createBusinessError(code: number, message: string): AppError {
+  return new AppError(code, message)
+}
+
+// 包装异步错误处理
+export async function wrapAsyncError<T>(
+  promise: Promise<T>,
+  errorMessage?: string
+): Promise<T> {
+  try {
+    return await promise
+  } catch (error) {
+    throw new AppError(
+      isAppError(error) ? error.code : 500,
+      errorMessage || handleError(error)
+    )
+  }
+}
+
+// 错误提示格式化
+export function formatErrorMessage(error: unknown): string {
+  if (isAppError(error)) {
+    const code = error.code
+    const message = error.message
+    return `${message}${code ? ` (${code})` : ''}`
+  }
+  return handleError(error)
+}
+===== End of File: utils\error.ts =====
+
