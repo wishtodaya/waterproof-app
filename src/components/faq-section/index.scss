@@ -1,125 +1,100 @@
+// components/faq-section/index.scss
 @import "../../styles/custom-theme.scss";
 
 .faq-section {
-  padding: 0 24px;
+  position: relative;
+  min-height: 200px;
+  background: $color-bg-base;
+  border-radius: 12px;
+  overflow: hidden;
 
-  .section-title {
-    font-size: 36px;
-    font-weight: 600;
+  &__title {
+    font-size: 32px;
+    font-weight: 500;
     color: $color-text-base;
-    margin-bottom: 32px;
+    padding: 24px;
   }
 
-  .faq-list {
+  &__list {
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 12px;
+    padding: 0 24px 24px;
   }
+}
 
-  .faq-item {
-    border-radius: 16px;
-    background-color: $color-bg-base;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+.faq-item {
+  position: relative;
+  min-height: 88px;
+  background: $color-grey-6;
+  border-radius: 8px;
+  overflow: hidden;
 
-    &.active {
-      .arrow {
-        transform: rotate(180deg);
-      }
-    }
-  }
-
-  .faq-header {
+  &__header {
     position: relative;
-    padding: 24px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+    padding: 20px 24px;
+    cursor: pointer;
 
     &:active {
       opacity: 0.7;
     }
   }
 
-  .header-content {
-    flex: 1;
+  &__main {
     display: flex;
     align-items: center;
     gap: 12px;
     padding-right: 32px;
   }
 
-  .question {
-    font-size: 30px;
-    font-weight: 500;
+  &__question {
+    font-size: 28px;
     color: $color-text-base;
+    line-height: 1.4;
   }
 
-  .category {
-    display: inline-block;
+  &__category {
     padding: 4px 12px;
     font-size: 24px;
     color: $color-brand;
     background: rgba($color-brand, 0.1);
     border-radius: 32px;
+    line-height: 1.2;
   }
 
-  .arrow {
+  &__arrow {
     position: absolute;
     right: 24px;
     top: 50%;
-    margin-top: -6px;
     width: 12px;
     height: 12px;
-    border-right: 2px solid $color-text-secondary;
-    border-bottom: 2px solid $color-text-secondary;
-    transform: rotate(45deg);
-    transition: transform 0.2s ease;
+    border-right: 2px solid $color-grey-2;
+    border-bottom: 2px solid $color-grey-2;
+    transform: translateY(-75%) rotate(45deg);
+    transition: transform 0.2s;
   }
 
-  .faq-content {
-    padding: 0 24px 24px;
+  &__content {
+    display: none;
+    border-top: 1px solid $color-border-base;
   }
 
-  .answer {
-    font-size: 28px;
-    line-height: 1.6;
+  &__answer {
+    padding: 20px 24px;
+    font-size: 26px;
     color: $color-text-secondary;
+    line-height: 1.6;
   }
-}
 
-// 小屏适配
-@media screen and (max-width: 375px) {
-  .faq-section {
-    padding: 0 16px;
+  &--active {
+    min-height: 120px;
 
-    .section-title {
-      font-size: 32px;
-      margin-bottom: 24px;
+    .faq-item__arrow {
+      transform: translateY(-25%) rotate(-135deg);
     }
 
-    .faq-list {
-      gap: 12px;
-    }
-
-    .faq-header {
-      padding: 20px;
-    }
-
-    .question {
-      font-size: 28px;
-    }
-
-    .category {
-      font-size: 22px;
-      padding: 4px 10px;
-    }
-
-    .faq-content {
-      padding: 0 20px 20px;
-    }
-
-    .answer {
-      font-size: 26px;
+    .faq-item__content {
+      display: block;
     }
   }
 }

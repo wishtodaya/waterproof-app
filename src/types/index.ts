@@ -22,6 +22,44 @@ export interface PaginatedResponse<T> extends ApiResponse<T> {
   }
 }
 
+//主页
+
+// Banner相关
+export interface Banner {
+  id: number
+  title: string
+  subtitle: string
+  imageUrl: string
+}
+
+// 服务案例相关
+export interface ServiceCase {
+  id: number
+  title: string
+  description: string
+  imageUrl: string
+  content?: string
+  type: string
+  date: string
+  views: number
+}
+
+// 服务优势相关
+export interface ServiceAdvantage {
+  id: number
+  icon: string
+  value: string
+  label: string
+}
+
+// 预约表单相关
+export interface BookingForm {
+  name: string
+  phone: string
+  address?: string
+  remark?: string
+}
+
 // 服务类型
 export type ServiceType = 'all' | 'home' | 'outdoor' | 'industrial'
 

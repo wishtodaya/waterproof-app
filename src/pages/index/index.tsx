@@ -11,7 +11,6 @@ import type { Banner, ServiceCase, ServiceAdvantage } from '../../types'
 import './index.scss'
 
 export default function Index() {
-  // State
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [banners, setBanners] = useState<Banner[]>([])
@@ -21,11 +20,9 @@ export default function Index() {
   const [showCaseModal, setShowCaseModal] = useState(false)
   const [currentCaseIndex, setCurrentCaseIndex] = useState(0)
 
-  // Refs for lifecycle management
   const refreshing = useRef(false)
   const mounted = useRef(false)
 
-  // 数据获取
   const fetchData = useCallback(async (showLoading = true) => {
     try {
       if (showLoading) {
@@ -33,27 +30,16 @@ export default function Index() {
       }
       setError(null)
 
-      const results = await Promise.allSettled([
+      const [bannerRes, caseRes, advantageRes] = await Promise.all([
         api.getBanners(),
         api.getCases(),
         api.getAdvantages()
       ])
 
-      const errors = results
-        .filter((result): result is PromiseRejectedResult => result.status === 'rejected')
-        .map(result => result.reason)
-
-      if (errors.length > 0) {
-        console.error('数据加载错误:', errors)
-        throw new Error('部分数据加载失败')
-      }
-
-      const [bannerResult, caseResult, advantageResult] = results as PromiseFulfilledResult<any>[]
-
       if (mounted.current) {
-        setBanners(bannerResult.value.data)
-        setCases(caseResult.value.data)
-        setAdvantages(advantageResult.value.data)
+        setBanners(bannerRes.data)
+        setCases(caseRes.data)
+        setAdvantages(advantageRes.data)
       }
     } catch (err) {
       console.error('初始化数据失败:', err)
@@ -68,7 +54,6 @@ export default function Index() {
     }
   }, [])
 
-  // Lifecycle
   useEffect(() => {
     mounted.current = true
     fetchData()
@@ -83,26 +68,18 @@ export default function Index() {
     }
   })
 
-  // Event handlers
   const handleRefresh = useCallback(async () => {
     if (refreshing.current) return
     refreshing.current = true
     
     try {
-      Taro.startPullDownRefresh()
       await fetchData(false)
-      
-      Taro.showToast({
-        title: '刷新成功',
-        icon: 'success',
-        duration: 1500
-      })
+      Taro.showToast({ title: '刷新成功', icon: 'success' })
     } catch (error) {
       console.error('刷新失败:', error)
       Taro.showToast({
         title: handleError(error),
-        icon: 'none',
-        duration: 2000
+        icon: 'none'
       })
     } finally {
       Taro.stopPullDownRefresh()
@@ -114,75 +91,36 @@ export default function Index() {
       phoneNumber: config.contact.phone
     }).catch(err => {
       if (!err.errMsg?.includes('cancel')) {
+        Taro.showToast({ title: '拨号失败', icon: 'none' })
+      }
+    })
+  }, [])
+
+  const handleWechat = useCallback(() => {
+    Taro.setClipboardData({
+      data: config.contact.wechat,
+      success: () => {
         Taro.showToast({
-          title: '拨号失败，请稍后重试',
+          title: '微信号已复制',
           icon: 'none'
         })
       }
     })
   }, [])
 
-  const handleWechat = useCallback(() => {
-    try {
-      Taro.setClipboardData({
-        data: config.contact.wechat,
-        success: () => {
-          Taro.showToast({
-            title: '微信号已复制，请打开微信添加',
-            icon: 'none',
-            duration: 2500
-          })
-        },
-        fail: () => {
-          Taro.showToast({
-            title: '复制失败，请稍后重试',
-            icon: 'none'
-          })
-        }
-      })
-    } catch (error) {
-      console.error('复制异常:', error)
-      Taro.showToast({
-        title: handleError(error),
-        icon: 'none'
-      })
-    }
+  const handleCaseClick = useCallback((caseItem: ServiceCase) => {
+    setSelectedCase(caseItem)
+    setShowCaseModal(true)
   }, [])
 
-  const handleCaseClick = useCallback(async (caseItem: ServiceCase) => {
-    try {
-      setShowCaseModal(true)
-      const response = await api.getCaseDetail(caseItem.id)
-      if (mounted.current) {
-        setSelectedCase(response.data)
-      }
-    } catch (error) {
-      console.error('获取案例详情失败:', error)
-      Taro.showToast({
-        title: handleError(error),
-        icon: 'none'
-      })
-      setShowCaseModal(false)
-    }
-  }, [mounted])
-
   const handleBooking = useCallback(() => {
-    Taro.switchTab({
-      url: '/pages/contact/index'
-    }).catch(err => {
-      console.error('切换页面失败:', err)
-      Taro.showToast({
-        title: '页面跳转失败，请稍后重试',
-        icon: 'none'
-      })
-    })
+    Taro.switchTab({ url: '/pages/contact/index' })
   }, [])
 
   const handleCaseChange: SwiperProps['onChange'] = useCallback((e) => {
     setCurrentCaseIndex(e.detail.current)
   }, [])
 
-  // Loading state
   if (loading) {
     return (
       <View className='loading'>
@@ -191,7 +129,6 @@ export default function Index() {
     )
   }
 
-  // Error state
   if (error) {
     return (
       <View className='error'>
@@ -203,73 +140,72 @@ export default function Index() {
 
   return (
     <View className='index'>
-      {/* Banner */}
-      <Swiper
-        className='banner'
-        circular
-        indicatorDots
-        autoplay
-        indicatorColor='rgba(255,255,255,0.6)'
-        indicatorActiveColor='#ffffff'
-        interval={config.ui.banner.interval}
-        duration={config.ui.banner.duration}
-      >
-        {banners.map(banner => (
-          <SwiperItem key={banner.id} className='banner-item'>
-            <Image 
-              src={banner.imageUrl}
-              className='banner-image'
-              mode='aspectFill'
-              lazyLoad
-            />
-            <View className='banner-text'>
-              <Text className='banner-title'>{banner.title}</Text>
-              <Text className='banner-subtitle'>{banner.subtitle}</Text>
-            </View>
-          </SwiperItem>
-        ))}
-      </Swiper>
+      <View className='index__header'>
+        <Swiper
+          className='swiper'
+          circular
+          autoplay
+          interval={3000}
+          duration={500}
+          indicatorDots
+          indicatorColor='rgba(255, 255, 255, 0.4)'
+          indicatorActiveColor='#ffffff'
+        >
+          {banners.map(banner => (
+            <SwiperItem key={banner.id} className='swiper-item'>
+              <View className='index__banner-item'>
+                <Image 
+                  src={banner.imageUrl}
+                  className='index__banner-image'
+                  mode='aspectFill'
+                  lazyLoad
+                />
+                <View className='index__banner-text'>
+                  <Text className='index__banner-title'>{banner.title}</Text>
+                  <Text className='index__banner-subtitle'>{banner.subtitle}</Text>
+                </View>
+              </View>
+            </SwiperItem>
+          ))}
+        </Swiper>
+      </View>
 
-      <View className='content-container'>
-        {/* Service Introduction */}
-        <View className='service-intro card'>
-          <View className='card-title'>专业防水服务</View>
-          <View className='btn-group'>
-            <AtButton type='primary' onClick={handleCall}>电话咨询</AtButton>
-            <AtButton type='secondary' onClick={handleWechat}>微信咨询</AtButton>
+      <View className='index__content'>
+        <View className='index__service-intro'>
+          <View className='index__title'>专业防水服务</View>
+          <View className='index__btn-group'>
+            <AtButton type='primary' onClick={handleCall}>📞电话咨询</AtButton>
+            <AtButton type='secondary' onClick={handleWechat}>💬微信咨询</AtButton>
           </View>
         </View>
 
-        {/* Cases */}
-        <View className='cases card'>
-          <View className='card-title'>精选案例</View>
+        <View className='index__cases'>
+          <View className='index__title'>精选案例</View>
           <Swiper
-            className='case-swiper'
+            className='index__case-swiper'
             circular
             autoplay={!showCaseModal}
-            interval={config.ui.cases.interval}
-            duration={400}
-            easingFunction='easeInOutCubic'
+            interval={4000}
+            duration={500}
             previousMargin='30px'
             nextMargin='30px'
-            snapToEdge
             onChange={handleCaseChange}
           >
             {cases.map((item, index) => (
               <SwiperItem key={item.id}>
                 <View 
-                  className={`case-item ${index === currentCaseIndex ? 'active' : ''}`}
+                  className={`index__case-item ${index === currentCaseIndex ? 'index__case-item--active' : ''}`}
                   onClick={() => handleCaseClick(item)}
                 >
                   <Image 
                     src={item.imageUrl}
-                    className='case-image'
+                    className='index__case-image'
                     mode='aspectFill'
                     lazyLoad
                   />
-                  <View className='case-content'>
-                    <Text className='case-title'>{item.title}</Text>
-                    <Text className='case-desc'>{item.description}</Text>
+                  <View className='index__case-content'>
+                    <Text className='index__case-title'>{item.title}</Text>
+                    <Text className='index__case-desc'>{item.description}</Text>
                   </View>
                 </View>
               </SwiperItem>
@@ -277,21 +213,20 @@ export default function Index() {
           </Swiper>
         </View>
 
-        {/* Advantages */}
-        <View className='advantages card'>
-          <View className='card-title'>我们的优势</View>
-          <View className='advantage-grid'>
+        <View className='index__advantages'>
+          <View className='index__title'>我们的优势</View>
+          <View className='index__advantage-grid'>
             {advantages.map(item => (
-              <View key={item.id} className='advantage-item'>
-                <Text className='advantage-icon'>{item.icon}</Text>
-                <Text className='advantage-value'>{item.value}</Text>
-                <Text className='advantage-label'>{item.label}</Text>
+              <View key={item.id} className='index__advantage-item'>
+                <Text className='index__advantage-icon'>{item.icon}</Text>
+                <Text className='index__advantage-value'>{item.value}</Text>
+                <Text className='index__advantage-label'>{item.label}</Text>
               </View>
             ))}
           </View>
           <AtButton 
-            type='primary' 
-            className='book-btn'
+            type='primary'
+            className='index__book-btn'
             onClick={handleBooking}
           >
             快速预约
@@ -299,7 +234,6 @@ export default function Index() {
         </View>
       </View>
 
-      {/* Modals */}
       <CaseDetailModal
         isOpen={showCaseModal}
         onClose={() => setShowCaseModal(false)}

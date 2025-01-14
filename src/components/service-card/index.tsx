@@ -1,5 +1,5 @@
 // components/service-card/index.tsx
-import { memo, useMemo, useCallback } from 'react'
+import { memo, useCallback } from 'react'
 import { View, Text } from '@tarojs/components'
 import type { ServiceItem } from '../../types'
 import './index.scss'
@@ -13,85 +13,70 @@ interface ServiceCardProps {
   onBook?: (service: ServiceItem) => void
 }
 
-export const ServiceCard = memo(function ServiceCard({
+export const ServiceCard = memo(({
   service,
   loading = false,
   expanded = false,
   className = '',
   onToggle,
   onBook
-}: ServiceCardProps) {
-  
+}: ServiceCardProps) => {
+
+  const handleToggle = useCallback(() => {
+    if (service) {
+      onToggle?.(service.id)
+    }
+  }, [service, onToggle])
+
+  const handleBook = useCallback((e: any) => {
+    e.stopPropagation()
+    if (service) {
+      onBook?.(service)
+    }
+  }, [service, onBook])
+
   // 加载状态
   if (loading) {
     return (
-      <View className={`service-card is-loading ${className}`}>
-        <View className='skeleton-content'>
-          <View className='skeleton-line' style='width: 60%' />
-          <View className='skeleton-line' style='width: 40%' />
-          <View className='skeleton-line' style='width: 90%' />
+      <View className='service-card service-card--loading'>
+        <View className='service-card__skeleton'>
+          <View className='service-card__skeleton-line' style='width: 60%' />
+          <View className='service-card__skeleton-line' style='width: 40%' />
+          <View className='service-card__skeleton-line' style='width: 90%' />
         </View>
       </View>
     )
   }
 
-  // 确保服务数据存在
+  // 无数据状态
   if (!service) return null
 
-  // 格式化价格
-  const formattedPrice = useMemo(() => {
-    return typeof service.price === 'number' 
-      ? service.price.toLocaleString('zh-CN')
-      : service.price
-  }, [service.price])
-
-  // 构建应用区域信息
-  const applicationArea = useMemo(() => {
-    if (!service.minArea && !service.maxArea) return null
-    if (service.minArea && service.maxArea) {
-      return `${service.minArea}-${service.maxArea}㎡`
-    }
-    if (service.minArea) return `≥${service.minArea}㎡`
-    return `≤${service.maxArea}㎡`
-  }, [service.minArea, service.maxArea])
-
-  // 展开/收起处理
-  const handleToggle = useCallback((e: any) => {
-    e.stopPropagation()
-    onToggle?.(service.id)
-  }, [service.id, onToggle])
-
-  // 预约处理
-  const handleBook = useCallback((e: any) => {
-    e.stopPropagation()
-    onBook?.(service)
-  }, [service, onBook])
-
   return (
-    <View className={`service-card ${expanded ? 'is-expanded' : ''} ${className}`}>
-      {/* 卡片主体，点击展开/收起 */}
-      <View className='card-main' onClick={handleToggle}>
+    <View className={`service-card ${expanded ? 'service-card--expanded' : ''} ${className}`}>
+      {/* 主要内容区 */}
+      <View className='service-card__main' onClick={handleToggle}>
         {/* 头部信息 */}
-        <View className='card-header'>
-          <View className='title-wrap'>
-            <Text className='title'>{service.title}</Text>
+        <View className='service-card__header'>
+          <View className='service-card__title-wrap'>
+            <Text className='service-card__title'>{service.title}</Text>
             {service.warranty && (
-              <Text className='warranty'>{service.warranty}</Text>
+              <Text className='service-card__warranty'>{service.warranty}</Text>
             )}
           </View>
-          <View className='price-wrap'>
-            <Text className='price'>¥{formattedPrice}</Text>
-            <Text className='unit'>/{service.unit}</Text>
+
+          <View className='service-card__price-wrap'>
+            <Text className='service-card__price'>¥{service.price}</Text>
+            <Text className='service-card__unit'>/{service.unit}</Text>
           </View>
         </View>
 
-        {/* 特点标签 */}
+        {/* 特性标签 */}
         {service.features?.length > 0 && (
-          <View className='features'>
+          <View className='service-card__features'>
             {service.features.map((feature, index) => (
-              <Text 
-                key={`${service.id}-feature-${index}`} 
-                className='feature-tag'
+              <Text
+                key={`${service.id}-feature-${index}`}
+                className='service-card__feature-tag'
               >
                 {feature}
               </Text>
@@ -99,48 +84,54 @@ export const ServiceCard = memo(function ServiceCard({
           </View>
         )}
 
-        {/* 简介 */}
-        <Text className='description'>{service.description}</Text>
-
-        {/* 展开/收起图标 */}
-        <View className={`expand-icon ${expanded ? 'expanded' : ''}`}>
-          <View className='icon-arrow' />
-        </View>
+        {/* 描述文本 */}
+        <Text className='service-card__desc'>{service.description}</Text>
+        
+        {/* 展开指示器 */}
+        <View className='service-card__arrow' />
       </View>
 
-      {/* 展开内容 */}
-      <View className={`card-expand ${expanded ? 'expanded' : ''}`}>
-        {/* 服务信息 */}
-        <View className='info-box'>
+      {/* 展开内容区 */}
+      <View className='service-card__expand'>
+        {/* 基本信息 */}
+        <View className='service-card__info'>
           {service.estimatedDuration && (
-            <View className='info-item'>
-              <Text className='label'>预计工期</Text>
-              <Text className='value'>{service.estimatedDuration}</Text>
+            <View className='service-card__info-item'>
+              <Text className='service-card__info-label'>预计工期</Text>
+              <Text className='service-card__info-value'>
+                {service.estimatedDuration}
+              </Text>
             </View>
           )}
-          {applicationArea && (
-            <View className='info-item'>
-              <Text className='label'>适用面积</Text>
-              <Text className='value'>{applicationArea}</Text>
+          
+          {(service.minArea || service.maxArea) && (
+            <View className='service-card__info-item'>
+              <Text className='service-card__info-label'>适用面积</Text>
+              <Text className='service-card__info-value'>
+                {service.minArea && service.maxArea
+                  ? `${service.minArea}-${service.maxArea}㎡`
+                  : service.minArea
+                    ? `≥${service.minArea}㎡`
+                    : `≤${service.maxArea}㎡`
+                }
+              </Text>
             </View>
           )}
         </View>
 
         {/* 服务流程 */}
         {service.process?.length > 0 && (
-          <View className='process-box'>
-            <Text className='process-title'>服务流程</Text>
-            <View className='process-steps'>
+          <View className='service-card__process'>
+            <Text className='service-card__process-title'>服务流程</Text>
+            <View className='service-card__process-steps'>
               {service.process.map((step, index) => (
-                <View 
-                  key={`${service.id}-step-${index}`} 
-                  className='step-item'
+                <View
+                  key={`${service.id}-step-${index}`}
+                  className='service-card__process-step'
                 >
-                  <View className='step-number'>{index + 1}</View>
-                  <View className='step-content'>
-                    <Text className='step-title'>{step.title}</Text>
-                    <Text className='step-desc'>{step.description}</Text>
-                  </View>
+                  <View className='service-card__step-number'>{index + 1}</View>
+                  <Text className='service-card__step-title'>{step.title}</Text>
+                  <Text className='service-card__step-desc'>{step.description}</Text>
                 </View>
               ))}
             </View>
@@ -148,10 +139,12 @@ export const ServiceCard = memo(function ServiceCard({
         )}
 
         {/* 预约按钮 */}
-        <View className='book-btn' onClick={handleBook}>
+        <View className='service-card__book' onClick={handleBook}>
           立即预约
         </View>
       </View>
     </View>
   )
 })
+
+export default ServiceCard

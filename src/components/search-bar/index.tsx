@@ -1,115 +1,66 @@
 // components/search-bar/index.tsx
-import { useState, useCallback, useEffect, useMemo } from 'react'
+import { useState, useCallback, memo } from 'react'
 import { View, Input } from '@tarojs/components'
-import debounce from 'lodash/debounce'
+import { SearchBarProps } from '../../types'
 import './index.scss'
 
-interface SearchBarProps {
-  value: string
-  placeholder?: string
-  className?: string
-  loading?: boolean
-  delay?: number  // 防抖延迟时间
-  maxLength?: number
-  onChange: (value: string) => void
-  onSearch?: (value: string) => void
-  onFocus?: () => void
-  onBlur?: () => void
-  onClear?: () => void
-}
-
-export const SearchBar: React.FC<SearchBarProps> = ({
+export const SearchBar = memo(({
   value,
   placeholder = '搜索',
-  className = '',
   loading = false,
-  delay = 500,
-  maxLength = 100,
+  className = '',
   onChange,
   onSearch,
   onFocus,
   onBlur,
   onClear
-}) => {
-  // 状态管理
+}: SearchBarProps) => {
   const [isFocused, setIsFocused] = useState(false)
-  const [innerValue, setInnerValue] = useState(value)
 
-  // 同步外部value变化
-  useEffect(() => {
-    setInnerValue(value)
-  }, [value])
-
-  // 防抖处理
-  const debouncedChange = useMemo(
-    () => debounce((value: string) => {
-      onChange(value)
-    }, delay),
-    [onChange, delay]
-  )
-
-  // 清理防抖
-  useEffect(() => {
-    return () => {
-      debouncedChange.cancel()
-    }
-  }, [debouncedChange])
-
-  // 输入处理
   const handleInput = useCallback((e: any) => {
-    const newValue = e.detail.value.trim()
-    setInnerValue(newValue)
-    debouncedChange(newValue)
-  }, [debouncedChange])
+    onChange(e.detail.value)
+  }, [onChange])
 
-  // 清除处理
   const handleClear = useCallback(() => {
-    setInnerValue('')
     onChange('')
     onClear?.()
   }, [onChange, onClear])
 
-  // 搜索处理
   const handleSearch = useCallback(() => {
-    if (!innerValue) return
-    onSearch?.(innerValue)
-  }, [innerValue, onSearch])
+    if (!value.trim()) return
+    onSearch?.(value)
+  }, [value, onSearch])
 
-  // 聚焦处理
   const handleFocus = useCallback(() => {
     setIsFocused(true)
     onFocus?.()
   }, [onFocus])
 
-  // 失焦处理
   const handleBlur = useCallback(() => {
     setIsFocused(false)
     onBlur?.()
   }, [onBlur])
 
   return (
-    <View className={`search-bar ${className} ${isFocused ? 'is-focused' : ''} ${loading ? 'is-loading' : ''}`}>
-      <View className='search-input-wrap'>
-        {/* 搜索图标 */}
-        <View className='search-icon'>
+    <View className={`search-bar ${isFocused ? 'search-bar--focused' : ''} ${loading ? 'search-bar--loading' : ''} ${className}`}>
+      <View className='search-bar__input-wrap'>
+        <View className='search-bar__icon'>
           {loading ? (
-            <View className='loading-icon' />
+            <View className='search-bar__loading' />
           ) : (
             <>
-              <View className='icon-circle' />
-              <View className='icon-line' />
+              <View className='search-bar__circle' />
+              <View className='search-bar__line' />
             </>
           )}
         </View>
 
-        {/* 输入框 */}
         <Input
-          className='search-input'
+          className='search-bar__input'
           type='text'
-          value={innerValue}
+          value={value}
           placeholder={placeholder}
-          placeholderClass='placeholder'
-          maxlength={maxLength}
+          placeholderClass='search-bar__placeholder'
           onInput={handleInput}
           onFocus={handleFocus}
           onBlur={handleBlur}
@@ -118,21 +69,19 @@ export const SearchBar: React.FC<SearchBarProps> = ({
           disabled={loading}
         />
 
-        {/* 清除按钮 */}
-        {innerValue && !loading && (
-          <View className='clear-btn' onClick={handleClear}>
-            <View className='clear-icon' />
+        {value && !loading && (
+          <View className='search-bar__clear' onClick={handleClear}>
+            <View className='search-bar__clear-icon' />
           </View>
         )}
       </View>
 
-      {/* 搜索按钮 */}
       <View 
-        className={`search-btn ${innerValue ? 'active' : ''} ${loading ? 'disabled' : ''}`}
+        className={`search-bar__action ${value ? 'search-bar__action--active' : ''} ${loading ? 'search-bar__action--disabled' : ''}`}
         onClick={handleSearch}
       >
         搜索
       </View>
     </View>
   )
-}
+})
