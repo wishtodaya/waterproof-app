@@ -1,49 +1,59 @@
-// components/service-card/index.scss
 @import "../../styles/custom-theme.scss";
 
 .service-card {
   position: relative;
-  min-height: 200px;
   background: $color-bg-base;
   border-radius: 12px;
-  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 
   &__main {
-    padding: 24px;
+    padding: 24px 28px;
     position: relative;
     cursor: pointer;
+    transition: background-color 0.25s ease;
+
+    &:hover {
+      background: rgba($color-brand, 0.02);
+    }
 
     &:active {
-      opacity: 0.7;
+      background: rgba($color-brand, 0.04);
     }
   }
 
   &__header {
     display: flex;
     justify-content: space-between;
-    margin-bottom: 16px;
+    margin-bottom: 20px;
   }
 
   &__title-wrap {
     flex: 1;
-    margin-right: 16px;
+    margin-right: 20px;
   }
 
   &__title {
     font-size: 32px;
-    font-weight: 500;
-    color: $color-text-base;
+    font-weight: 600;
+    color: $color-text-title;
     line-height: 1.4;
   }
 
   &__warranty {
     display: inline-block;
     margin-left: 12px;
-    padding: 4px 12px;
+    padding: 4px 16px;
     font-size: 24px;
     color: $color-brand;
-    background: rgba($color-brand, 0.1);
-    border-radius: 32px;
+    background: rgba($color-brand, 0.08);
+    border-radius: 8px;
+    font-weight: 500;
+    transition: all 0.25s ease;
+
+    &:hover {
+      background: rgba($color-brand, 0.12);
+    }
   }
 
   &__price-wrap {
@@ -54,18 +64,20 @@
     font-size: 36px;
     font-weight: bold;
     color: $color-brand;
+    transition: color 0.25s ease;
   }
 
   &__unit {
     font-size: 24px;
-    color: $color-text-secondary;
+    color: rgba($color-text-secondary, 0.85);
+    margin-left: 2px;
   }
 
   &__features {
     display: flex;
     flex-wrap: wrap;
     gap: 8px;
-    margin-bottom: 16px;
+    margin-bottom: 20px;
   }
 
   &__feature-tag {
@@ -73,7 +85,13 @@
     font-size: 24px;
     color: $color-text-secondary;
     background: $color-grey-6;
-    border-radius: 6px;
+    border-radius: 8px;
+    transition: all 0.25s ease;
+
+    &:hover {
+      background: $color-grey-5;
+      color: $color-text-base;
+    }
   }
 
   &__desc {
@@ -89,34 +107,45 @@
 
   &__arrow {
     position: absolute;
-    right: 24px;
+    right: 28px;
     top: 50%;
-    margin-top: -6px;
     width: 12px;
     height: 12px;
-    border-right: 2px solid $color-grey-2;
-    border-bottom: 2px solid $color-grey-2;
-    transform: rotate(45deg);
-    transition: transform 0.2s;
+    border-right: 2px solid rgba($color-text-title, 0.3);
+    border-bottom: 2px solid rgba($color-text-title, 0.3);
+    transform: translateY(-50%) rotate(45deg);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transform-origin: center;
   }
 
   &__expand {
-    display: none;
+    overflow: hidden;
+    max-height: 0;
+    opacity: 0;
+    transform: translateY(-12px);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    will-change: max-height, opacity, transform;
     border-top: 1px solid $color-border-base;
   }
 
   &__info {
     display: flex;
     gap: 16px;
-    padding: 24px;
+    padding: 24px 28px;
   }
 
   &__info-item {
     flex: 1;
-    padding: 16px;
+    padding: 20px;
     background: $color-grey-6;
-    border-radius: 8px;
+    border-radius: 12px;
     text-align: center;
+    transition: all 0.25s ease;
+
+    &:hover {
+      background: $color-grey-5;
+      transform: translateY(-1px);
+    }
   }
 
   &__info-label {
@@ -130,32 +159,33 @@
     display: block;
     font-size: 28px;
     color: $color-text-base;
-    font-weight: 500;
+    font-weight: 600;
   }
 
   &__process {
-    padding: 24px;
+    padding: 24px 28px;
     border-top: 1px solid $color-border-base;
   }
 
   &__process-title {
     font-size: 28px;
-    font-weight: 500;
-    color: $color-text-base;
-    margin-bottom: 24px;
+    font-weight: 600;
+    color: $color-text-title;
+    margin-bottom: 32px;
   }
 
   &__process-steps {
     position: relative;
     display: flex;
     justify-content: space-between;
+    padding: 0 20px;
 
     &::before {
       content: '';
       position: absolute;
       top: 24px;
-      left: 40px;
-      right: 40px;
+      left: 60px;
+      right: 60px;
       height: 2px;
       background: $color-border-base;
     }
@@ -169,6 +199,11 @@
     align-items: center;
     text-align: center;
     z-index: 1;
+    transition: transform 0.25s ease;
+
+    &:hover {
+      transform: translateY(-2px);
+    }
   }
 
   &__step-number {
@@ -177,69 +212,191 @@
     background: $color-brand;
     color: $color-white;
     font-size: 24px;
+    font-weight: 600;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     margin-bottom: 16px;
+    transition: all 0.25s ease;
+    box-shadow: 0 2px 8px rgba($color-brand, 0.2);
+
+    &:hover {
+      transform: scale(1.05);
+      box-shadow: 0 4px 12px rgba($color-brand, 0.25);
+    }
   }
 
   &__step-title {
     font-size: 28px;
-    font-weight: 500;
-    color: $color-text-base;
+    font-weight: 600;
+    color: $color-text-title;
     margin-bottom: 8px;
   }
 
   &__step-desc {
     font-size: 24px;
     color: $color-text-secondary;
-    line-height: 1.4;
+    line-height: 1.5;
   }
 
   &__book {
-    margin: 0 24px 24px;
+    margin: 0 28px 28px;
     height: 88px;
-    line-height: 88px;
-    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     font-size: 32px;
+    font-weight: 600;
     color: $color-white;
     background: $color-brand;
-    border-radius: 44px;
+    border-radius: 12px;
     cursor: pointer;
+    transition: all 0.25s ease;
+    box-shadow: 0 2px 8px rgba($color-brand, 0.2);
+
+    &:hover {
+      background: darken($color-brand, 5%);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba($color-brand, 0.25);
+    }
 
     &:active {
+      transform: translateY(0);
       opacity: 0.9;
     }
   }
 
   &--expanded {
-    min-height: 400px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
 
     .service-card__arrow {
-      transform: rotate(-135deg);
-      margin-top: 0;
+      transform: translateY(-50%) rotate(-135deg);
+      border-color: $color-brand;
     }
 
     .service-card__expand {
-      display: block;
+      max-height: 2000px;
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .service-card__main {
+      background: rgba($color-brand, 0.02);
     }
   }
 
   &--loading {
+    min-height: 200px;
+    
     .service-card__skeleton {
-      min-height: 200px;
+      padding: 24px 28px;
     }
 
     .service-card__skeleton-line {
       height: 24px;
       background: $color-grey-6;
-      border-radius: 4px;
+      border-radius: 8px;
       margin-bottom: 16px;
+      animation: shimmer 1.5s infinite linear;
+      background: linear-gradient(
+        90deg,
+        $color-grey-6 0%,
+        lighten($color-grey-6, 2%) 50%,
+        $color-grey-6 100%
+      );
+      background-size: 200% 100%;
 
       &:last-child {
         margin-bottom: 0;
+        width: 60%;
       }
     }
   }
 }
+
+@keyframes shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+@media (max-width: 375px) {
+  .service-card {
+    &__main {
+      padding: 20px 24px;
+    }
+
+    &__title {
+      font-size: 28px;
+    }
+
+    &__warranty {
+      font-size: 22px;
+      padding: 4px 12px;
+    }
+
+    &__price {
+      font-size: 32px;
+    }
+
+    &__unit {
+      font-size: 22px;
+    }
+
+    &__feature-tag {
+      font-size: 22px;
+      padding: 6px 12px;
+    }
+
+    &__desc {
+      font-size: 26px;
+    }
+
+    &__info,
+    &__process {
+      padding: 20px 24px;
+    }
+
+    &__info-item {
+      padding: 16px;
+    }
+
+    &__info-label {
+      font-size: 22px;
+    }
+
+    &__info-value {
+      font-size: 26px;
+    }
+
+    &__process-title {
+      font-size: 26px;
+      margin-bottom: 24px;
+    }
+
+    &__step-number {
+      width: 40px;
+      height: 40px;
+      font-size: 22px;
+    }
+
+    &__step-title {
+      font-size: 26px;
+    }
+
+    &__step-desc {
+      font-size: 22px;
+    }
+
+    &__book {
+      margin: 0 24px 24px;
+      height: 80px;
+      font-size: 28px;
+    }
+  }
+}
+
