@@ -1,5 +1,6 @@
 // components/service-card/index.tsx
 import { memo, useCallback } from 'react'
+import Taro from '@tarojs/taro'
 import { View, Text } from '@tarojs/components'
 import type { ServiceItem } from '../../types'
 import './index.scss'
@@ -18,8 +19,7 @@ export const ServiceCard = memo(({
   loading = false,
   expanded = false,
   className = '',
-  onToggle,
-  onBook
+  onToggle
 }: ServiceCardProps) => {
 
   const handleToggle = useCallback(() => {
@@ -28,12 +28,10 @@ export const ServiceCard = memo(({
     }
   }, [service, onToggle])
 
-  const handleBook = useCallback((e: any) => {
-    e.stopPropagation()
-    if (service) {
-      onBook?.(service)
-    }
-  }, [service, onBook])
+   const handleBook= useCallback(() => {
+      Taro.switchTab({ url: '/pages/contact/index' })
+    }, [])
+  
 
   // 加载状态
   if (loading) {
