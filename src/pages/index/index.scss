@@ -1,346 +1,301 @@
-// index.scss
 @import "../../styles/custom-theme.scss";
 
 .index {
-  position: relative;
-  z-index: 0;
-  min-height: 100vh;
-  background: $color-bg;
-  box-sizing: border-box;
+ position: relative;
+ min-height: 100vh;
+ background: $color-bg;
 
-  &__header {
-    position: relative;
-    z-index: 0;
-    width: 100%;
-    height: 320px;
-    overflow: hidden;
+ /* Header区域 */
+ &__header {
+   position: relative;
+   z-index: $z-index-banner;
+   width: 100%;
+   height: 420px;
+   overflow: hidden;
 
-    :global {
-      .swiper {
-        width: 100%;
-        height: 320px;
-        
-        .swiper-item {
-          width: 100%;
-          height: 100%;
-          overflow: hidden;
-        }
+   .swiper {
+     width: 100%;
+     height: 100%;
+     
+     .swiper-item {
+       width: 100%;
+       height: 100%;
+       background: $color-bg-light;
+     }
 
-        .wx-swiper-dots {
-          bottom: 12px;
-          
-          .wx-swiper-dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 4px;
-            transition: all 0.3s;
-            
-            &.wx-swiper-dot-active {
-              width: 16px;
-            }
-          }
-        }
-      }
-    }
-  }
+     .wx-swiper-dots {
+       bottom: $spacing-sm;
+       
+       .wx-swiper-dot {
+         width: 8px;
+         height: 8px;
+         border-radius: $radius-full;
+         transition: all $duration-base $ease-base;
+         
+         &.wx-swiper-dot-active {
+           width: 16px;
+         }
+       }
+     }
+   }
+ }
 
-  &__banner-item {
-    position: relative;
-    width: 100%;
-    height: 320px;
-    overflow: hidden; 
-  }
+ &__banner-item {
+   position: relative;
+   width: 100%;
+   height: 100%;
+   overflow: hidden;
+ }
 
-  &__banner-image {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
+ &__banner-image {
+   width: 100%;
+   height: 100%;
+   object-fit: cover;
+   will-change: transform;
+ }
 
-  &__banner-text {
-    position: absolute;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    z-index: 1;
-    padding: 64px 24px 40px;
-    background: linear-gradient(
-      180deg,
-      transparent 0%,
-      rgba(0, 0, 0, 0.6) 30%,
-      rgba(0, 0, 0, 0.85) 100%
-    );
-    pointer-events: none; 
-  }
+ &__banner-text {
+   position: absolute;
+   left: 0;
+   right: 0;
+   bottom: 0;
+   z-index: $z-index-content;
+   padding: $spacing-xxl $spacing-xl $spacing-lg;
+   background: linear-gradient(
+     180deg,
+     transparent 0%,
+     rgba($color-black, 0.6) 30%,
+     rgba($color-black, 0.85) 100%
+   );
+ }
 
-  &__banner-title {
-    display: block; 
-    font-size: 40px;
-    font-weight: bold;
-    line-height: 1.2;
-    color: $color-white;
-    margin-bottom: 12px;
-    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
-  }
+ &__banner-title {
+   display: block;
+   font-size: $font-size-xxl;
+   font-weight: $font-weight-bold;
+   color: $color-white;
+   margin-bottom: $spacing-sm;
+ }
 
-  &__banner-subtitle {
-    display: block;
-    font-size: 28px;
-    line-height: 1.4;
-    color: rgba($color-white, 0.95);
-    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
-  }
+ &__banner-subtitle {
+   display: block;
+   font-size: $font-size-base;
+   color: rgba($color-white, 0.95);
+ }
 
-  &__content {
-    position: relative;
-    z-index: 1;
-    padding: 8px 16px;
-  }
+ /* 内容区域 */
+ &__content {
+   position: relative;
+   z-index: $z-index-content;
+   padding: $spacing-base;
+   min-height: calc(100vh - 480px);
+ }
 
-  &__service-intro {
-    margin-bottom: 12px;
-    padding: 24px;
-    background: $color-bg-base;
-    border-radius: 12px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-    height: 320px;
-    display: flex;
-    flex-direction: column;
-  }
+ /* 服务介绍 */
+ &__service-intro {
+   margin-bottom: $spacing-sm;
+   padding: $spacing-xl;
+   background: $color-bg-base;
+   border-radius: $radius-lg;
+   box-shadow: $shadow-base;
+   min-height: 200px;
+ }
 
-  &__title {
-    font-size: 36px;
-    font-weight: bold;
-    margin-bottom: 32px;
-    padding-bottom: 20px;
-    border-bottom: 1px solid $color-border-base;
-    color: $color-text-title;
-    flex-shrink: 0;
-  }
+ &__title {
+   font-size: $font-size-xl;
+   font-weight: $font-weight-bold;
+   color: $color-text-title;
+   margin-bottom: $spacing-xl;
+ }
 
-  &__btn-group {
-    display: flex;
-    gap: 16px;
-    height: 130px;
-    align-items: center;
-    margin-top: 24px;
+ &__btn-group {
+   display: flex;
+   gap: $spacing-base;
 
-    :global {
-      .at-button {
-        flex: 1;
-        height: 130px;
-        font-size: 34px;
-        border-radius: 12px;
-        justify-content: center;
-        gap: 12px; 
-        padding: 16px 8px;
-        
-        &--primary {
-          background: $color-brand;
-          box-shadow: 0 4px 12px rgba($color-brand, 0.2);
-        }
-        
-        &--secondary {
-          background: rgba($color-brand, 0.1);
-          border: 2px solid $color-brand;
-          color: $color-brand;
-          font-weight: 500;
-        }
-      }
-    }
-  }
+   .at-button {
+     flex: 1;
+     height: 100px;
+     background-color: $color-brand;
+     color: $color-white;
+   }
+ }
 
-  &__cases {
-    margin-bottom: 12px;
-    padding: 24px;
-    background: $color-bg-base;
-    border-radius: 12px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-  }
+ /* 案例展示 */
+ &__cases {
+   margin-bottom: $spacing-sm;
+   padding: $spacing-xl;
+   background: $color-bg-base;
+   border-radius: $radius-lg;
+   box-shadow: $shadow-base;
+   min-height: 200px;
+ }
 
-  &__case-swiper {
-    height: 460px;
-    padding: 20px 0;
-  }
+ &__case-swiper {
+   min-height: 460px;
+   padding: $spacing-lg 0;
+ }
 
-  &__case-item {
-    height: 420px;
-    margin: 0 12px;
-    background: $color-bg-base;
-    border-radius: 12px;
-    overflow: hidden;
-    transform: scale(0.92);
-    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+ &__case-item {
+   height: 420px;
+   margin: 0 $spacing-sm;
+   background: $color-bg-base;
+   border-radius: $radius-lg;
+   overflow: hidden;
+   transform: scale(0.92);
+   transition: $transition-base;
+   box-shadow: $shadow-base;
+   will-change: transform;
 
-    &::after {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.35);
-      opacity: 1;
-      transition: opacity 0.3s ease;
-      z-index: 1;
-    }
+   &::after {
+     content: '';
+     position: absolute;
+     inset: 0;
+     background: rgba($color-black, 0.35);
+     opacity: 1;
+     transition: opacity $duration-base $ease-base;
+     will-change: opacity;
+     z-index: $z-index-overlay;
+   }
 
-    &--active {
-      transform: scale(1);
+   &--active {
+     transform: scale(1);
+     box-shadow: $shadow-lg;
 
-      &::after {
-        opacity: 0;
-      }
-    }
-  }
+     &::after {
+       opacity: 0;
+     }
+   }
+ }
 
-  &__case-image {
-    width: 100%;
-    height: 240px;
-    object-fit: cover;
-  }
+ &__case-image {
+   width: 100%;
+   height: 240px;
+   object-fit: cover;
+   will-change: transform;
+ }
 
-  &__case-content {
-    position: relative;
-    z-index: 2;
-    height: 180px;
-    padding: 20px;
-    background: $color-bg-base;
-  }
+ &__case-content {
+   position: relative;
+   z-index: $z-index-content;
+   padding: $spacing-lg;
+   background: $color-bg-base;
+ }
 
-  &__case-title {
-    font-size: 28px;
-    font-weight: 600;
-    line-height: 1.4;
-    color: $color-text-title;
-    margin-bottom: 12px;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-  }
+ &__case-title {
+   display: -webkit-box;
+   -webkit-box-orient: vertical;
+   -webkit-line-clamp: 2;
+   overflow: hidden;
+   font-size: $font-size-lg;
+   font-weight: $font-weight-semibold;
+   color: $color-text-title;
+   margin-bottom: $spacing-sm;
+ }
 
-  &__case-desc {
-    font-size: 26px;
-    line-height: 1.5;
-    color: $color-text-secondary;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-  }
+ &__case-desc {
+   display: -webkit-box;
+   -webkit-box-orient: vertical;
+   -webkit-line-clamp: 2;
+   overflow: hidden;
+   font-size: $font-size-base;
+   color: $color-text-secondary;
+ }
 
-  &__advantages {
-    padding: 24px;
-    background: $color-bg-base;
-    border-radius: 12px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-  }
+ /* 优势展示 */
+ &__advantages {
+   padding: $spacing-xl;
+   background: $color-bg-base;
+   border-radius: $radius-lg;
+   box-shadow: $shadow-base;
+ }
 
-  &__advantage-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 12px;
-    margin-bottom: 24px;
-  }
+ &__advantages-grid {
+   display: grid;
+   grid-template-columns: repeat(2, 1fr);
+   grid-template-rows: repeat(2, 1fr);
+   gap: $spacing-base;
+   margin-bottom: $spacing-xl;
+ }
 
-  &__advantage-item {
-    min-height: 160px;
-    padding: 24px 20px;
-    background: rgba($color-brand, 0.04);
-    border-radius: 12px;
-    text-align: center;
-    transition: transform 0.2s ease;
-  }
+ &__advantages-item {
+   aspect-ratio: 1;
+   padding: $spacing-base;
+   background: rgba($color-brand, 0.04);
+   border-radius: $radius-lg;
+   display: flex;
+   flex-direction: column;
+   align-items: center;
+   justify-content: center;
+   transition: transform $duration-fast $ease-base;
 
-  &__advantage-icon {
-    display: block;
-    font-size: 56px;
-    margin-bottom: 16px;
-  }
+   &:hover {
+     transform: translateY(-2px);
+   }
+ }
 
-  &__advantage-value {
-    font-size: 36px;
-    font-weight: bold;
-    color: $color-brand;
-    margin-bottom: 8px;
-  }
+ &__advantage-icon {
+   font-size: 48px;
+   margin-bottom: $spacing-sm;
+ }
 
-  &__advantage-label {
-    font-size: 26px;
-    color: $color-text-secondary;
-    line-height: 1.4;
-  }
+ &__advantage-value {
+   font-size: $font-size-xl;
+   font-weight: $font-weight-bold;
+   color: $color-brand;
+   margin-bottom: $spacing-xs;
+ }
 
-  &__book-btn {
-    width: 100%;
-    height: 108px;
-    font-size: 34px;
-    margin-top: 24px;
-    border-radius: 12px;
-    background: $color-brand;
-    box-shadow: 0 4px 12px rgba($color-brand, 0.2);
-  }
+ &__advantage-label {
+   font-size: $font-size-base;
+   color: $color-text-secondary;
+ }
+
+ &__book-btn {
+   width: 100%;
+   height: 100px;
+   background-color: $color-brand;
+   color: $color-white;
+ }
 }
 
+/* 加载和错误状态 */
 .loading,
 .error {
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 24px;
-  color: $color-text-secondary;
-  
-  :global {
-    .at-button {
-      width: 240px;
-    }
-  }
+ min-height: 100vh;
+ display: flex;
+ flex-direction: column;
+ align-items: center;
+ justify-content: center;
+ gap: $spacing-xl;
+ color: $color-text-secondary;
 }
 
-@media screen and (max-width: 375px) {
-  .index {
-    &__content {
-      padding: 4px 12px;
-    }
+/* 响应式 */
+@media screen and (max-width: $breakpoint-xs) {
+ .index {
+   &__header {
+     height: 360px;
+   }
 
-    &__header,
-    :global(.swiper),
-    &__banner-item {
-      height: 280px;
-    }
+   &__content {
+     min-height: calc(100vh - 360px);
+     padding: $spacing-sm;
+   }
+   
+   &__advantages-grid {
+     gap: $spacing-sm;
+   }
+   
+   &__advantages-item {
+     padding: $spacing-sm;
+   }
 
-    &__service-intro {
-      height: 280px;
-    }
+   &__advantage-icon {
+     font-size: 40px;
+   }
 
-    &__banner-title {
-      font-size: 36px;
-    }
-
-    &__banner-subtitle {
-      font-size: 24px;
-    }
-
-    &__title {
-      font-size: 32px;
-      margin-bottom: 24px;
-    }
-
-    &__service-intro,
-    &__cases,
-    &__advantages {
-      padding: 20px;
-    }
-
-    &__btn-group {
-      height: 120px;
-      font-size: 32px;
-    }
-
-    &__book-btn {
-      height: 96px;
-      font-size: 32px;
-    }
-  }
+   &__book-btn {
+     height: 88px;
+   }
+ }
 }

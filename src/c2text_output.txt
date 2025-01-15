@@ -3,6 +3,8 @@
   📄 app.scss
   📄 app.ts
   📁 components
+    📁 case-detail-modal
+      📄 index.tsx
     📁 faq-section
       📄 index.scss
       📄 index.tsx
@@ -19,11 +21,25 @@
     📄 index.ts
   📄 index.html
   📁 pages
+    📁 cases
+      📄 index.config.ts
+      📄 index.scss
+      📄 index.tsx
+    📁 contact
+      📄 index.config.ts
+      📄 index.scss
+      📄 index.tsx
+    📁 index
+      📄 index.config.ts
+      📄 index.scss
+      📄 index.tsx
     📁 project
       📄 index.config.ts
       📄 index.scss
       📄 index.tsx
   📁 services
+    📄 index-api.ts
+    📄 index-mock-data.ts
     📄 project-api.ts
     📄 project-mock-data.ts
   📁 styles
@@ -140,104 +156,242 @@ export default App
 ===== End of File: app.ts =====
 
 
+===== File: components\case-detail-modal\index.tsx =====
+import { memo } from 'react'
+import { View, Text, Image, Button } from '@tarojs/components'
+import { AtModal, AtModalHeader, AtModalContent, AtModalAction } from 'taro-ui'
+import type { ServiceCase } from '../../types'
+
+interface CaseDetailModalProps {
+  isOpen: boolean
+  onClose: () => void
+  data: ServiceCase | null
+}
+
+export const CaseDetailModal = memo(function CaseDetailModal({
+  isOpen,
+  onClose,
+  data
+}: CaseDetailModalProps) {
+  if (!data) return null
+
+  return (
+    <AtModal
+      isOpened={isOpen}
+      onClose={onClose}
+    >
+      <AtModalHeader>{data.title}</AtModalHeader>
+      <AtModalContent>
+        <View className='case-detail'>
+          <Image
+            src={data.imageUrl}
+            mode='aspectFill'
+            className='case-detail__image'
+            lazyLoad
+          />
+          <View className='case-detail__content'>
+            <Text className='case-detail__desc'>{data.description}</Text>
+            {data.content && (
+              <View className='case-detail__full-content'>{data.content}</View>
+            )}
+            <View className='case-detail__meta'>
+              <Text className='case-detail__type'>类型：{data.type}</Text>
+              <Text className='case-detail__date'>日期：{data.date}</Text>
+              <Text className='case-detail__views'>浏览：{data.views}</Text>
+            </View>
+          </View>
+        </View>
+      </AtModalContent>
+      <AtModalAction>
+        <Button onClick={onClose}>关闭</Button>
+      </AtModalAction>
+    </AtModal>
+  )
+})
+===== End of File: components\case-detail-modal\index.tsx =====
+
+
 ===== File: components\faq-section\index.scss =====
-// components/faq-section/index.scss
 @import "../../styles/custom-theme.scss";
 
 .faq-section {
   position: relative;
-  min-height: 200px;
   background: $color-bg-base;
   border-radius: 12px;
-  overflow: hidden;
-
+  padding: 24px 20px 12px;
+  
   &__title {
     font-size: 32px;
-    font-weight: 500;
-    color: $color-text-base;
-    padding: 24px;
+    font-weight: 600;
+    color: $color-text-title;
+    margin-bottom: 8px;
   }
 
   &__list {
     display: flex;
     flex-direction: column;
-    gap: 12px;
-    padding: 0 24px 24px;
   }
 }
 
 .faq-item {
-  position: relative;
-  min-height: 88px;
-  background: $color-grey-6;
-  border-radius: 8px;
-  overflow: hidden;
-
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  
+  & + & {
+    border-top: 1px solid rgba($color-border-base, 0.5);
+  }
+  
   &__header {
-    position: relative;
-    padding: 20px 24px;
+    padding: 16px 0;
     cursor: pointer;
+    position: relative;
+    user-select: none;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+
+    &:hover {
+      .faq-item__question {
+        color: $color-brand;
+      }
+      
+      .faq-item__arrow {
+        border-color: $color-brand;
+        transform: translateY(-50%) rotate(60deg);
+      }
+    }
 
     &:active {
-      opacity: 0.7;
+      .faq-item__question {
+        opacity: 0.7;
+      }
     }
   }
 
   &__main {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding-right: 32px;
+    padding-right: 36px;
   }
 
   &__question {
     font-size: 28px;
-    color: $color-text-base;
-    line-height: 1.4;
+    font-weight: 500;
+    color: $color-text-title;
+    line-height: 1.5;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   &__category {
+    display: inline-block;
+    margin-top: 8px;
     padding: 4px 12px;
     font-size: 24px;
     color: $color-brand;
-    background: rgba($color-brand, 0.1);
-    border-radius: 32px;
-    line-height: 1.2;
+    background: rgba($color-brand, 0.08);
+    border-radius: 6px;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+
+    &:hover {
+      background: rgba($color-brand, 0.12);
+    }
   }
 
   &__arrow {
     position: absolute;
-    right: 24px;
+    right: 2px;
     top: 50%;
     width: 12px;
     height: 12px;
-    border-right: 2px solid $color-grey-2;
-    border-bottom: 2px solid $color-grey-2;
-    transform: translateY(-75%) rotate(45deg);
-    transition: transform 0.2s;
+    border-right: 2px solid rgba($color-text-title, 0.4);
+    border-bottom: 2px solid rgba($color-text-title, 0.4);
+    transform: translateY(-50%) rotate(45deg);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transform-origin: center;
   }
 
   &__content {
-    display: none;
-    border-top: 1px solid $color-border-base;
+    position: relative;
+    overflow: hidden;
+    opacity: 0;
+    max-height: 0;
+    transform: translateY(-12px);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    will-change: max-height, opacity, transform;
   }
 
   &__answer {
-    padding: 20px 24px;
+    padding: 0 0 16px;
     font-size: 26px;
-    color: $color-text-secondary;
     line-height: 1.6;
+    color: rgba($color-text-secondary, 0.85);
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   &--active {
-    min-height: 120px;
+    background: rgba($color-brand, 0.02);
+
+    .faq-item__header {
+      padding-bottom: 12px;
+    }
 
     .faq-item__arrow {
-      transform: translateY(-25%) rotate(-135deg);
+      transform: translateY(-50%) rotate(-135deg);
+      border-color: $color-brand;
+    }
+
+    .faq-item__question {
+      color: $color-brand;
+      font-weight: 600;
     }
 
     .faq-item__content {
-      display: block;
+      opacity: 1;
+      max-height: 1000px;
+      transform: translateY(0);
+    }
+
+    .faq-item__category {
+      background: rgba($color-brand, 0.12);
+      color: darken($color-brand, 5%);
+    }
+  }
+}
+
+@media (max-width: 375px) {
+  .faq-section {
+    padding: 20px 16px 8px;
+    
+    &__title {
+      font-size: 28px;
+      margin-bottom: 4px;
+    }
+  }
+
+  .faq-item {
+    &__header {
+      padding: 14px 0;
+    }
+
+    &__question {
+      font-size: 26px;
+    }
+
+    &__category {
+      font-size: 22px;
+      padding: 3px 10px;
+      margin-top: 6px;
+    }
+
+    &__answer {
+      font-size: 24px;
+      padding: 0 0 14px;
+    }
+
+    &__arrow {
+      width: 10px;
+      height: 10px;
+    }
+
+    &--active {
+      .faq-item__header {
+        padding-bottom: 10px;
+      }
     }
   }
 }
@@ -340,7 +494,6 @@ export default FAQSection
 
 
 ===== File: components\search-bar\index.scss =====
-// components/search-bar/index.scss
 @import "../../styles/custom-theme.scss";
 
 .search-bar {
@@ -350,7 +503,7 @@ export default FAQSection
   background: $color-bg-base;
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 16px;
   padding: 12px 24px;
 
   &__input-wrap {
@@ -358,10 +511,15 @@ export default FAQSection
     height: 64px;
     background: $color-grey-6;
     border-radius: 32px;
-    padding: 0 16px;
+    padding: 0 20px;
     display: flex;
     align-items: center;
     position: relative;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+
+    &:hover {
+      background: mix($color-grey-6, $color-grey-5, 70%);
+    }
 
     &:active {
       background: $color-grey-5;
@@ -374,34 +532,37 @@ export default FAQSection
     display: flex;
     align-items: center;
     justify-content: center;
-    opacity: 0.5;
+    opacity: 0.6;
+    transition: opacity 0.25s ease;
   }
 
   &__circle {
     position: absolute;
     width: 16px;
     height: 16px;
-    border: 2px solid $color-grey-1;
+    border: 2px solid $color-grey-2;
     border-radius: 50%;
+    transition: all 0.25s ease;
   }
 
   &__line {
     position: absolute;
     width: 10px;
     height: 2px;
-    background: $color-grey-1;
+    background: $color-grey-2;
     transform: rotate(45deg);
     transform-origin: 0 50%;
     margin: 14px 0 0 13px;
+    transition: all 0.25s ease;
   }
 
   &__loading {
     width: 20px;
     height: 20px;
-    border: 2px solid $color-grey-1;
-    border-top-color: transparent;
+    border: 2px solid rgba($color-brand, 0.3);
+    border-top-color: $color-brand;
     border-radius: 50%;
-    animation: search-loading 0.8s linear infinite;
+    animation: search-loading 0.8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
   }
 
   &__input {
@@ -409,12 +570,28 @@ export default FAQSection
     height: 100%;
     font-size: 28px;
     background: transparent;
-    padding: 0 8px;
+    padding: 0 12px;
     color: $color-text-base;
+    transition: all 0.25s ease;
+
+    &:focus {
+      & + .search-bar__icon {
+        opacity: 0.8;
+
+        .search-bar__circle {
+          border-color: $color-brand;
+        }
+
+        .search-bar__line {
+          background: $color-brand;
+        }
+      }
+    }
   }
 
   &__placeholder {
     color: $color-text-placeholder;
+    transition: color 0.25s ease;
   }
 
   &__clear {
@@ -424,18 +601,30 @@ export default FAQSection
     align-items: center;
     justify-content: center;
     opacity: 0.7;
+    cursor: pointer;
+    transition: all 0.25s ease;
+
+    &:hover {
+      opacity: 0.9;
+    }
 
     &:active {
       opacity: 0.5;
+      transform: scale(0.95);
     }
   }
 
   &__clear-icon {
-    width: 32px;
-    height: 32px;
+    width: 28px;
+    height: 28px;
     border-radius: 50%;
-    background: $color-grey-2;
+    background: $color-grey-3;
     position: relative;
+    transition: all 0.25s ease;
+
+    &:hover {
+      background: $color-grey-2;
+    }
 
     &::before,
     &::after {
@@ -443,9 +632,10 @@ export default FAQSection
       position: absolute;
       top: 50%;
       left: 50%;
-      width: 16px;
+      width: 14px;
       height: 2px;
       background: $color-white;
+      transition: transform 0.25s ease;
     }
 
     &::before {
@@ -459,23 +649,33 @@ export default FAQSection
 
   &__action {
     font-size: 28px;
+    font-weight: 500;
     color: $color-text-secondary;
-    padding: 0 8px;
+    padding: 0 12px;
     height: 64px;
     line-height: 64px;
+    cursor: pointer;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    user-select: none;
+
+    &:hover {
+      color: mix($color-brand, $color-text-secondary, 70%);
+    }
 
     &:active {
-      opacity: 0.7;
+      color: mix($color-brand, $color-text-secondary, 85%);
+      transform: scale(0.98);
     }
 
     &--active {
       color: $color-brand;
-      font-weight: 500;
+      font-weight: 600;
     }
 
     &--disabled {
       opacity: 0.5;
       pointer-events: none;
+      cursor: not-allowed;
     }
   }
 }
@@ -483,6 +683,61 @@ export default FAQSection
 @keyframes search-loading {
   to {
     transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 375px) {
+  .search-bar {
+    height: 80px;
+    padding: 10px 20px;
+    gap: 12px;
+
+    &__input-wrap {
+      height: 56px;
+      padding: 0 16px;
+    }
+
+    &__icon {
+      width: 36px;
+      height: 36px;
+    }
+
+    &__circle {
+      width: 14px;
+      height: 14px;
+    }
+
+    &__line {
+      width: 9px;
+      margin: 12px 0 0 11px;
+    }
+
+    &__input {
+      font-size: 26px;
+      padding: 0 10px;
+    }
+
+    &__clear {
+      width: 36px;
+      height: 36px;
+    }
+
+    &__clear-icon {
+      width: 24px;
+      height: 24px;
+
+      &::before,
+      &::after {
+        width: 12px;
+      }
+    }
+
+    &__action {
+      font-size: 26px;
+      height: 56px;
+      line-height: 56px;
+      padding: 0 10px;
+    }
   }
 }
 ===== End of File: components\search-bar\index.scss =====
@@ -580,52 +835,62 @@ export const SearchBar = memo(({
 
 
 ===== File: components\service-card\index.scss =====
-// components/service-card/index.scss
 @import "../../styles/custom-theme.scss";
 
 .service-card {
   position: relative;
-  min-height: 200px;
   background: $color-bg-base;
   border-radius: 12px;
-  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 
   &__main {
-    padding: 24px;
+    padding: 24px 28px;
     position: relative;
     cursor: pointer;
+    transition: background-color 0.25s ease;
+
+    &:hover {
+      background: rgba($color-brand, 0.02);
+    }
 
     &:active {
-      opacity: 0.7;
+      background: rgba($color-brand, 0.04);
     }
   }
 
   &__header {
     display: flex;
     justify-content: space-between;
-    margin-bottom: 16px;
+    margin-bottom: 20px;
   }
 
   &__title-wrap {
     flex: 1;
-    margin-right: 16px;
+    margin-right: 20px;
   }
 
   &__title {
     font-size: 32px;
-    font-weight: 500;
-    color: $color-text-base;
+    font-weight: 600;
+    color: $color-text-title;
     line-height: 1.4;
   }
 
   &__warranty {
     display: inline-block;
     margin-left: 12px;
-    padding: 4px 12px;
+    padding: 4px 16px;
     font-size: 24px;
     color: $color-brand;
-    background: rgba($color-brand, 0.1);
-    border-radius: 32px;
+    background: rgba($color-brand, 0.08);
+    border-radius: 8px;
+    font-weight: 500;
+    transition: all 0.25s ease;
+
+    &:hover {
+      background: rgba($color-brand, 0.12);
+    }
   }
 
   &__price-wrap {
@@ -636,18 +901,20 @@ export const SearchBar = memo(({
     font-size: 36px;
     font-weight: bold;
     color: $color-brand;
+    transition: color 0.25s ease;
   }
 
   &__unit {
     font-size: 24px;
-    color: $color-text-secondary;
+    color: rgba($color-text-secondary, 0.85);
+    margin-left: 2px;
   }
 
   &__features {
     display: flex;
     flex-wrap: wrap;
     gap: 8px;
-    margin-bottom: 16px;
+    margin-bottom: 20px;
   }
 
   &__feature-tag {
@@ -655,7 +922,13 @@ export const SearchBar = memo(({
     font-size: 24px;
     color: $color-text-secondary;
     background: $color-grey-6;
-    border-radius: 6px;
+    border-radius: 8px;
+    transition: all 0.25s ease;
+
+    &:hover {
+      background: $color-grey-5;
+      color: $color-text-base;
+    }
   }
 
   &__desc {
@@ -671,34 +944,45 @@ export const SearchBar = memo(({
 
   &__arrow {
     position: absolute;
-    right: 24px;
+    right: 28px;
     top: 50%;
-    margin-top: -6px;
     width: 12px;
     height: 12px;
-    border-right: 2px solid $color-grey-2;
-    border-bottom: 2px solid $color-grey-2;
-    transform: rotate(45deg);
-    transition: transform 0.2s;
+    border-right: 2px solid rgba($color-text-title, 0.3);
+    border-bottom: 2px solid rgba($color-text-title, 0.3);
+    transform: translateY(-50%) rotate(45deg);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transform-origin: center;
   }
 
   &__expand {
-    display: none;
+    overflow: hidden;
+    max-height: 0;
+    opacity: 0;
+    transform: translateY(-12px);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    will-change: max-height, opacity, transform;
     border-top: 1px solid $color-border-base;
   }
 
   &__info {
     display: flex;
     gap: 16px;
-    padding: 24px;
+    padding: 24px 28px;
   }
 
   &__info-item {
     flex: 1;
-    padding: 16px;
+    padding: 20px;
     background: $color-grey-6;
-    border-radius: 8px;
+    border-radius: 12px;
     text-align: center;
+    transition: all 0.25s ease;
+
+    &:hover {
+      background: $color-grey-5;
+      transform: translateY(-1px);
+    }
   }
 
   &__info-label {
@@ -712,32 +996,33 @@ export const SearchBar = memo(({
     display: block;
     font-size: 28px;
     color: $color-text-base;
-    font-weight: 500;
+    font-weight: 600;
   }
 
   &__process {
-    padding: 24px;
+    padding: 24px 28px;
     border-top: 1px solid $color-border-base;
   }
 
   &__process-title {
     font-size: 28px;
-    font-weight: 500;
-    color: $color-text-base;
-    margin-bottom: 24px;
+    font-weight: 600;
+    color: $color-text-title;
+    margin-bottom: 32px;
   }
 
   &__process-steps {
     position: relative;
     display: flex;
     justify-content: space-between;
+    padding: 0 20px;
 
     &::before {
       content: '';
       position: absolute;
       top: 24px;
-      left: 40px;
-      right: 40px;
+      left: 60px;
+      right: 60px;
       height: 2px;
       background: $color-border-base;
     }
@@ -751,6 +1036,11 @@ export const SearchBar = memo(({
     align-items: center;
     text-align: center;
     z-index: 1;
+    transition: transform 0.25s ease;
+
+    &:hover {
+      transform: translateY(-2px);
+    }
   }
 
   &__step-number {
@@ -759,69 +1049,190 @@ export const SearchBar = memo(({
     background: $color-brand;
     color: $color-white;
     font-size: 24px;
+    font-weight: 600;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     margin-bottom: 16px;
+    transition: all 0.25s ease;
+    box-shadow: 0 2px 8px rgba($color-brand, 0.2);
+
+    &:hover {
+      transform: scale(1.05);
+      box-shadow: 0 4px 12px rgba($color-brand, 0.25);
+    }
   }
 
   &__step-title {
     font-size: 28px;
-    font-weight: 500;
-    color: $color-text-base;
+    font-weight: 600;
+    color: $color-text-title;
     margin-bottom: 8px;
   }
 
   &__step-desc {
     font-size: 24px;
     color: $color-text-secondary;
-    line-height: 1.4;
+    line-height: 1.5;
   }
 
   &__book {
-    margin: 0 24px 24px;
+    margin: 0 28px 28px;
     height: 88px;
-    line-height: 88px;
-    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     font-size: 32px;
+    font-weight: 600;
     color: $color-white;
     background: $color-brand;
-    border-radius: 44px;
+    border-radius: 12px;
     cursor: pointer;
+    transition: all 0.25s ease;
+    box-shadow: 0 2px 8px rgba($color-brand, 0.2);
+
+    &:hover {
+      background: darken($color-brand, 5%);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba($color-brand, 0.25);
+    }
 
     &:active {
+      transform: translateY(0);
       opacity: 0.9;
     }
   }
 
   &--expanded {
-    min-height: 400px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
 
     .service-card__arrow {
-      transform: rotate(-135deg);
-      margin-top: 0;
+      transform: translateY(-50%) rotate(-135deg);
+      border-color: $color-brand;
     }
 
     .service-card__expand {
-      display: block;
+      max-height: 2000px;
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .service-card__main {
+      background: rgba($color-brand, 0.02);
     }
   }
 
   &--loading {
+    min-height: 200px;
+    
     .service-card__skeleton {
-      min-height: 200px;
+      padding: 24px 28px;
     }
 
     .service-card__skeleton-line {
       height: 24px;
       background: $color-grey-6;
-      border-radius: 4px;
+      border-radius: 8px;
       margin-bottom: 16px;
+      animation: shimmer 1.5s infinite linear;
+      background: linear-gradient(
+        90deg,
+        $color-grey-6 0%,
+        lighten($color-grey-6, 2%) 50%,
+        $color-grey-6 100%
+      );
+      background-size: 200% 100%;
 
       &:last-child {
         margin-bottom: 0;
+        width: 60%;
       }
+    }
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+@media (max-width: 375px) {
+  .service-card {
+    &__main {
+      padding: 20px 24px;
+    }
+
+    &__title {
+      font-size: 28px;
+    }
+
+    &__warranty {
+      font-size: 22px;
+      padding: 4px 12px;
+    }
+
+    &__price {
+      font-size: 32px;
+    }
+
+    &__unit {
+      font-size: 22px;
+    }
+
+    &__feature-tag {
+      font-size: 22px;
+      padding: 6px 12px;
+    }
+
+    &__desc {
+      font-size: 26px;
+    }
+
+    &__info,
+    &__process {
+      padding: 20px 24px;
+    }
+
+    &__info-item {
+      padding: 16px;
+    }
+
+    &__info-label {
+      font-size: 22px;
+    }
+
+    &__info-value {
+      font-size: 26px;
+    }
+
+    &__process-title {
+      font-size: 26px;
+      margin-bottom: 24px;
+    }
+
+    &__step-number {
+      width: 40px;
+      height: 40px;
+      font-size: 22px;
+    }
+
+    &__step-title {
+      font-size: 26px;
+    }
+
+    &__step-desc {
+      font-size: 22px;
+    }
+
+    &__book {
+      margin: 0 24px 24px;
+      height: 80px;
+      font-size: 28px;
     }
   }
 }
@@ -983,7 +1394,6 @@ export default ServiceCard
 
 
 ===== File: components\tab-bar\index.scss =====
-// components/tab-bar/index.scss
 @import "../../styles/custom-theme.scss";
 
 .tab-bar {
@@ -1002,15 +1412,28 @@ export default ServiceCard
     align-items: center;
     justify-content: center;
     position: relative;
+    cursor: pointer;
+    user-select: none;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+
+    &:hover {
+      .tab-bar__text {
+        color: mix($color-brand, $color-text-secondary, 70%);
+      }
+    }
 
     &:active {
-      opacity: 0.7;
+      .tab-bar__text {
+        color: mix($color-brand, $color-text-secondary, 85%);
+        transform: scale(0.98);
+      }
     }
 
     &--active {
       .tab-bar__text {
         color: $color-brand;
-        font-weight: 500;
+        font-weight: 600;
+        transform: translateY(-1px);
       }
 
       &::after {
@@ -1018,19 +1441,72 @@ export default ServiceCard
         position: absolute;
         left: 50%;
         bottom: 0;
-        width: 40px;
+        width: 24px;
         height: 3px;
         background: $color-brand;
-        border-radius: 2px;
-        transform: translateX(-50%);
+        border-radius: 3px;
+        transform: translateX(-50%) scaleX(1);
+        transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
       }
+
+      &:hover::after {
+        width: 32px;
+      }
+    }
+
+    &:not(.tab-bar__item--active)::after {
+      content: '';
+      position: absolute;
+      left: 50%;
+      bottom: 0;
+      width: 24px;
+      height: 3px;
+      background: $color-brand;
+      border-radius: 3px;
+      transform: translateX(-50%) scaleX(0);
+      transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      opacity: 0;
+    }
+
+    &:hover:not(.tab-bar__item--active)::after {
+      transform: translateX(-50%) scaleX(0.5);
+      opacity: 0.3;
     }
   }
 
   &__text {
+    position: relative;
     font-size: 28px;
     color: $color-text-secondary;
-    transition: color 0.2s ease;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    padding: 0 12px;
+    display: flex;
+    align-items: center;
+    white-space: nowrap;
+  }
+}
+
+@media (max-width: 375px) {
+  .tab-bar {
+    height: 80px;
+    padding: 0 16px;
+
+    &__item {
+      height: 80px;
+
+      &--active::after {
+        width: 20px;
+
+        &:hover::after {
+          width: 28px;
+        }
+      }
+    }
+
+    &__text {
+      font-size: 26px;
+      padding: 0 8px;
+    }
   }
 }
 ===== End of File: components\tab-bar\index.scss =====
@@ -1127,6 +1603,882 @@ export const config: Config = {
 ===== End of File: index.html =====
 
 
+===== File: pages\cases\index.config.ts =====
+// pages/cases/index.config.ts
+export default {
+    navigationBarTitleText: '工程案例'
+  }
+===== End of File: pages\cases\index.config.ts =====
+
+
+===== File: pages\cases\index.scss =====
+// pages/cases/index.scss
+@import "../../styles/custom-theme.scss";
+
+.cases {
+  min-height: 100vh;
+  background: $color-bg;
+  padding: 24px;
+
+  // 搜索区域
+  .search-section {
+    margin-bottom: 24px;
+    padding: 16px;
+    background: $color-bg-base;
+    border-radius: 16px;
+  }
+
+  // 筛选区域
+  .filter-section {
+    margin-bottom: 24px;
+    
+    .filter-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+
+      .tag-item {
+        padding: 8px 16px;
+        color: $color-text-secondary;
+        background: $color-bg-light;
+        border-radius: 20px;
+        font-size: 26px;
+        transition: all 0.3s ease;
+
+        &.active {
+          color: $color-text-base-inverse;
+          background: $color-brand;
+        }
+      }
+    }
+  }
+
+  // 案例列表
+  .case-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 24px;
+  }
+}
+===== End of File: pages\cases\index.scss =====
+
+
+===== File: pages\cases\index.tsx =====
+// pages/contact/index.tsx
+import { View } from '@tarojs/components'
+import './index.scss'
+
+export default function Contact() {
+
+  return (
+    <View className='contact'>
+      {/* 表单区域 */}
+      <View className='form-section'>
+      </View>
+
+      {/* 联系信息 */}
+      <View className='contact-info'>
+      </View>
+    </View>
+  )
+}
+===== End of File: pages\cases\index.tsx =====
+
+
+===== File: pages\contact\index.config.ts =====
+// pages/contact/index.config.ts 
+export default {
+    navigationBarTitleText: '联系我们'
+  }
+===== End of File: pages\contact\index.config.ts =====
+
+
+===== File: pages\contact\index.scss =====
+// pages/contact/index.scss
+@import "../../styles/custom-theme.scss";
+
+.contact {
+  min-height: 100vh;
+  background: $color-bg;
+  padding: 24px;
+
+  // 表单区域
+  .form-section {
+    margin-bottom: 32px;
+    padding: 24px;
+    background: $color-bg-base;
+    border-radius: 16px;
+
+    .form-title {
+      margin-bottom: 24px;
+      color: $color-text-base;
+      font-size: 32px;
+      font-weight: bold;
+    }
+
+    .form-item {
+      margin-bottom: 24px;
+
+      .label {
+        margin-bottom: 8px;
+        color: $color-text-secondary;
+        font-size: 28px;
+      }
+
+      .input {
+        width: 100%;
+        height: 88px;
+        padding: 0 24px;
+        background: $color-bg-light;
+        border: 1px solid $color-border-base;
+        border-radius: 12px;
+        font-size: 28px;
+        transition: all 0.3s ease;
+
+        &:focus {
+          border-color: $color-brand;
+          background: $color-bg-base;
+        }
+
+        &.textarea {
+          height: 200px;
+          padding: 16px 24px;
+          line-height: 1.5;
+        }
+      }
+
+      .error-msg {
+        margin-top: 8px;
+        color: $color-error;
+        font-size: 24px;
+      }
+    }
+
+    .submit-btn {
+      width: 100%;
+      height: 88px;
+      margin-top: 32px;
+      color: $color-text-base-inverse;
+      background: $color-brand;
+      border: none;
+      border-radius: 44px;
+      font-size: 32px;
+      transition: all 0.3s ease;
+
+      &:active {
+        transform: translateY(2px);
+      }
+
+      &.loading {
+        opacity: 0.8;
+      }
+    }
+  }
+
+  // 联系信息
+  .contact-info {
+    padding: 24px;
+    background: $color-bg-base;
+    border-radius: 16px;
+
+    .info-title {
+      margin-bottom: 24px;
+      color: $color-text-base;
+      font-size: 32px;
+      font-weight: bold;
+    }
+
+    .info-item {
+      display: flex;
+      align-items: center;
+      margin-bottom: 20px;
+      padding: 16px;
+      background: $color-bg-light;
+      border-radius: 12px;
+
+      .icon {
+        margin-right: 16px;
+        color: $color-brand;
+        font-size: 40px;
+      }
+
+      .content {
+        flex: 1;
+
+        .label {
+          margin-bottom: 4px;
+          color: $color-text-secondary;
+          font-size: 26px;
+        }
+
+        .value {
+          color: $color-text-base;
+          font-size: 28px;
+          font-weight: 500;
+        }
+      }
+    }
+  }
+}
+
+// 响应式适配
+@media screen and (max-width: 375px) {
+  .cases,
+  .contact {
+    padding: 16px;
+
+    .form-section,
+    .contact-info {
+      padding: 20px;
+
+      .form-title,
+      .info-title {
+        font-size: 30px;
+      }
+    }
+  }
+}
+===== End of File: pages\contact\index.scss =====
+
+
+===== File: pages\contact\index.tsx =====
+// pages/cases/index.tsx
+import { View } from '@tarojs/components'
+import { useState } from 'react'
+import './index.scss'
+
+export default function Cases() {
+  const [loading, setLoading] = useState(false)
+
+  return (
+    <View className='cases'>
+      {/* 搜索区域 */}
+      <View className='search-section'>
+      </View>
+
+      {/* 分类筛选 */}
+      <View className='filter-section'>
+      </View>
+
+      {/* 案例列表 */}
+      <View className='case-list'>
+      </View>
+    </View>
+  )
+}
+===== End of File: pages\contact\index.tsx =====
+
+
+===== File: pages\index\index.config.ts =====
+// pages/index/index.config.ts
+export default {
+  navigationBarTitleText: '防水服务',
+  enablePullDownRefresh: true,
+  backgroundColor: '#f5f5f5',
+  backgroundTextStyle: 'dark',
+  navigationBarBackgroundColor: '#ffffff',
+  navigationBarTextStyle: 'black'
+}
+===== End of File: pages\index\index.config.ts =====
+
+
+===== File: pages\index\index.scss =====
+// index.scss
+@import "../../styles/custom-theme.scss";
+
+.index {
+  position: relative;
+  z-index: 0;
+  min-height: 100vh;
+  background: $color-bg;
+  box-sizing: border-box;
+
+  &__header {
+    position: relative;
+    z-index: 0;
+    width: 100%;
+    height: 320px;
+    overflow: hidden;
+
+    :global {
+      .swiper {
+        width: 100%;
+        height: 320px;
+        
+        .swiper-item {
+          width: 100%;
+          height: 100%;
+          overflow: hidden;
+        }
+
+        .wx-swiper-dots {
+          bottom: 12px;
+          
+          .wx-swiper-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 4px;
+            transition: all 0.3s;
+            
+            &.wx-swiper-dot-active {
+              width: 16px;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  &__banner-item {
+    position: relative;
+    width: 100%;
+    height: 320px;
+    overflow: hidden; 
+    background: $color-bg-base;
+  }
+
+  &__banner-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  &__banner-text {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1;
+    padding: 64px 24px 40px;
+    background: linear-gradient(
+      180deg,
+      transparent 0%,
+      rgba(0, 0, 0, 0.6) 30%,
+      rgba(0, 0, 0, 0.85) 100%
+    );
+    pointer-events: none; 
+  }
+
+  &__banner-title {
+    display: block; 
+    font-size: 40px;
+    font-weight: bold;
+    line-height: 1.2;
+    color: $color-white;
+    margin-bottom: 12px;
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+  }
+
+  &__banner-subtitle {
+    display: block;
+    font-size: 28px;
+    line-height: 1.4;
+    color: rgba($color-white, 0.95);
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+  }
+
+  &__content {
+    position: relative;
+    z-index: 1;
+    padding: 8px 16px;
+  }
+
+  &__service-intro {
+    margin-bottom: 12px;
+    padding: 24px;
+    background: $color-bg-base;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    height: 320px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  &__title {
+    font-size: 36px;
+    font-weight: bold;
+    margin-bottom: 32px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid $color-border-base;
+    color: $color-text-title;
+    flex-shrink: 0;
+  }
+
+  &__btn-group {
+    display: flex;
+    gap: 16px;
+    height: 130px;
+    align-items: center;
+    margin-top: 24px;
+
+    :global {
+      .at-button {
+        flex: 1;
+        height: 130px;
+        font-size: 34px;
+        border-radius: 12px;
+        justify-content: center;
+        gap: 12px; 
+        padding: 16px 8px;
+        
+        &--primary {
+          background: $color-brand;
+          box-shadow: 0 4px 12px rgba($color-brand, 0.2);
+        }
+        
+        &--secondary {
+          background: rgba($color-brand, 0.1);
+          border: 2px solid $color-brand;
+          color: $color-brand;
+          font-weight: 500;
+        }
+      }
+    }
+  }
+
+  &__cases {
+    margin-bottom: 12px;
+    padding: 24px;
+    background: $color-bg-base;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  }
+
+  &__case-swiper {
+    height: 460px;
+    padding: 20px 0;
+  }
+
+  &__case-item {
+    height: 420px;
+    margin: 0 12px;
+    background: $color-bg-base;
+    border-radius: 12px;
+    overflow: hidden;
+    transform: scale(0.92);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+
+    &::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.35);
+      opacity: 1;
+      transition: opacity 0.3s ease;
+      z-index: 1;
+    }
+
+    &--active {
+      transform: scale(1);
+
+      &::after {
+        opacity: 0;
+      }
+    }
+  }
+
+  &__case-image {
+    width: 100%;
+    height: 240px;
+    object-fit: cover;
+  }
+
+  &__case-content {
+    position: relative;
+    z-index: 2;
+    height: 180px;
+    padding: 20px;
+    background: $color-bg-base;
+  }
+
+  &__case-title {
+    font-size: 28px;
+    font-weight: 600;
+    line-height: 1.4;
+    color: $color-text-title;
+    margin-bottom: 12px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  &__case-desc {
+    font-size: 26px;
+    line-height: 1.5;
+    color: $color-text-secondary;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  &__advantages {
+    padding: 24px;
+    background: $color-bg-base;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  }
+
+  &__advantage-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+
+  &__advantage-item {
+    min-height: 160px;
+    padding: 24px 20px;
+    background: rgba($color-brand, 0.04);
+    border-radius: 12px;
+    text-align: center;
+    transition: transform 0.2s ease;
+  }
+
+  &__advantage-icon {
+    display: block;
+    font-size: 56px;
+    margin-bottom: 16px;
+  }
+
+  &__advantage-value {
+    font-size: 36px;
+    font-weight: bold;
+    color: $color-brand;
+    margin-bottom: 8px;
+  }
+
+  &__advantage-label {
+    font-size: 26px;
+    color: $color-text-secondary;
+    line-height: 1.4;
+  }
+
+  &__book-btn {
+    width: 100%;
+    height: 108px;
+    font-size: 34px;
+    margin-top: 24px;
+    border-radius: 12px;
+    background: $color-brand;
+    box-shadow: 0 4px 12px rgba($color-brand, 0.2);
+  }
+}
+
+.loading,
+.error {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  color: $color-text-secondary;
+  
+  :global {
+    .at-button {
+      width: 240px;
+    }
+  }
+}
+
+@media screen and (max-width: 375px) {
+  .index {
+    &__content {
+      padding: 4px 12px;
+    }
+
+    &__header,
+    :global(.swiper),
+    &__banner-item {
+      height: 280px;
+    }
+
+    &__service-intro {
+      height: 280px;
+    }
+
+    &__banner-title {
+      font-size: 36px;
+    }
+
+    &__banner-subtitle {
+      font-size: 24px;
+    }
+
+    &__title {
+      font-size: 32px;
+      margin-bottom: 24px;
+    }
+
+    &__service-intro,
+    &__cases,
+    &__advantages {
+      padding: 20px;
+    }
+
+    &__btn-group {
+      height: 120px;
+      font-size: 32px;
+    }
+
+    &__book-btn {
+      height: 96px;
+      font-size: 32px;
+    }
+  }
+}
+===== End of File: pages\index\index.scss =====
+
+
+===== File: pages\index\index.tsx =====
+import { useEffect, useState, useCallback, useRef } from 'react'
+import { View, Text, Image, Swiper, SwiperItem } from '@tarojs/components'
+import type { SwiperProps } from '@tarojs/components'
+import { AtButton } from 'taro-ui'
+import Taro, { useDidShow } from '@tarojs/taro'
+import { api } from '../../services/index-api'
+import { config } from '../../config'
+import { handleError } from '../../utils/error'
+import { CaseDetailModal } from '../../components/case-detail-modal'
+import type { Banner, ServiceCase, ServiceAdvantage } from '../../types'
+import './index.scss'
+
+export default function Index() {
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const [banners, setBanners] = useState<Banner[]>([])
+  const [cases, setCases] = useState<ServiceCase[]>([])
+  const [advantages, setAdvantages] = useState<ServiceAdvantage[]>([])
+  const [selectedCase, setSelectedCase] = useState<ServiceCase | null>(null)
+  const [showCaseModal, setShowCaseModal] = useState(false)
+  const [currentCaseIndex, setCurrentCaseIndex] = useState(0)
+
+  const refreshing = useRef(false)
+  const mounted = useRef(false)
+
+  const fetchData = useCallback(async (showLoading = true) => {
+    try {
+      if (showLoading) {
+        setLoading(true)
+      }
+      setError(null)
+
+      const [bannerRes, caseRes, advantageRes] = await Promise.all([
+        api.getBanners(),
+        api.getCases(),
+        api.getAdvantages()
+      ])
+
+      if (mounted.current) {
+        setBanners(bannerRes.data)
+        setCases(caseRes.data)
+        setAdvantages(advantageRes.data)
+      }
+    } catch (err) {
+      console.error('初始化数据失败:', err)
+      if (mounted.current) {
+        setError(handleError(err))
+      }
+    } finally {
+      if (showLoading && mounted.current) {
+        setLoading(false)
+      }
+      refreshing.current = false
+    }
+  }, [])
+
+  useEffect(() => {
+    mounted.current = true
+    fetchData()
+    return () => {
+      mounted.current = false
+    }
+  }, [fetchData])
+
+  useDidShow(() => {
+    if (!refreshing.current) {
+      fetchData(false)
+    }
+  })
+
+  const handleRefresh = useCallback(async () => {
+    if (refreshing.current) return
+    refreshing.current = true
+    
+    try {
+      await fetchData(false)
+      Taro.showToast({ title: '刷新成功', icon: 'success' })
+    } catch (error) {
+      console.error('刷新失败:', error)
+      Taro.showToast({
+        title: handleError(error),
+        icon: 'none'
+      })
+    } finally {
+      Taro.stopPullDownRefresh()
+    }
+  }, [fetchData])
+
+  const handleCall = useCallback(() => {
+    Taro.makePhoneCall({
+      phoneNumber: config.contact.phone
+    }).catch(err => {
+      if (!err.errMsg?.includes('cancel')) {
+        Taro.showToast({ title: '拨号失败', icon: 'none' })
+      }
+    })
+  }, [])
+
+  const handleWechat = useCallback(() => {
+    Taro.setClipboardData({
+      data: config.contact.wechat,
+      success: () => {
+        Taro.showToast({
+          title: '微信号已复制',
+          icon: 'none'
+        })
+      }
+    })
+  }, [])
+
+  const handleCaseClick = useCallback((caseItem: ServiceCase) => {
+    setSelectedCase(caseItem)
+    setShowCaseModal(true)
+  }, [])
+
+  const handleBooking = useCallback(() => {
+    Taro.switchTab({ url: '/pages/contact/index' })
+  }, [])
+
+  const handleCaseChange: SwiperProps['onChange'] = useCallback((e) => {
+    setCurrentCaseIndex(e.detail.current)
+  }, [])
+
+  if (loading) {
+    return (
+      <View className='loading'>
+        <Text>加载中...</Text>
+      </View>
+    )
+  }
+
+  if (error) {
+    return (
+      <View className='error'>
+        <Text>{error}</Text>
+        <AtButton type='primary' onClick={handleRefresh}>重试</AtButton>
+      </View>
+    )
+  }
+
+  return (
+    <View className='index'>
+      <View className='index__header'>
+        <Swiper
+          className='swiper'
+          circular
+          autoplay
+          interval={3000}
+          duration={500}
+          indicatorDots
+          indicatorColor='rgba(255, 255, 255, 0.4)'
+          indicatorActiveColor='#ffffff'
+        >
+          {banners.map(banner => (
+            <SwiperItem key={banner.id} className='swiper-item'>
+              <View className='index__banner-item'>
+                <Image 
+                  src={banner.imageUrl}
+                  className='index__banner-image'
+                  mode='aspectFill'
+                />
+                <View className='index__banner-text'>
+                  <Text className='index__banner-title'>{banner.title}</Text>
+                  <Text className='index__banner-subtitle'>{banner.subtitle}</Text>
+                </View>
+              </View>
+            </SwiperItem>
+          ))}
+        </Swiper>
+      </View>
+
+      <View className='index__content'>
+        <View className='index__service-intro'>
+          <View className='index__title'>专业防水服务</View>
+          <View className='index__btn-group'>
+            <AtButton type='primary' onClick={handleCall}>📞电话咨询</AtButton>
+            <AtButton type='secondary' onClick={handleWechat}>💬微信咨询</AtButton>
+          </View>
+        </View>
+
+        <View className='index__cases'>
+          <View className='index__title'>精选案例</View>
+          <Swiper
+            className='index__case-swiper'
+            circular
+            autoplay={!showCaseModal}
+            interval={4000}
+            duration={500}
+            previousMargin='30px'
+            nextMargin='30px'
+            onChange={handleCaseChange}
+          >
+            {cases.map((item, index) => (
+              <SwiperItem key={item.id}>
+                <View 
+                  className={`index__case-item ${index === currentCaseIndex ? 'index__case-item--active' : ''}`}
+                  onClick={() => handleCaseClick(item)}
+                >
+                  <Image 
+                    src={item.imageUrl}
+                    className='index__case-image'
+                    mode='aspectFill'
+                  />
+                  <View className='index__case-content'>
+                    <Text className='index__case-title'>{item.title}</Text>
+                    <Text className='index__case-desc'>{item.description}</Text>
+                  </View>
+                </View>
+              </SwiperItem>
+            ))}
+          </Swiper>
+        </View>
+
+        <View className='index__advantages'>
+          <View className='index__title'>我们的优势</View>
+          <View className='index__advantage-grid'>
+            {advantages.map(item => (
+              <View key={item.id} className='index__advantage-item'>
+                <Text className='index__advantage-icon'>{item.icon}</Text>
+                <Text className='index__advantage-value'>{item.value}</Text>
+                <Text className='index__advantage-label'>{item.label}</Text>
+              </View>
+            ))}
+          </View>
+          <AtButton 
+            type='primary'
+            className='index__book-btn'
+            onClick={handleBooking}
+          >
+            快速预约
+          </AtButton>
+        </View>
+      </View>
+
+      <CaseDetailModal
+        isOpen={showCaseModal}
+        onClose={() => setShowCaseModal(false)}
+        data={selectedCase}
+      />
+    </View>
+  )
+}
+===== End of File: pages\index\index.tsx =====
+
+
 ===== File: pages\project\index.config.ts =====
 // pages/project/index.config.ts
 export default {
@@ -1141,7 +2493,6 @@ export default {
 
 
 ===== File: pages\project\index.scss =====
-// pages/project/index.scss
 @import "../../styles/custom-theme.scss";
 
 .project {
@@ -1158,8 +2509,13 @@ export default {
     right: 0;
     height: 176px;
     background: $color-bg-base;
-    z-index: 1;
+    z-index: 10;
     border-bottom: 1px solid $color-border-base;
+    transition: box-shadow 0.3s ease;
+
+    &--shadow {
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    }
 
     :global {
       .search-bar {
@@ -1180,41 +2536,86 @@ export default {
 
   &__content {
     position: relative;
-    z-index: 0;
-    transform: translateY(176px);
+    z-index: 1;
+    padding-top: 176px;
     min-height: calc(100vh - 176px);
     box-sizing: border-box;
+    transition: transform 0.3s ease;
   }
 
   &__services {
-    padding: 24px 24px 0;
+    padding: 20px 20px 0;
+    transition: padding 0.3s ease;
   }
 
   &__skeleton {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 16px;
     min-height: 600px;
+    padding: 4px;
+  }
+
+  &__skeleton-item {
+    height: 200px;
+    background: $color-bg-base;
+    border-radius: 12px;
+    overflow: hidden;
+    position: relative;
   }
 
   &__list {
     display: flex;
     flex-direction: column;
-    gap: 12px;
-    margin-bottom: 24px;
+    gap: 16px;
+    margin-bottom: 32px;
   }
 
+  &__list-item {
+    opacity: 0;
+    transform: translateY(20px);
+    animation: fadeInUp 0.5s ease forwards;
+  }
+
+  &__list-item-1 { animation-delay: 0.05s; }
+  &__list-item-2 { animation-delay: 0.10s; }
+  &__list-item-3 { animation-delay: 0.15s; }
+  &__list-item-4 { animation-delay: 0.20s; }
+  &__list-item-5 { animation-delay: 0.25s; }
+  &__list-item-6 { animation-delay: 0.30s; }
+  &__list-item-7 { animation-delay: 0.35s; }
+  &__list-item-8 { animation-delay: 0.40s; }
+  &__list-item-9 { animation-delay: 0.45s; }
+  &__list-item-10 { animation-delay: 0.50s; }
+
   &__empty {
-    height: 200px;
+    height: 240px;
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
     color: $color-text-secondary;
     font-size: 28px;
+    background: $color-bg-base;
+    border-radius: 12px;
+    margin: 0 4px;
+    animation: fadeIn 0.3s ease;
+  }
+
+  &__empty-icon {
+    font-size: 48px;
+    margin-bottom: 16px;
+    color: rgba($color-text-secondary, 0.5);
+  }
+
+  &__empty-text {
+    font-size: 28px;
+    color: $color-text-secondary;
   }
 
   &__faq {
-    padding: 0 24px 24px;
+    padding: 0 20px 32px;
+    animation: fadeIn 0.5s ease;
 
     :global {
       .faq-section {
@@ -1225,7 +2626,93 @@ export default {
 }
 
 .taro_page {
+  padding-bottom: constant(safe-area-inset-bottom);
   padding-bottom: env(safe-area-inset-bottom);
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@media screen and (min-width: 768px) {
+  .project {
+    &__services {
+      padding-left: 20px;
+      padding-right: 20px;
+    }
+
+    &__faq {
+      padding-left: 20px;
+      padding-right: 20px;
+    }
+  }
+}
+
+@media screen and (max-width: 375px) {
+  .project {
+    &__header {
+      height: 160px;
+
+      :global {
+        .search-bar {
+          height: 80px;
+          padding: 10px 20px;
+        }
+
+        .tab-bar {
+          height: 80px;
+          padding: 0 20px;
+        }
+      }
+    }
+
+    &__content {
+      padding-top: 160px;
+      min-height: calc(100vh - 160px);
+    }
+
+    &__services {
+      padding: 16px 16px 0;
+    }
+
+    &__list {
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    &__empty {
+      height: 200px;
+    }
+
+    &__empty-icon {
+      font-size: 40px;
+      margin-bottom: 12px;
+    }
+
+    &__empty-text {
+      font-size: 26px;
+    }
+
+    &__faq {
+      padding: 0 16px 24px;
+    }
+  }
 }
 ===== End of File: pages\project\index.scss =====
 
@@ -1430,6 +2917,154 @@ export default function ProjectPage() {
   )
 }
 ===== End of File: pages\project\index.tsx =====
+
+
+===== File: services\index-api.ts =====
+import type { Banner, ServiceCase, ServiceAdvantage, BookingForm, ApiResponse } from '../types'
+import { AppError } from '../utils/error'
+import { mockBanners, mockCases, mockAdvantages } from './index-mock-data'
+
+async function mockRequest<T>(data: T, delay = 500): Promise<T> {
+  await new Promise(resolve => setTimeout(resolve, delay))
+  return data
+}
+
+export const api = {
+  getBanners(): Promise<ApiResponse<Banner[]>> {
+    return mockRequest({ code: 0, message: 'success', data: mockBanners })
+  },
+
+  getCases(): Promise<ApiResponse<ServiceCase[]>> {
+    return mockRequest({ code: 0, message: 'success', data: mockCases })
+  },
+
+  getCaseDetail(id: number): Promise<ApiResponse<ServiceCase>> {
+    const caseItem = mockCases.find(item => item.id === id)
+    if (!caseItem) {
+      throw new AppError(404, '案例不存在')
+    }
+    return mockRequest({ code: 0, message: 'success', data: caseItem })
+  },
+
+  getAdvantages(): Promise<ApiResponse<ServiceAdvantage[]>> {
+    return mockRequest({ code: 0, message: 'success', data: mockAdvantages })
+  },
+
+  async submitBooking(form: BookingForm): Promise<ApiResponse<{ id: number }>> {
+    // Validate required fields
+    if (!form.name?.trim()) {
+      throw new AppError(400, '请输入姓名')
+    }
+    if (!form.phone?.trim()) {
+      throw new AppError(400, '请输入手机号')
+    }
+
+    // Validate phone format
+    const phoneRegex = /^1[3-9]\d{9}$/
+    if (!phoneRegex.test(form.phone)) {
+      throw new AppError(400, '请输入正确的手机号')
+    }
+
+    // Validate field lengths
+    if (form.name.length > 20) {
+      throw new AppError(400, '姓名不能超过20个字符')
+    }
+    if (form.address && form.address.length > 100) {
+      throw new AppError(400, '地址不能超过100个字符')
+    }
+    if (form.remark && form.remark.length > 200) {
+      throw new AppError(400, '备注不能超过200个字符')
+    }
+
+    // Simulate API call
+    return mockRequest({ 
+      code: 0, 
+      message: 'success', 
+      data: { id: Date.now() } 
+    }, 1000)
+  }
+}
+===== End of File: services\index-api.ts =====
+
+
+===== File: services\index-mock-data.ts =====
+import type { Banner, ServiceCase, ServiceAdvantage } from '../types'
+
+export const mockBanners: Banner[] = [
+  {
+    id: 1,
+    title: '品质服务保障',
+    subtitle: '十年质保 终身维护',
+    imageUrl: require('../assets/banner/banner1.png')
+  },
+  {
+    id: 2,
+    title: '专业防水服务',
+    subtitle: '一站式解决您的渗漏问题',
+    imageUrl: require('../assets/banner/banner2.png')
+  }
+]
+
+export const mockCases: ServiceCase[] = [
+  {
+    id: 1,
+    title: '地铁站防水工程',
+    description: '为北京新建地铁站提供防水保护',
+    imageUrl: require('../assets/case/case1.png'),
+    content: '本项目是为北京市政新建地铁站提供的整体防水解决方案。采用了最新的防水材料和工艺，确保地铁站在使用寿命内不会出现渗漏问题。项目包括防水设计、材料选型、施工和验收等全过程服务。',
+    type: '基础设施',
+    date: '2024-01-06',
+    views: 1280
+  },
+  {
+    id: 2,
+    title: '商业建筑防水工程',
+    description: '为上海某商业建筑提供全面防水解决方案',
+    imageUrl: require('../assets/case/case2.png'),
+    content: '该项目是为上海某大型商业综合体提供的防水维护服务。主要解决了建筑外墙渗水、地下车库渗漏等问题。采用了环保型防水材料，确保了防水效果的同时也保护了环境。',
+    type: '商业建筑',
+    date: '2024-01-05',
+    views: 960
+  },
+  {
+    id: 3,
+    title: '住宅小区防水工程',
+    description: '为广州某高档住宅小区提供屋面防水服务',
+    imageUrl: require('../assets/case/case2.png'),
+    content: '本项目为广州某高档住宅小区提供整体屋面防水服务。采用了先进的防水技术和材料，解决了房屋渗漏问题，提高了居民的生活质量。项目获得了业主的一致好评。',
+    type: '住宅建筑',
+    date: '2024-01-04',
+    views: 756
+  }
+]
+
+export const mockAdvantages: ServiceAdvantage[] = [
+  {
+    id: 1,
+    icon: '🏅',
+    value: '100+',
+    label: '专业认证'
+  },
+  {
+    id: 2,
+    icon: '⏱️',
+    value: '30分钟',
+    label: '快速响应'
+  },
+  {
+    id: 3,
+    icon: '📊',
+    value: '1000+',
+    label: '成功案例'
+  },
+  {
+    id: 4,
+    icon: '😊',
+    value: '99%',
+    label: '客户满意'
+  }
+]
+===== End of File: services\index-mock-data.ts =====
 
 
 ===== File: services\project-api.ts =====

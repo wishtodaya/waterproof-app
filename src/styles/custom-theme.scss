@@ -1,84 +1,166 @@
 /* custom-theme.scss */
-
-/* The Color of O2Team Brand */
-$color-brand: #2563eb;                      // 品牌主色
-$color-brand-light: #60a5fa;                // 品牌色-浅色
-$color-brand-dark: #1d4ed8;                 // 品牌色-深色
-$color-brand-disabled: #bfdbfe;             // 品牌色-禁用
-
-/* Color */
-$color-success: #22c55e;                    // 成功色
-$color-error: #ef4444;                      // 错误色
-$color-warning: #f59e0b;                    // 警告色
-$color-info: #78A4FA;
-
-/* Color Palette */
-$color-black-0: #000;
-$color-black-1: #333;
-$color-black-2: #7F7F7F;
-$color-black-3: #B2B2B2;
-
-$color-grey-0: #333;
-$color-grey-1: #666;
-$color-grey-2: #999;
-$color-grey-3: #CCC;
-$color-grey-4: #E5E5E5;
-$color-grey-5: #F0F0F0;
-$color-grey-6: #F7F7F7;
-
-$color-white: #FFF;
-
-/* Text Color */
-$color-text-base: #1e293b;                  // 基础文字色
-$color-text-base-inverse: #ffffff;          // 反色文字色
-$color-text-secondary: #475569;             // 次要文字色
-$color-text-placeholder: #94a3b8;           // 占位文字色
-$color-text-disabled: #cbd5e1;              // 禁用文字色
-$color-text-title: #2C405A;
-$color-text-paragraph: #3F536E;
-
-/* Link */
-$color-link: #6190E8;
-$color-link-hover: #79A1EB;
-$color-link-active: #4F7DE2;
-$color-link-disabled: #BFBFBF;
-
-/* 背景色 */
-$color-bg: #f8fafc;                         // 背景色
-$color-bg-base: #ffffff;                    // 组件背景色
-$color-bg-light: #f1f5f9;                   // 浅背景色
-$color-bg-dark: #e2e8f0;                    // 深背景色
-$color-bg-grey: #F7F7F7;
-
-/* 边框颜色 */
-$color-border-base: #e2e8f0;                // 基础边框色
-$color-border-split: #edf2f7;               // 分割线 (原tint 20%)
-$color-border-light: #f1f5f9;               // 浅边框色
-$color-border-dark: #cbd5e1;                // 深边框色
-$color-border-lighter: #f7fafc;             // 更浅边框色 (原tint 50%)
-$color-border-lightest: #fcfdfe;            // 最浅边框色 (原tint 80%)
-$color-border-grey: #CCC;
-
-/* 图标颜色 */
-$color-icon-base: #CCC;
-
-/* 功能色相关 */
-// 成功色
-$color-success-light: #86efac;              // 成功色-浅色
-$color-success-dark: #16a34a;               // 成功色-深色
-$color-success-disabled: #bbf7d0;           // 成功色-禁用
-
-// 警告色
-$color-warning-light: #fcd34d;              // 警告色-浅色
-$color-warning-dark: #d97706;               // 警告色-深色
-$color-warning-disabled: #fde68a;           // 警告色-禁用
-
-// 错误色
-$color-error-light: #fca5a5;                // 错误色-浅色
-$color-error-dark: #dc2626;                 // 错误色-深色
-$color-error-disabled: #fecaca;             // 错误色-禁用
-
-/**
- * 引入Taro UI默认样式
- */
 @import "~taro-ui/dist/style/index.scss";
+
+/* Z-index Management */
+$z-index-modal: 1000;
+$z-index-popup: 900;
+$z-index-mask: 800;
+$z-index-navigation: 100;
+$z-index-header: 90; 
+$z-index-footer: 90;
+$z-index-float: 80;
+$z-index-dropdown: 70;
+$z-index-sticky: 60;
+$z-index-banner: 50;
+$z-index-fixed: 40;
+$z-index-backdrop: 30;
+$z-index-overlay: 20;
+$z-index-content: 1;
+$z-index-base: -1;
+
+/* Brand Colors */
+$color-brand: #2563eb; 
+$color-brand-light: #60a5fa;
+$color-brand-dark: #1d4ed8;
+$color-brand-disabled: #bfdbfe;
+
+/* Function Colors */
+$color-success: #22c55e;                    
+$color-error: #ef4444;                      
+$color-warning: #f59e0b;                    
+$color-info: #3b82f6;                      
+
+/* Status Colors */
+$color-success-light: #86efac;
+$color-success-dark: #16a34a;
+$color-success-disabled: #bbf7d0;
+
+$color-error-light: #fca5a5;
+$color-error-dark: #dc2626;
+$color-error-disabled: #fecaca;
+
+$color-warning-light: #fcd34d;
+$color-warning-dark: #d97706;
+$color-warning-disabled: #fde68a;
+
+/* Basic Colors */
+$color-black: #000000;
+$color-white: #ffffff;
+
+/* Text Colors */
+$color-text-base: #1e293b;                  
+$color-text-base-inverse: #ffffff;          
+$color-text-secondary: #475569;             
+$color-text-placeholder: #94a3b8;           
+$color-text-disabled: #cbd5e1;              
+$color-text-title: #0f172a;                 
+$color-text-paragraph: #334155;             
+
+/* Background Colors */
+$color-bg: #f1f5f9;                      
+$color-bg-base: #ffffff;                    
+$color-bg-light: #f8fafc;                   
+$color-bg-dark: #e2e8f0;                  
+
+/* Border Colors */
+$color-border-base: #cbd5e1;             
+$color-border-light: #e2e8f0;
+$color-border-split: #cbd5e1;            
+$color-border-dark: #94a3b8;             
+
+/* Component Size */
+$size-xs: 20px;
+$size-sm: 24px;
+$size-base: 28px;
+$size-lg: 32px;
+$size-xl: 36px;
+
+/* Font Size */
+$font-size-xs: 20px;
+$font-size-sm: 24px;
+$font-size-base: 28px;
+$font-size-lg: 32px;
+$font-size-xl: 36px;
+$font-size-xxl: 40px;
+
+/* Font Weight */
+$font-weight-light: 300;
+$font-weight-normal: 400;
+$font-weight-medium: 500;
+$font-weight-semibold: 600;
+$font-weight-bold: 700;
+
+/* Line Height */
+$line-height-compact: 1.2;
+$line-height-base: 1.5;
+$line-height-loose: 1.8;
+
+/* Spacing */
+$spacing-xxs: 4px;
+$spacing-xs: 8px;
+$spacing-sm: 12px;
+$spacing-base: 16px;
+$spacing-lg: 24px;
+$spacing-xl: 32px;
+$spacing-xxl: 48px;
+
+/* Border Radius */
+$radius-none: 0;
+$radius-sm: 4px;
+$radius-base: 8px;
+$radius-lg: 12px;
+$radius-xl: 16px;
+$radius-full: 9999px;
+
+/* Shadows */
+$shadow-none: none;
+$shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+$shadow-base: 0 2px 8px rgba(0, 0, 0, 0.08);
+$shadow-lg: 0 4px 12px rgba(0, 0, 0, 0.1);
+$shadow-xl: 0 8px 16px rgba(0, 0, 0, 0.12);
+
+/* Animation Duration */
+$duration-fast: 150ms;
+$duration-base: 300ms;
+$duration-slow: 450ms;
+
+/* Animation Timing Functions */
+$ease-base: cubic-bezier(0.4, 0, 0.2, 1);
+$ease-in: cubic-bezier(0.4, 0, 1, 1);
+$ease-out: cubic-bezier(0, 0, 0.2, 1);
+$ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+
+/* Breakpoints */
+$breakpoint-xs: 375px;
+$breakpoint-sm: 576px;
+$breakpoint-md: 768px;
+
+/* Layout */
+$header-height: 88px;
+$tab-bar-height: 98px;
+$input-height: 88px;
+$button-height: 88px;
+
+/* Component Specific */
+$card-padding: 24px;
+$card-radius: $radius-lg;
+$card-shadow: $shadow-base;
+
+$modal-radius: $radius-lg;
+$modal-shadow: $shadow-lg;
+
+$button-radius: $radius-base;
+$input-radius: $radius-base;
+
+/* Overlay */
+$mask-bg: rgba(0, 0, 0, 0.4);
+$backdrop-filter: blur(8px);
+
+/* Transition */
+$transition-base: all $duration-base $ease-base;
+$transition-fade: opacity $duration-base $ease-base;
+$transition-slide: transform $duration-base $ease-base;
+
+/* Component Override */
+$at-button-height: $button-height;
+$at-input-height: $input-height;
