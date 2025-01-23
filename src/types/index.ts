@@ -52,14 +52,6 @@ export interface ServiceAdvantage {
   label: string
 }
 
-// 预约表单相关
-export interface BookingForm {
-  name: string
-  phone: string
-  address?: string
-  remark?: string
-}
-
 // 服务类型
 export type ServiceType = 'all' | 'home' | 'outdoor' | 'industrial'
 
@@ -249,4 +241,34 @@ export interface ProjectConfig {
   imageBaseUrl: string
   priceUnit: string
   areaUnit: string
+}
+
+export interface Config {
+  ui: {
+  banner: {
+  interval: number
+  duration: number
+  }
+  cases: {
+  interval: number
+  duration: number
+  displayCount: number
+  cardHeight: number
+  }
+  }
+  contact: {
+  phone: string
+  wechat: string
+  }
+  }
+
+
+  // 预约表单数据类型
+export interface BookingFormData {
+  area: string            // 施工面积
+  region: string[]        // 地区信息
+  address: string         // 详细地址
+  name: string           // 联系人
+  phone: string          // 联系电话
+  remark: string         // 备注说明
 }
