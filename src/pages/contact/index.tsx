@@ -1,81 +1,115 @@
 // pages/contact/index.tsx
+import { useState, useCallback, useEffect } from 'react'
 import { View } from "@tarojs/components"
-import { useShareAppMessage } from "@tarojs/taro"
+import { useShareAppMessage, showToast, showLoading, hideLoading } from "@tarojs/taro"
+import { AtLoadMore } from 'taro-ui'
 import AboutUs from "../../components/about-us"
 import BookingForm from "../../components/booking-form"
+import { contactApi } from "../../services/contact-api"
+import { handleError } from "../../utils/error"
+import type { AboutUsProps } from "../../components/about-us/types"
+import type { ServiceTypeOption, BookingFormData } from "../../components/booking-form/types"
 import "./index.scss"
 
-const SERVICE_TYPES = [
-  {
-    label: "卫生间防水",
-    value: "bathroom",
-    icon: "🚽",
-  },
-  {
-    label: "房屋防水",
-    value: "house",
-    icon: "🏠",
-  },
-  {
-    label: "外墙防水",
-    value: "wall",
-    icon: "🧱",
-  },
-  {
-    label: "地下室防水",
-    value: "basement",
-    icon: "🏗️",
-  },
-  {
-    label: "阳台防水",
-    value: "balcony",
-    icon: "🏛️",
-  },
-  {
-    label: "屋顶防水",
-    value: "roof",
-    icon: "🏘️",
-  },
-]
-
-export default function ContactPage() {
-  useShareAppMessage(() => ({
-    title: "专业防水工程服务 - 免费上门勘测",
-    path: "/pages/contact/index",
-    imageUrl: "../../assets/share/contact.png",
-  }))
-
-  const handleSubmit = async (data) => {
-    console.log("Form submitted:", data)
-    // TODO: 提交表单逻辑
-  }
-
-  return (
-    <View className="contact-page">
-      <View className="contact-page__content">
-        <View className="contact-page__section contact-page__section--booking">
-          <View className="contact-page__section-header">
-            <View className="contact-page__section-title">预约服务</View>
-            <View className="contact-page__section-subtitle">填写信息免费上门勘测</View>
-          </View>
-          <BookingForm serviceTypes={SERVICE_TYPES} onSubmit={handleSubmit} />
-        </View>
-
-        <View className="contact-page__section contact-page__section--about">
-          <View className="contact-page__section-header">
-            <View className="contact-page__section-title">关于我们</View>
-            <View className="contact-page__section-subtitle">专业防水服务十年</View>
-          </View>
-          <AboutUs
-            description="我们是专业从事建筑防水工程的专业服务公司，拥有十年以上从业经验，为商业和住宅客户提供全方位的防水解决方案。我们的团队持有专业资质证书，采用优质材料，确保施工质量。"
-            phone="1234567890"
-            wechat="company_waterproof"
-            businessHours="09:00-18:00"
-            address="北京市朝阳区xx路xx号"
-          />
-        </View>
-      </View>
-    </View>
-  )
+interface PageState {
+ submitting: boolean
+ loading: boolean
+ serviceTypes: ServiceTypeOption[]
+ contactInfo: AboutUsProps | null
 }
 
+export default function ContactPage() {
+ const [state, setState] = useState<PageState>({
+   submitting: false,
+   loading: true,
+   serviceTypes: [],
+   contactInfo: null
+ })
+
+ useShareAppMessage(() => ({
+   title: "专业防水工程服务 - 免费上门勘测",
+   path: "/pages/contact/index",
+   imageUrl: "../../assets/share/contact.png",
+ }))
+
+ useEffect(() => {
+   const initPage = async () => {
+     showLoading({ title: '加载中...' })
+     try {
+       const [typesRes, infoRes] = await Promise.all([
+         contactApi.getServiceTypes(),
+         contactApi.getContactInfo()
+       ])
+       setState(prev => ({
+         ...prev,
+         serviceTypes: typesRes.data,
+         contactInfo: infoRes.data,
+         loading: false
+       }))
+     } catch (error) {
+       showToast({ title: handleError(error), icon: 'none' })
+     } finally {
+       hideLoading()
+     }
+   }
+   initPage()
+ }, [])
+
+ const handleSubmit = useCallback(async (data: BookingFormData) => {
+   if(state.submitting) return
+   
+   try {
+     setState(prev => ({ ...prev, submitting: true }))
+     await contactApi.submitBooking(data)
+     showToast({ 
+       title: '预约成功,我们会尽快联系您',
+       icon: 'success',
+       duration: 2000
+     })
+   } catch (error) {
+     showToast({ 
+       title: handleError(error),
+       icon: 'none',
+       duration: 2000
+     })
+   } finally {
+     setState(prev => ({ ...prev, submitting: false }))
+   }
+ }, [state.submitting])
+
+ if (state.loading) {
+   return (
+     <View className="contact-page">
+       <AtLoadMore status="loading" />
+     </View>
+   )
+ }
+
+ return (
+   <View className="contact-page">
+     <View className="contact-page__content">
+       <View className="contact-page__section contact-page__section--booking">
+         <View className="contact-page__section-header">
+           <View className="contact-page__section-title">预约服务</View>
+           <View className="contact-page__section-subtitle">填写信息免费上门勘测</View>
+         </View>
+         <BookingForm 
+           loading={state.submitting}
+           serviceTypes={state.serviceTypes} 
+           onSubmit={handleSubmit}
+         />
+       </View>
+
+       {state.contactInfo && (
+         <View className="contact-page__section contact-page__section--about">
+           <View className="contact-page__section-header">
+             <View className="contact-page__section-title">关于我们</View>
+             <View className="contact-page__section-subtitle">专业防水服务十年</View>
+           </View>
+           <AboutUs {...state.contactInfo} />
+         </View>
+       )}
+     </View>
+   </View>
+ )
+}
