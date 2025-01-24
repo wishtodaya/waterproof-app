@@ -1,6 +1,6 @@
 // services/project-api.ts
-import type { ServiceType, ServiceItem, FAQ, ApiResponse, SearchOptions } from '../types'
-import { AppError } from '../utils/error'
+import type { ServiceType, ServiceItem, FAQ, ApiResponse, SearchOptions } from '../../types'
+import { AppError } from '../../utils/error'
 import { mockServices, mockFaqs } from './project-mock-data'
 
 /**

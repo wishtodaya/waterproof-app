@@ -1,4 +1,4 @@
-import type { Banner, ServiceCase, ServiceAdvantage } from '../types'
+import type { Banner, ServiceCase, ServiceAdvantage } from '../../types'
 
 export const mockBanners: Banner[] = [
   {

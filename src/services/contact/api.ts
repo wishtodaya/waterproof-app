@@ -1,8 +1,8 @@
 // services/contact-api.ts
-import { ServiceTypeOption, BookingFormData } from '../components/booking-form/types'
-import { AboutUsProps } from '../components/about-us/types'
-import { ApiResponse } from '../types'
-import { AppError } from '../utils/error'
+import { ServiceTypeOption, BookingFormData } from '../../components/booking-form/types'
+import { AboutUsProps } from '../../components/about-us/types'
+import { ApiResponse } from '../../types'
+import { AppError } from '../../utils/error'
 import { mockServiceTypes, mockContactInfo } from './contact-mock-data'
 
 const mockRequest = async <T>(data: T): Promise<ApiResponse<T>> => {

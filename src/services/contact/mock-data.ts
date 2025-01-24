@@ -1,6 +1,6 @@
 // services/contact-mock-data.ts
-import type { ServiceTypeOption } from '../components/booking-form/types'
-import type { AboutUsProps } from '../components/about-us/types'
+import type { ServiceTypeOption } from '../../components/booking-form/types'
+import type { AboutUsProps } from '../../components/about-us/types'
 export const mockServiceTypes: ServiceTypeOption[] = [
     {
       label: "卫生间防水",
