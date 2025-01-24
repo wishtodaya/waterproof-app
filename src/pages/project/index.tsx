@@ -6,11 +6,7 @@ import { SearchBar } from '../../components/search-bar'
 import { TabBar } from '../../components/tab-bar'
 import { ServiceCard } from '../../components/service-card'
 import { FAQSection } from '../../components/faq-section'
-<<<<<<< HEAD
 import { projectApi } from '../../services/project/api'
-=======
-import { projectApi } from '../../services/project/project-api'
->>>>>>> ef5daf10762dcc175b7b6758e8012d2e0fa18216
 import { handleError } from '../../utils/error'
 import type { ServiceItem, FAQ, ServiceType } from '../../types'
 import './index.scss'

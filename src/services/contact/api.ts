@@ -3,11 +3,7 @@ import { ServiceTypeOption, BookingFormData } from '../../components/booking-for
 import { AboutUsProps } from '../../components/about-us/types'
 import { ApiResponse } from '../../types'
 import { AppError } from '../../utils/error'
-<<<<<<< HEAD
 import { mockServiceTypes, mockContactInfo } from './mock-data'
-=======
-import { mockServiceTypes, mockContactInfo } from './contact-mock-data'
->>>>>>> ef5daf10762dcc175b7b6758e8012d2e0fa18216
 
 const mockRequest = async <T>(data: T): Promise<ApiResponse<T>> => {
     await new Promise(resolve => setTimeout(resolve, 500))

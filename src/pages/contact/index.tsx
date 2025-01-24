@@ -5,11 +5,7 @@ import { useShareAppMessage, showToast, showLoading, hideLoading } from "@tarojs
 import { AtLoadMore } from 'taro-ui'
 import AboutUs from "../../components/about-us"
 import BookingForm from "../../components/booking-form"
-<<<<<<< HEAD
 import { contactApi } from "../../services/contact/api"
-=======
-import { contactApi } from "../../services/contact/contact-api"
->>>>>>> ef5daf10762dcc175b7b6758e8012d2e0fa18216
 import { handleError } from "../../utils/error"
 import type { AboutUsProps } from "../../components/about-us/types"
 import type { ServiceTypeOption, BookingFormData } from "../../components/booking-form/types"
