@@ -1,5 +1,5 @@
 // services/project-mock-data.ts
-import type { ServiceItem, FAQ } from '../types'
+import type { ServiceItem, FAQ } from '../../types'
 
 export const mockServices: ServiceItem[] = [
   {

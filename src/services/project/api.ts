@@ -1,7 +1,7 @@
 // services/project-api.ts
-import type { ServiceType, ServiceItem, FAQ, ApiResponse, SearchOptions } from '../types'
-import { AppError } from '../utils/error'
-import { mockServices, mockFaqs } from './project-mock-data'
+import type { ServiceType, ServiceItem, FAQ, ApiResponse, SearchOptions } from '../../types'
+import { AppError } from '../../utils/error'
+import { mockServices, mockFaqs } from './mock-data'
 
 /**
  * 模拟异步请求
