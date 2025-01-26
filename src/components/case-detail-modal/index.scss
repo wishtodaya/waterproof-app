@@ -1,0 +1,311 @@
+@import "../../styles/custom-theme.scss";
+
+.case-detail {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: $z-index-modal;
+  background: $color-bg;
+  transform: translateY(100%);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  flex-direction: column;
+
+  &--open {
+    transform: translateY(0);
+  }
+
+  &__header {
+    position: relative;
+    height: 88px;
+    padding: 0 88px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: $color-bg-base;
+    box-shadow: $shadow-sm;
+  }
+
+  &__back {
+    position: absolute;
+    left: $spacing-base;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 64px;
+    height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: $radius-full;
+    color: $color-text-secondary;
+    transition: all 0.2s ease;
+
+    &:active {
+      background: rgba($color-text-secondary, 0.08);
+      transform: translateY(-50%) scale(0.95);
+    }
+  }
+
+  &__title {
+    font-size: $font-size-lg;
+    font-weight: $font-weight-semibold;
+    color: $color-text-title;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 70%;
+  }
+
+  &__type {
+    position: absolute;
+    right: $spacing-base;
+    top: 50%;
+    transform: translateY(-50%);
+    padding: $spacing-xs $spacing-sm;
+    background: rgba($color-brand, 0.08);
+    color: $color-brand;
+    font-size: $font-size-sm;
+    border-radius: $radius-full;
+    font-weight: $font-weight-medium;
+  }
+
+  &__content {
+    flex: 1;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  &__swiper-wrap {
+    background: $color-bg-dark;
+    padding: $spacing-lg 0;
+  }
+
+  &__swiper {
+    height: 440px;
+  }
+
+  &__swiper-item {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  &__main {
+    padding: $spacing-lg $spacing-xl;
+  }
+
+  &__info-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: $spacing-lg;
+    padding: $spacing-xl;
+    background: $color-bg-base;
+    border-radius: $radius-lg;
+    margin-bottom: $spacing-xl;
+    box-shadow: $shadow-sm;
+  }
+
+  &__info-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: $spacing-xs;
+  }
+
+  &__info-label {
+    font-size: $font-size-sm;
+    color: $color-text-secondary;
+    margin-top: $spacing-xs;
+  }
+
+  &__info-value {
+    font-size: $font-size-base;
+    color: $color-text-title;
+    font-weight: $font-weight-semibold;
+  }
+
+  &__sections {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-xl;
+  }
+
+  &__section {
+    padding: $spacing-xl;
+    background: $color-bg-base;
+    border-radius: $radius-lg;
+    box-shadow: $shadow-sm;
+  }
+
+  &__section-header {
+    display: flex;
+    align-items: center;
+    gap: $spacing-sm;
+    margin-bottom: $spacing-lg;
+  }
+
+  &__section-line {
+    width: 4px;
+    height: 20px;
+    background: $color-brand;
+    border-radius: $radius-sm;
+  }
+
+  &__section-title {
+    font-size: $font-size-lg;
+    font-weight: $font-weight-semibold;
+    color: $color-text-title;
+  }
+
+  &__section-content {
+    font-size: $font-size-base;
+    color: $color-text-secondary;
+    line-height: $line-height-loose;
+    white-space: pre-wrap;
+  }
+
+  &__process {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-base;
+  }
+
+  &__process-item {
+    display: flex;
+    align-items: flex-start;
+    gap: $spacing-lg;
+    padding: $spacing-lg;
+    background: rgba($color-brand, 0.02);
+    border-radius: $radius-lg;
+    transition: all 0.2s ease;
+
+    &:active {
+      transform: translateX(4px);
+      background: rgba($color-brand, 0.04);
+    }
+  }
+
+  &__process-number {
+    width: 44px;
+    height: 44px;
+    border-radius: $radius-full;
+    background: rgba($color-brand, 0.08);
+    color: $color-brand;
+    font-weight: $font-weight-semibold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: $font-size-lg;
+  }
+
+  &__process-text {
+    flex: 1;
+    color: $color-text-secondary;
+    line-height: $line-height-loose;
+    padding-top: $spacing-xs;
+  }
+
+  &__footer {
+    padding: $spacing-base $spacing-xl calc(#{$spacing-base} + env(safe-area-inset-bottom));
+    background: $color-bg-base;
+    box-shadow: 0 -1px 2px rgba(0, 0, 0, 0.05);
+    display: flex;
+    gap: $spacing-lg;
+  }
+
+  &__action {
+    flex: 1;
+    height: 88px;
+    font-size: $font-size-lg;
+    font-weight: $font-weight-medium;
+    border-radius: $radius-lg;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    
+    &--primary {
+      background: $color-brand;
+      color: $color-white;
+
+      &:active {
+        background: darken($color-brand, 5%);
+        transform: translateY(1px);
+      }
+    }
+
+    &:active {
+      opacity: 0.9;
+      transform: translateY(1px);
+    }
+  }
+
+  @media screen and (max-width: $breakpoint-sm) {
+    &__header {
+      height: 80px;
+      padding: 0 80px;
+    }
+
+    &__back {
+      width: 56px;
+      height: 56px;
+    }
+
+    &__title {
+      font-size: $font-size-base;
+      max-width: 60%;
+    }
+
+    &__type {
+      font-size: $font-size-xs;
+      padding: $spacing-xxs $spacing-xs;
+    }
+
+    &__swiper {
+      height: 360px;
+    }
+
+    &__main {
+      padding: $spacing-base;
+    }
+
+    &__info-grid {
+      padding: $spacing-lg;
+      gap: $spacing-base;
+      margin-bottom: $spacing-lg;
+    }
+
+    &__sections {
+      gap: $spacing-lg;
+    }
+
+    &__section {
+      padding: $spacing-lg;
+    }
+
+    &__process-item {
+      padding: $spacing-base;
+      gap: $spacing-base;
+    }
+
+    &__process-number {
+      width: 36px;
+      height: 36px;
+      font-size: $font-size-base;
+    }
+
+    &__footer {
+      padding: $spacing-sm $spacing-base calc(#{$spacing-sm} + env(safe-area-inset-bottom));
+      gap: $spacing-base;
+    }
+
+    &__action {
+      height: 80px;
+      font-size: $font-size-base;
+    }
+  }
+}
+

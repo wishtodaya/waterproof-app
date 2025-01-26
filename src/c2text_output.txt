@@ -1,0 +1,5981 @@
+📁 src
+  📄 app.config.ts
+  📄 app.scss
+  📄 app.ts
+  📁 components
+    📁 about-us
+      📄 index.scss
+      📄 index.tsx
+      📄 types.ts
+    📁 booking-form
+      📄 index.scss
+      📄 index.tsx
+      📄 types.ts
+    📁 case-card
+      📄 index.scss
+      📄 index.tsx
+      📄 types.ts
+    📁 case-detail-modal
+      📄 index.scss
+      📄 index.tsx
+    📁 faq-section
+      📄 index.scss
+      📄 index.tsx
+    📁 image-comparison
+      📄 index.scss
+      📄 index.tsx
+    📁 region-picker
+      📄 index.scss
+      📄 index.tsx
+      📄 types.ts
+    📁 search-bar
+      📄 index.scss
+      📄 index.tsx
+    📁 service-card
+      📄 index.scss
+      📄 index.tsx
+    📁 tab-bar
+      📄 index.scss
+      📄 index.tsx
+  📁 config
+    📄 index.ts
+  📄 index.html
+  📁 pages
+    📁 cases
+      📄 index.config.ts
+      📄 index.scss
+      📄 index.tsx
+    📁 contact
+      📄 index.config.ts
+      📄 index.scss
+      📄 index.tsx
+    📁 index
+      📄 index.config.ts
+      📄 index.scss
+      📄 index.tsx
+    📁 project
+      📄 index.config.ts
+      📄 index.scss
+      📄 index.tsx
+  📁 services
+    📁 cases
+      📄 api.ts
+      📄 mock-data.ts
+    📁 contact
+      📄 api.ts
+      📄 mock-data.ts
+    📁 index
+      📄 api.ts
+      📄 mock-data.ts
+    📁 project
+      📄 api.ts
+      📄 mock-data.ts
+  📁 styles
+    📄 custom-theme.scss
+  📁 types
+    📄 index.ts
+  📁 utils
+    📄 error.ts
+
+===== File: app.config.ts =====
+// app.config.ts
+export default defineAppConfig({
+  pages: [
+    'pages/index/index',
+    'pages/project/index',
+    'pages/cases/index',
+    'pages/contact/index'
+  ],
+  window: {
+    backgroundTextStyle: 'light',
+    navigationBarBackgroundColor: '#ffffff',
+    navigationBarTitleText: '防水服务',
+    navigationBarTextStyle: 'black',
+    backgroundColor: '#f6f6f6'
+  },
+  tabBar: {
+    color: '#999999',
+    selectedColor: '#2563eb',
+    backgroundColor: '#ffffff',
+    borderStyle: 'white',
+    list: [
+      {
+        pagePath: 'pages/index/index',
+        text: '首页',
+        iconPath: 'assets/tab-bar/home.png',
+        selectedIconPath: 'assets/tab-bar/home-active.png'
+      },
+      {
+        pagePath: 'pages/project/index',
+        text: '服务',
+        iconPath: 'assets/tab-bar/service.png',
+        selectedIconPath: 'assets/tab-bar/service-active.png'
+      },
+      {
+        pagePath: 'pages/cases/index',
+        text: '案例',
+        iconPath: 'assets/tab-bar/case.png',
+        selectedIconPath: 'assets/tab-bar/case-active.png'
+      },
+      {
+        pagePath: 'pages/contact/index',
+        text: '联系我们',
+        iconPath: 'assets/tab-bar/contact.png',
+        selectedIconPath: 'assets/tab-bar/contact-active.png'
+      }
+    ]
+  }
+})
+===== End of File: app.config.ts =====
+
+
+===== File: app.scss =====
+// app.scss
+@import "./styles/custom-theme.scss";
+
+// 基础样式设置
+page {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+  font-size: $font-size-base;
+  line-height: $line-height-base;
+  background: $color-bg;
+  color: $color-text-base;
+}
+
+// 按钮重置样式
+button {
+  &::after {
+    border: none;
+  }
+}
+
+// 安全区域适配
+.safe-area-bottom {
+  padding-bottom: constant(safe-area-inset-bottom);
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+// 响应式布局断点
+@media screen and (max-width: $breakpoint-xs) {
+  page {
+    font-size: $font-size-sm;
+  }
+}
+===== End of File: app.scss =====
+
+
+===== File: app.ts =====
+// app.tsx
+import { PropsWithChildren } from 'react'
+import { useLaunch, useError, getStorageSync, setStorageSync, onNetworkStatusChange } from '@tarojs/taro'
+import './styles/custom-theme.scss'
+import './app.scss'
+
+function App({ children }: PropsWithChildren<any>) {
+  useLaunch(() => {
+    initApp()
+  })
+
+  useError((error) => {
+    console.error('App Error:', error)
+  })
+
+  const initApp = async () => {
+    try {
+      // 初始化日志
+      const logs = getStorageSync('logs') || []
+      logs.unshift(Date.now())
+      setStorageSync('logs', logs)
+
+      // 网络状态监听
+      onNetworkStatusChange((res) => {
+        console.log('network status:', res.isConnected)
+      })
+
+    } catch (error) {
+      console.error('App initialization failed:', error)
+    }
+  }
+
+  return children
+}
+
+export default App
+===== End of File: app.ts =====
+
+
+===== File: components\about-us\index.scss =====
+// components/about-us/index.scss
+@import "../../styles/custom-theme.scss";
+
+.about-us {
+  box-sizing: border-box;
+  height: 100%;
+  padding: $spacing-xl;
+  max-width: 1200px;
+  margin: 0 auto;
+
+  &__intro {
+    margin-bottom: $spacing-xl;
+    max-width: 800px;
+  }
+
+  &__desc {
+    display: block;
+    font-size: $font-size-base;
+    line-height: 1.8;
+    color: $color-text-secondary;
+    text-align: justify;
+    letter-spacing: 0.02em;
+  }
+
+  &__grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: $spacing-lg;
+  }
+
+  .grid-item {
+    position: relative;
+    display: flex;
+    gap: $spacing-lg; // 增加图标与文本的间距
+    padding: $spacing-lg + 2 $spacing-xl; // 微调垂直内边距
+    border-radius: $radius-lg;
+    background: $color-bg-base;
+    border: 1px solid rgba(var(--card-color), 0.15); // 微调边框透明度
+
+    &__icon {
+      flex-shrink: 0;
+      width: 26px; // 稍微增加图标容器宽度
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      .at-icon {
+        font-size: 26px; // 稍微增加图标大小
+      }
+    }
+
+    &__content {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: center; // 确保内容垂直居中
+    }
+
+    &__label {
+      display: block;
+      font-size: $font-size-sm;
+      color: rgba($color-text-secondary, 0.85); // 微调标签颜色
+      margin-bottom: 4px; // 减小标签和值之间的间距
+      letter-spacing: 0.02em;
+    }
+
+    &__value {
+      display: block;
+      font-size: $font-size-base;
+      line-height: 1.5;
+      color: $color-text-title;
+      font-weight: 500; // 调整字重
+      word-wrap: break-word;
+      letter-spacing: 0.01em;
+    }
+  }
+
+  @media screen and (max-width: $breakpoint-sm) {
+    padding: $spacing-lg;
+
+    &__intro {
+      margin-bottom: $spacing-lg;
+    }
+
+    &__grid {
+      grid-template-columns: 1fr;
+      gap: $spacing-base;
+    }
+
+    .grid-item {
+      padding: $spacing-lg;
+      gap: $spacing-base;
+      
+      &__icon {
+        width: 24px;
+
+        .at-icon {
+          font-size: 24px;
+        }
+      }
+    }
+  }
+}
+===== End of File: components\about-us\index.scss =====
+
+
+===== File: components\about-us\index.tsx =====
+// components/about-us/index.tsx
+import { View, Text } from "@tarojs/components"
+import { AtIcon } from "taro-ui"
+import type { AboutUsProps } from "./types"
+import "./index.scss"
+
+interface InfoCard {
+  icon: string
+  label: string
+  value: string
+  color: string
+}
+
+export default function AboutUs({ description, phone, wechat, address, businessHours }: AboutUsProps) {
+  const infoCards: InfoCard[] = [
+    {
+      icon: "phone",
+      label: "电话咨询",
+      value: phone,
+      color: "rgb(2, 132, 199)",
+    },
+    {
+      icon: "message",
+      label: "微信咨询",
+      value: wechat,
+      color: "rgb(5, 150, 105)",
+    },
+    {
+      icon: "clock",
+      label: "营业时间",
+      value: businessHours,
+      color: "rgb(147, 51, 234)",
+    },
+    {
+      icon: "map-pin",
+      label: "公司地址",
+      value: address,
+      color: "rgb(220, 38, 38)",
+    },
+  ]
+
+  return (
+    <View className="about-us">
+      <View className="about-us__intro">
+        <Text className="about-us__desc">{description}</Text>
+      </View>
+
+      <View className="about-us__grid">
+        {infoCards.map(({ icon, label, value, color }) => (
+          <View
+            key={icon}
+            className="grid-item"
+            style={
+              {
+                "--card-color": color,
+              } as React.CSSProperties
+            }
+          >
+            <View className="grid-item__icon">
+              <AtIcon value={icon} size={26} color={color} />
+            </View>
+            <View className="grid-item__content">
+              <Text className="grid-item__label">{label}</Text>
+              <Text className="grid-item__value">{value}</Text>
+            </View>
+          </View>
+        ))}
+      </View>
+    </View>
+  )
+}
+===== End of File: components\about-us\index.tsx =====
+
+
+===== File: components\about-us\types.ts =====
+// components/about-us/types.ts
+ export interface AboutUsProps {
+  description: string
+  phone: string
+  wechat: string
+  businessHours: string
+  address: string
+ }
+===== End of File: components\about-us\types.ts =====
+
+
+===== File: components\booking-form\index.scss =====
+@import "../../styles/custom-theme.scss";
+
+.booking-form {
+  background: $color-bg-base;
+  width: 100%;
+  padding: $spacing-lg $spacing-lg $spacing-base;
+  box-sizing: border-box;
+
+  &__content {
+    width: 100%;
+  }
+
+  &__form-item {
+    margin-bottom: $spacing-lg;
+  }
+
+  &__label {
+    display: flex;
+    align-items: center;
+    margin-bottom: $spacing-xs;
+
+    &-required {
+      color: $color-error;
+      font-size: $font-size-lg;
+      margin-right: $spacing-xxs;
+      line-height: 1;
+    }
+
+    &-text {
+      font-size: $font-size-base;
+      color: $color-text-title;
+      font-weight: $font-weight-medium;
+      line-height: 1;
+    }
+
+    &-unit {
+      font-size: $font-size-base;
+      color: $color-text-secondary;
+      margin-left: $spacing-xxs;
+      line-height: 1;
+    }
+  }
+
+  &__input {
+    width: 100%;
+    height: $input-height;
+    padding: 0 $spacing-lg;
+    font-size: $font-size-base;
+    color: $color-text-title;
+    background: $color-bg-light;
+    border: 1px solid $color-border-base;
+    border-radius: $radius-lg;
+    transition: all 0.3s ease;
+    box-sizing: border-box;
+
+    &::placeholder {
+      color: $color-text-placeholder;
+    }
+
+    &:hover {
+      border-color: $color-brand-light;
+    }
+
+    &:focus {
+      border-color: $color-brand;
+      background: $color-white;
+      box-shadow: 0 0 0 2px rgba($color-brand, 0.1);
+    }
+
+    &--error {
+      border-color: $color-error;
+
+      &:focus {
+        box-shadow: 0 0 0 2px rgba($color-error, 0.1);
+      }
+    }
+  }
+
+  &__error {
+    margin-top: $spacing-xs;
+    font-size: $font-size-sm;
+    color: $color-error;
+    display: flex;
+    align-items: center;
+    line-height: 1.2;
+
+    &::before {
+      content: '!';
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: $size-sm;
+      height: $size-sm;
+      background: rgba($color-error, 0.1);
+      border-radius: $radius-full;
+      margin-right: $spacing-xs;
+      font-weight: $font-weight-bold;
+      flex-shrink: 0;
+    }
+  }
+
+  &__picker {
+    width: 100%;
+    position: relative;
+
+    &-inner {
+      width: 100%;
+      height: $input-height;
+      padding: 0 40px 0 $spacing-lg; // 右侧预留箭头空间
+      display: flex;
+      align-items: center;
+      background: $color-bg-light;
+      border: 1px solid $color-border-base;
+      border-radius: $radius-lg;
+      position: relative;
+      transition: all 0.3s ease;
+      box-sizing: border-box; // 确保padding计入总宽度
+
+      .booking-form__picker--error & {
+        border-color: $color-error;
+      }
+    }
+
+    &-text,
+    &-placeholder {
+      display: block;
+      width: 100%; // 占满容器宽度
+      font-size: $font-size-base;
+      line-height: $input-height;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    &-text {
+      color: $color-text-title;
+    }
+
+    &-placeholder {
+      color: $color-text-placeholder;
+    }
+
+    &-arrow {
+      position: absolute;
+      right: $spacing-lg;
+      top: 50%;
+      width: 10px;
+      height: 10px;
+      margin-top: -5px;
+      border-right: 2px solid $color-border-dark;
+      border-bottom: 2px solid $color-border-dark;
+      transform: rotate(45deg);
+      transition: transform 0.2s;
+      pointer-events: none;
+    }
+
+    &:hover &-inner {
+      border-color: $color-brand-light;
+    }
+
+    &:focus-within &-inner {
+      border-color: $color-brand;
+      background: $color-white;
+      box-shadow: 0 0 0 2px rgba($color-brand, 0.1);
+    }
+
+    &--error &-inner:focus-within {
+      box-shadow: 0 0 0 2px rgba($color-error, 0.1);
+    }
+  }
+
+  textarea#{&}__input {
+    height: 120px;
+    padding: $spacing-lg;
+    line-height: $line-height-base;
+    resize: none;
+  }
+
+  &__submit {
+    margin-top: $spacing-xl;
+    padding: 0 $spacing-base;
+
+    .submit-button {
+      width: 100%;
+      height: 96px;
+      font-size: $font-size-lg;
+      font-weight: $font-weight-medium;
+      color: $color-white;
+      background: $color-brand;
+      border-radius: $radius-lg;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      &--hover {
+        opacity: 0.9;
+        transform: translateY(1px);
+      }
+
+      &--loading {
+        opacity: 0.8;
+        pointer-events: none;
+      }
+    }
+  }
+
+  @media screen and (min-width: $breakpoint-md) {
+    padding: $spacing-xl;
+
+    &__submit {
+      margin-top: $spacing-xxl;
+    }
+  }
+
+  @media screen and (max-width: $breakpoint-sm) {
+    padding: $spacing-base;
+  }
+}
+===== End of File: components\booking-form\index.scss =====
+
+
+===== File: components\booking-form\index.tsx =====
+// components/booking-form/index.tsx
+import { useState, useCallback } from 'react'
+import { View, Text, Input, Textarea, Picker, Button } from '@tarojs/components'
+import Taro from '@tarojs/taro'
+import RegionPicker from '../region-picker'
+import type { BookingFormData, BookingFormProps, FormErrors } from './types'
+import './index.scss'
+
+const DEFAULT_FORM: BookingFormData = {
+ name: '',
+ phone: '',
+ area: '',
+ serviceType: '',
+ region: [],
+ address: '',
+ remark: ''
+}
+
+export default function BookingForm({
+ loading = false,
+ serviceTypes = [],
+ onSubmit
+}: BookingFormProps) {
+ const [form, setForm] = useState<BookingFormData>(DEFAULT_FORM)
+ const [errors, setErrors] = useState<FormErrors>({})
+ const [touched, setTouched] = useState<Record<string, boolean>>({})
+
+ // 表单验证
+ const validateField = useCallback((name: string, value: any): string => {
+   switch(name) {
+     case 'name':
+       if (!value) return '请输入联系人姓名'
+       if (value.length < 2) return '姓名至少2个字符'
+       if (value.length > 20) return '姓名不能超过20个字符'
+       return ''
+     case 'phone':
+       if (!value) return '请输入手机号码'
+       if (!/^1[3-9]\d{9}$/.test(value)) return '请输入正确的手机号'
+       return ''
+     case 'area':
+       if (!value) return '请输入施工面积'
+       const areaNum = parseFloat(value)
+       if (isNaN(areaNum) || areaNum <= 0) return '请输入有效的面积'
+       if (areaNum > 10000) return '面积不能超过10000平方米'
+       return ''
+     case 'serviceType':
+       if (!value) return '请选择服务类型'
+       return ''
+     case 'region':
+       if (!value?.length) return '请选择所在地区'
+       return ''
+     case 'address':
+       if (!value) return '请输入详细地址'
+       if (value.length < 5) return '详细地址至少5个字符'
+       if (value.length > 100) return '详细地址不能超过100个字符'
+       return ''
+     default:
+       return ''
+   }
+ }, [])
+
+ // 处理输入变化
+ const handleInput = useCallback((name: keyof BookingFormData, event: any) => {
+   const value = event?.detail?.value ?? event
+   setForm(prev => ({ ...prev, [name]: value }))
+   setTouched(prev => ({ ...prev, [name]: true }))
+
+   const error = validateField(name, value)
+   setErrors(prev => ({ ...prev, [name]: error }))
+ }, [validateField])
+
+ // 处理提交
+ const handleSubmit = useCallback(async () => {
+   if (loading) return
+
+   const allTouched: Record<string, boolean> = {}
+   const newErrors: FormErrors = {}
+   let hasError = false
+
+   Object.keys(form).forEach(key => {
+     allTouched[key] = true
+     if (key !== 'remark') {
+       const error = validateField(key, form[key as keyof BookingFormData])
+       if (error) {
+         newErrors[key] = error
+         hasError = true
+       }
+     }
+   })
+
+   setTouched(allTouched)
+   setErrors(newErrors)
+
+   if (!hasError) {
+     try {
+       await Taro.vibrateShort()
+       await onSubmit(form)
+     } catch (error) {
+       console.error('Submit error:', error)
+       Taro.showToast({
+         title: '提交失败，请重试',
+         icon: 'none',
+         duration: 2000
+       })
+     }
+   } else {
+     Taro.showToast({
+       title: '请完善必填信息',
+       icon: 'none',
+       duration: 2000
+     })
+   }
+ }, [form, loading, onSubmit, validateField])
+
+ return (
+   <View className='booking-form'>
+     <View className='booking-form__content'>
+       {/* 联系人姓名 */}
+       <View className='booking-form__form-item'>
+         <View className='booking-form__label'>
+           <Text className='booking-form__label-required'>*</Text>
+           <Text className='booking-form__label-text'>联系人姓名</Text>
+         </View>
+         <Input
+           className={`booking-form__input ${touched.name && errors.name ? 'booking-form__input--error' : ''}`}
+           placeholder='请输入姓名'
+           maxlength={20}
+           value={form.name}
+           onInput={e => handleInput('name', e)}
+           onBlur={() => setTouched(prev => ({ ...prev, name: true }))}
+         />
+         {touched.name && errors.name && (
+           <Text className='booking-form__error'>{errors.name}</Text>
+         )}
+       </View>
+
+       {/* 联系电话 */}
+       <View className='booking-form__form-item'>
+         <View className='booking-form__label'>
+           <Text className='booking-form__label-required'>*</Text>
+           <Text className='booking-form__label-text'>联系电话</Text>
+         </View>
+         <Input
+           className={`booking-form__input ${touched.phone && errors.phone ? 'booking-form__input--error' : ''}`}
+           type='number'
+           maxlength={11}
+           placeholder='请输入手机号码'
+           value={form.phone}
+           onInput={e => handleInput('phone', e)}
+           onBlur={() => setTouched(prev => ({ ...prev, phone: true }))}
+         />
+         {touched.phone && errors.phone && (
+           <Text className='booking-form__error'>{errors.phone}</Text>
+         )}
+       </View>
+
+       {/* 施工面积 */}
+       <View className='booking-form__form-item'>
+         <View className='booking-form__label'>
+           <Text className='booking-form__label-required'>*</Text>
+           <Text className='booking-form__label-text'>施工面积</Text>
+           <Text className='booking-form__label-unit'>（㎡）</Text>
+         </View>
+         <Input
+           className={`booking-form__input ${touched.area && errors.area ? 'booking-form__input--error' : ''}`}
+           type='digit'
+           placeholder='请输入面积'
+           value={form.area}
+           onInput={e => handleInput('area', e)}
+           onBlur={() => setTouched(prev => ({ ...prev, area: true }))}
+         />
+         {touched.area && errors.area && (
+           <Text className='booking-form__error'>{errors.area}</Text>
+         )}
+       </View>
+
+       {/* 服务类型 */}
+       <View className='booking-form__form-item'>
+  <View className='booking-form__label'>
+    <Text className='booking-form__label-required'>*</Text>
+    <Text className='booking-form__label-text'>服务类型</Text>
+  </View>
+  <View className={`booking-form__picker ${touched.serviceType && errors.serviceType ? 'booking-form__picker--error' : ''}`}>
+    <Picker
+      mode='selector'
+      range={serviceTypes}
+      rangeKey='label'
+      onChange={e => {
+        const index = Number(e.detail.value)
+        handleInput('serviceType', serviceTypes[index].value)
+        setTouched(prev => ({ ...prev, serviceType: true }))
+      }}
+    >
+      <View className='booking-form__picker-inner'>
+        <Text className={form.serviceType ? 'booking-form__picker-text' : 'booking-form__picker-placeholder'}>
+          {form.serviceType 
+            ? serviceTypes.find(item => item.value === form.serviceType)?.label 
+            : '请选择服务类型'
+          }
+        </Text>
+        <View className='booking-form__picker-arrow' />
+      </View>
+    </Picker>
+  </View>
+  {touched.serviceType && errors.serviceType && (
+    <Text className='booking-form__error'>{errors.serviceType}</Text>
+  )}
+</View>
+
+       {/* 所在地区 */}
+       <View className='booking-form__form-item'>
+         <View className='booking-form__label'>
+           <Text className='booking-form__label-required'>*</Text>
+           <Text className='booking-form__label-text'>所在地区</Text>
+         </View>
+         <RegionPicker
+           value={form.region}
+           onChange={value => {
+             handleInput('region', value)
+             setTouched(prev => ({ ...prev, region: true }))
+           }}
+           error={touched.region && !!errors.region}
+         />
+         {touched.region && errors.region && (
+           <Text className='booking-form__error'>{errors.region}</Text>
+         )}
+       </View>
+
+       {/* 详细地址 */}
+       <View className='booking-form__form-item'>
+         <View className='booking-form__label'>
+           <Text className='booking-form__label-required'>*</Text>
+           <Text className='booking-form__label-text'>详细地址</Text>
+         </View>
+         <Input
+           className={`booking-form__input ${touched.address && errors.address ? 'booking-form__input--error' : ''}`}
+           placeholder='请输入详细地址'
+           maxlength={100}
+           value={form.address}
+           onInput={e => handleInput('address', e)}
+           onBlur={() => setTouched(prev => ({ ...prev, address: true }))}
+         />
+         {touched.address && errors.address && (
+           <Text className='booking-form__error'>{errors.address}</Text>
+         )}
+       </View>
+
+       {/* 补充说明 */}
+       <View className='booking-form__form-item'>
+         <View className='booking-form__label'>
+           <Text className='booking-form__label-text'>补充说明</Text>
+         </View>
+         <Textarea
+           className='booking-form__input'
+           placeholder='请输入您的具体需求或其他说明（选填）'
+           maxlength={200}
+           value={form.remark}
+           onInput={e => handleInput('remark', e)}
+         />
+       </View>
+
+       {/* 提交按钮 */}
+       <View className='booking-form__submit safe-area-bottom'>
+         <Button
+           className={`submit-button ${loading ? 'submit-button--loading' : ''}`}
+           loading={loading}
+           onClick={handleSubmit}
+           hoverClass='submit-button--hover'
+         >
+           立即预约 {loading ? '' : '›'}
+         </Button>
+       </View>
+     </View>
+   </View>
+ )
+}
+===== End of File: components\booking-form\index.tsx =====
+
+
+===== File: components\booking-form\types.ts =====
+// components/booking-form/types.ts
+export interface ServiceTypeOption {
+  label: string
+  value: string
+}
+
+export interface BookingFormData {
+  name: string              // 联系人姓名
+  phone: string            // 联系电话
+  area: string             // 施工面积
+  serviceType: string      // 服务类型
+  region: string[]         // 所在地区
+  address: string          // 详细地址
+  remark: string          // 补充说明
+}
+
+export interface BookingFormProps {
+  loading?: boolean
+  serviceTypes: ServiceTypeOption[]
+  onSubmit: (data: BookingFormData) => void | Promise<void>
+}
+
+export interface FormErrors {
+  [key: string]: string
+}
+===== End of File: components\booking-form\types.ts =====
+
+
+===== File: components\case-card\index.scss =====
+@import "../../styles/custom-theme.scss";
+
+.case-card {
+  width: 100%;
+  background: $color-bg-base;
+  border-radius: $radius-lg;
+  overflow: hidden;
+  box-shadow: $shadow-base;
+  transition: all $duration-base $ease-base;
+
+  &:active {
+    transform: translateY(2px);
+    box-shadow: $shadow-sm;
+  }
+
+  &__images {
+    position: relative;
+    display: flex;
+    height: 280px;
+    background: $color-bg-dark;
+    overflow: hidden;
+  }
+
+  &__image {
+    width: 50%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform $duration-base $ease-base;
+
+    &:active {
+      transform: scale(1.02);
+    }
+  }
+
+  &__image-divider {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 24px;
+    height: 24px;
+    background: $color-brand;
+    border-radius: $radius-full;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 8px rgba($color-brand, 0.3);
+    z-index: 1;
+  }
+
+  &__content {
+    padding: $spacing-lg;
+  }
+
+  &__header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: $spacing-base;
+    margin-bottom: $spacing-base;
+  }
+
+  &__title {
+    flex: 1;
+    font-size: $font-size-lg;
+    font-weight: $font-weight-semibold;
+    color: $color-text-title;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+  &__type {
+    font-size: $font-size-sm;
+    color: $color-brand;
+    background: rgba($color-brand, 0.1);
+    padding: $spacing-xs $spacing-sm;
+    border-radius: $radius-full;
+    white-space: nowrap;
+  }
+
+  &__desc {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    font-size: $font-size-base;
+    color: $color-text-secondary;
+    line-height: $line-height-base;
+    margin-bottom: $spacing-lg;
+    min-height: calc(#{$font-size-base} * #{$line-height-base} * 2);
+  }
+
+  &__meta {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: $spacing-base;
+  }
+
+  &__meta-item {
+    display: flex;
+    align-items: center;
+    gap: $spacing-xs;
+    color: $color-text-secondary;
+    font-size: $font-size-sm;
+  }
+
+  @media screen and (max-width: $breakpoint-sm) {
+    &__images {
+      height: 200px;
+    }
+
+    &__content {
+      padding: $spacing-base;
+    }
+
+    &__title {
+      font-size: $font-size-base;
+    }
+
+    &__type {
+      font-size: $font-size-xs;
+      padding: $spacing-xxs $spacing-xs;
+    }
+
+    &__desc {
+      font-size: $font-size-sm;
+      margin-bottom: $spacing-base;
+    }
+
+    &__meta {
+      gap: $spacing-sm;
+    }
+    
+    &__meta-item {
+      font-size: $font-size-xs;
+    }
+  }
+}
+===== End of File: components\case-card\index.scss =====
+
+
+===== File: components\case-card\index.tsx =====
+import { memo } from "react"
+import { View, Image, Text } from "@tarojs/components"
+import { AtIcon } from "taro-ui"
+import type { CaseData } from "./types"
+import "./index.scss"
+
+export interface CaseCardProps {
+  data: CaseData
+  onClick?: (data: CaseData) => void
+}
+
+export const CaseCard = memo(({ data, onClick }: CaseCardProps) => {
+  const { beforeImage, afterImage, title, type, area, date, location, description } = data
+
+  return (
+    <View className="case-card" onClick={() => onClick?.(data)}>
+      <View className="case-card__images">
+        <Image className="case-card__image" src={beforeImage || "/placeholder.svg"} mode="aspectFill" lazyLoad />
+        <View className="case-card__image-divider">
+          <AtIcon value="arrow-right" size="12" color="#fff" />
+        </View>
+        <Image className="case-card__image" src={afterImage || "/placeholder.svg"} mode="aspectFill" lazyLoad />
+      </View>
+
+      <View className="case-card__content">
+        <View className="case-card__header">
+          <Text className="case-card__title">{title}</Text>
+          <Text className="case-card__type">{type}</Text>
+        </View>
+
+        <Text className="case-card__desc">{description}</Text>
+
+        <View className="case-card__meta">
+          <View className="case-card__meta-item">
+            <AtIcon value="map-pin" size="14" color="#666" />
+            <Text>{location}</Text>
+          </View>
+          <View className="case-card__meta-item">
+            <AtIcon value="bookmark" size="14" color="#666" />
+            <Text>{area}</Text>
+          </View>
+          <View className="case-card__meta-item">
+            <AtIcon value="calendar" size="14" color="#666" />
+            <Text>{date}</Text>
+          </View>
+        </View>
+      </View>
+    </View>
+  )
+})
+
+CaseCard.displayName = "CaseCard"
+===== End of File: components\case-card\index.tsx =====
+
+
+===== File: components\case-card\types.ts =====
+// types.ts
+export interface CaseImage {
+    beforeImage: string
+    afterImage: string
+    description: string
+  }
+  
+  export interface CaseData {
+    id: number
+    title: string
+    type: string
+    description: string
+    beforeImage: string
+    afterImage: string
+    area: string
+    location: string
+    date: string
+    duration: string
+    solution: string
+    process: string[]
+    images: CaseImage[]
+  }
+  
+  export interface CaseFilterOption {
+    label: string
+    value: string
+  }
+  
+  export interface CasePageState {
+    cases: CaseData[]
+    loading: boolean
+    error: string | null
+    currentType: string
+    searchValue: string
+    showDetail: boolean
+    selectedCase: CaseData | null
+    page: number
+    hasMore: boolean
+  }
+===== End of File: components\case-card\types.ts =====
+
+
+===== File: components\case-detail-modal\index.scss =====
+@import "../../styles/custom-theme.scss";
+
+.case-detail {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: $z-index-modal;
+  background: $color-bg;
+  transform: translateY(100%);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  flex-direction: column;
+
+  &--open {
+    transform: translateY(0);
+  }
+
+  &__header {
+    position: relative;
+    height: 88px;
+    padding: 0 88px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: $color-bg-base;
+    box-shadow: $shadow-sm;
+  }
+
+  &__back {
+    position: absolute;
+    left: $spacing-base;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 64px;
+    height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: $radius-full;
+    color: $color-text-secondary;
+    transition: all 0.2s ease;
+
+    &:active {
+      background: rgba($color-text-secondary, 0.08);
+      transform: translateY(-50%) scale(0.95);
+    }
+  }
+
+  &__title {
+    font-size: $font-size-lg;
+    font-weight: $font-weight-semibold;
+    color: $color-text-title;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 70%;
+  }
+
+  &__type {
+    position: absolute;
+    right: $spacing-base;
+    top: 50%;
+    transform: translateY(-50%);
+    padding: $spacing-xs $spacing-sm;
+    background: rgba($color-brand, 0.08);
+    color: $color-brand;
+    font-size: $font-size-sm;
+    border-radius: $radius-full;
+    font-weight: $font-weight-medium;
+  }
+
+  &__content {
+    flex: 1;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  &__swiper-wrap {
+    background: $color-bg-dark;
+    padding: $spacing-lg 0;
+  }
+
+  &__swiper {
+    height: 440px;
+  }
+
+  &__swiper-item {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  &__main {
+    padding: $spacing-lg $spacing-xl;
+  }
+
+  &__info-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: $spacing-lg;
+    padding: $spacing-xl;
+    background: $color-bg-base;
+    border-radius: $radius-lg;
+    margin-bottom: $spacing-xl;
+    box-shadow: $shadow-sm;
+  }
+
+  &__info-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: $spacing-xs;
+  }
+
+  &__info-label {
+    font-size: $font-size-sm;
+    color: $color-text-secondary;
+    margin-top: $spacing-xs;
+  }
+
+  &__info-value {
+    font-size: $font-size-base;
+    color: $color-text-title;
+    font-weight: $font-weight-semibold;
+  }
+
+  &__sections {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-xl;
+  }
+
+  &__section {
+    padding: $spacing-xl;
+    background: $color-bg-base;
+    border-radius: $radius-lg;
+    box-shadow: $shadow-sm;
+  }
+
+  &__section-header {
+    display: flex;
+    align-items: center;
+    gap: $spacing-sm;
+    margin-bottom: $spacing-lg;
+  }
+
+  &__section-line {
+    width: 4px;
+    height: 20px;
+    background: $color-brand;
+    border-radius: $radius-sm;
+  }
+
+  &__section-title {
+    font-size: $font-size-lg;
+    font-weight: $font-weight-semibold;
+    color: $color-text-title;
+  }
+
+  &__section-content {
+    font-size: $font-size-base;
+    color: $color-text-secondary;
+    line-height: $line-height-loose;
+    white-space: pre-wrap;
+  }
+
+  &__process {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-base;
+  }
+
+  &__process-item {
+    display: flex;
+    align-items: flex-start;
+    gap: $spacing-lg;
+    padding: $spacing-lg;
+    background: rgba($color-brand, 0.02);
+    border-radius: $radius-lg;
+    transition: all 0.2s ease;
+
+    &:active {
+      transform: translateX(4px);
+      background: rgba($color-brand, 0.04);
+    }
+  }
+
+  &__process-number {
+    width: 44px;
+    height: 44px;
+    border-radius: $radius-full;
+    background: rgba($color-brand, 0.08);
+    color: $color-brand;
+    font-weight: $font-weight-semibold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: $font-size-lg;
+  }
+
+  &__process-text {
+    flex: 1;
+    color: $color-text-secondary;
+    line-height: $line-height-loose;
+    padding-top: $spacing-xs;
+  }
+
+  &__footer {
+    padding: $spacing-base $spacing-xl calc(#{$spacing-base} + env(safe-area-inset-bottom));
+    background: $color-bg-base;
+    box-shadow: 0 -1px 2px rgba(0, 0, 0, 0.05);
+    display: flex;
+    gap: $spacing-lg;
+  }
+
+  &__action {
+    flex: 1;
+    height: 88px;
+    font-size: $font-size-lg;
+    font-weight: $font-weight-medium;
+    border-radius: $radius-lg;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    
+    &--primary {
+      background: $color-brand;
+      color: $color-white;
+
+      &:active {
+        background: darken($color-brand, 5%);
+        transform: translateY(1px);
+      }
+    }
+
+    &:active {
+      opacity: 0.9;
+      transform: translateY(1px);
+    }
+  }
+
+  @media screen and (max-width: $breakpoint-sm) {
+    &__header {
+      height: 80px;
+      padding: 0 80px;
+    }
+
+    &__back {
+      width: 56px;
+      height: 56px;
+    }
+
+    &__title {
+      font-size: $font-size-base;
+      max-width: 60%;
+    }
+
+    &__type {
+      font-size: $font-size-xs;
+      padding: $spacing-xxs $spacing-xs;
+    }
+
+    &__swiper {
+      height: 360px;
+    }
+
+    &__main {
+      padding: $spacing-base;
+    }
+
+    &__info-grid {
+      padding: $spacing-lg;
+      gap: $spacing-base;
+      margin-bottom: $spacing-lg;
+    }
+
+    &__sections {
+      gap: $spacing-lg;
+    }
+
+    &__section {
+      padding: $spacing-lg;
+    }
+
+    &__process-item {
+      padding: $spacing-base;
+      gap: $spacing-base;
+    }
+
+    &__process-number {
+      width: 36px;
+      height: 36px;
+      font-size: $font-size-base;
+    }
+
+    &__footer {
+      padding: $spacing-sm $spacing-base calc(#{$spacing-sm} + env(safe-area-inset-bottom));
+      gap: $spacing-base;
+    }
+
+    &__action {
+      height: 80px;
+      font-size: $font-size-base;
+    }
+  }
+}
+===== End of File: components\case-detail-modal\index.scss =====
+
+
+===== File: components\case-detail-modal\index.tsx =====
+import { memo, useState } from "react"
+import { View, Text, Button, Swiper, SwiperItem } from "@tarojs/components"
+import { AtIcon } from "taro-ui"
+import { ImageComparison } from "../image-comparison"
+import type { CaseData } from "../case-card/types"
+import "./index.scss"
+
+interface CaseDetailModalProps {
+  isOpen: boolean
+  onClose: () => void
+  data: CaseData | null
+  onBook?: (data: CaseData) => void
+}
+
+export const CaseDetailModal = memo(({ isOpen, onClose, data, onBook }: CaseDetailModalProps) => {
+  const [currentImage, setCurrentImage] = useState(0)
+
+  if (!isOpen || !data) return null
+
+  return (
+    <View className={`case-detail ${isOpen ? "case-detail--open" : ""}`}>
+      <View className="case-detail__header">
+        <View className="case-detail__back" onClick={onClose}>
+          <AtIcon value="chevron-left" size="20" />
+        </View>
+        <Text className="case-detail__title">{data.title}</Text>
+        <Text className="case-detail__type">{data.type}</Text>
+      </View>
+
+      <View className="case-detail__content">
+        <View className="case-detail__swiper-wrap">
+          <Swiper
+            className="case-detail__swiper"
+            onChange={(e) => setCurrentImage(e.detail.current)}
+            circular
+            indicatorDots
+            indicatorColor="rgba(255, 255, 255, 0.3)"
+            indicatorActiveColor="#ffffff"
+          >
+            {data.images.map((image, index) => (
+              <SwiperItem key={index} className="case-detail__swiper-item">
+                <ImageComparison
+                  beforeImage={image.beforeImage}
+                  afterImage={image.afterImage}
+                  description={image.description}
+                  height={440}
+                />
+              </SwiperItem>
+            ))}
+          </Swiper>
+        </View>
+
+        <View className="case-detail__main">
+          <View className="case-detail__info-grid">
+            <View className="case-detail__info-item">
+              <AtIcon value="calendar" size="20" color="var(--color-brand)" />
+              <Text className="case-detail__info-label">施工周期</Text>
+              <Text className="case-detail__info-value">{data.duration}</Text>
+            </View>
+            <View className="case-detail__info-item">
+              <AtIcon value="map-pin" size="20" color="var(--color-brand)" />
+              <Text className="case-detail__info-label">项目地点</Text>
+              <Text className="case-detail__info-value">{data.location}</Text>
+            </View>
+            <View className="case-detail__info-item">
+              <AtIcon value="bookmark" size="20" color="var(--color-brand)" />
+              <Text className="case-detail__info-label">施工面积</Text>
+              <Text className="case-detail__info-value">{data.area}</Text>
+            </View>
+          </View>
+
+          <View className="case-detail__sections">
+            <View className="case-detail__section">
+              <View className="case-detail__section-header">
+                <View className="case-detail__section-line" />
+                <Text className="case-detail__section-title">项目介绍</Text>
+              </View>
+              <Text className="case-detail__section-content">{data.description}</Text>
+            </View>
+
+            <View className="case-detail__section">
+              <View className="case-detail__section-header">
+                <View className="case-detail__section-line" />
+                <Text className="case-detail__section-title">解决方案</Text>
+              </View>
+              <Text className="case-detail__section-content">{data.solution}</Text>
+            </View>
+
+            <View className="case-detail__section">
+              <View className="case-detail__section-header">
+                <View className="case-detail__section-line" />
+                <Text className="case-detail__section-title">施工流程</Text>
+              </View>
+              <View className="case-detail__process">
+                {data.process.map((step, index) => (
+                  <View key={index} className="case-detail__process-item">
+                    <View className="case-detail__process-number">{index + 1}</View>
+                    <Text className="case-detail__process-text">{step}</Text>
+                  </View>
+                ))}
+              </View>
+            </View>
+          </View>
+        </View>
+      </View>
+
+      <View className="case-detail__footer safe-area-bottom">
+        <Button className="case-detail__action" onClick={onClose}>
+          返回列表
+        </Button>
+        <Button className="case-detail__action case-detail__action--primary" onClick={() => onBook?.(data)}>
+          在线预约
+        </Button>
+      </View>
+    </View>
+  )
+})
+
+CaseDetailModal.displayName = "CaseDetailModal"
+===== End of File: components\case-detail-modal\index.tsx =====
+
+
+===== File: components\faq-section\index.scss =====
+// components/faq-section/index.scss
+@import "../../styles/custom-theme.scss";
+
+.faq-section {
+  position: relative;
+  background: $color-bg-base;
+  border-radius: $radius-lg;
+  padding: $spacing-xl $spacing-lg;
+  box-shadow: 0 4px 16px rgba($color-black, 0.06);
+  
+  &__title {
+    font-size: $font-size-xl;
+    font-weight: $font-weight-semibold;
+    color: $color-text-title;
+    margin-bottom: $spacing-xl;
+    padding: 0 $spacing-base;
+  }
+}
+
+.faq-item {
+  position: relative;
+  transition: all 0.3s ease;
+  
+  & + & {
+    border-top: 1px solid rgba($color-border-base, 0.15);
+  }
+  
+  &__header {
+    position: relative;
+    min-height: 44px;
+    padding: $spacing-lg $spacing-base;
+  }
+
+  &__main {
+    padding-right: 44px;
+  }
+
+  &__question {
+    font-size: $font-size-lg;
+    font-weight: $font-weight-medium;
+    color: $color-text-title;
+    line-height: 1.5;
+    margin-bottom: $spacing-xs;
+  }
+
+  &__category {
+    display: inline-flex;
+    align-items: center;
+    height: 48px;
+    padding: 0 $spacing-base;
+    font-size: $font-size-base;
+    color: $color-brand;
+    background: rgba($color-brand, 0.08);
+    border-radius: $radius-full;
+    font-weight: $font-weight-medium;
+  }
+
+  &__arrow {
+    position: absolute;
+    right: $spacing-base;
+    top: $spacing-lg;
+    width: 12px;
+    height: 12px;
+    border-right: 2px solid rgba($color-text-secondary, 0.5);
+    border-bottom: 2px solid rgba($color-text-secondary, 0.5);
+    transform: rotate(45deg);
+    transition: transform 0.3s ease;
+  }
+
+  &__content {
+    overflow: hidden;
+    opacity: 0;
+    max-height: 0;
+    transition: all 0.3s ease;
+  }
+
+  &__answer {
+    padding: 0 $spacing-base $spacing-lg $spacing-base; // 与问题保持相同的左右内边距
+    font-size: $font-size-lg;
+    line-height: 1.6;
+    color: $color-text-secondary;
+  }
+
+  &--active {
+    background: rgba($color-brand, 0.03);
+    margin: $spacing-xs 0;
+    border-radius: $radius-lg;
+
+    .faq-item__arrow {
+      transform: rotate(-135deg);
+      border-color: $color-brand;
+    }
+
+    .faq-item__question {
+      color: $color-brand;
+      font-weight: $font-weight-semibold;
+    }
+
+    .faq-item__content {
+      opacity: 1;
+      max-height: 2000px;
+    }
+
+    .faq-item__category {
+      background: rgba($color-brand, 0.12);
+    }
+
+    & + & {
+      border-top: none;
+    }
+  }
+
+  &:active {
+    .faq-item__question {
+      opacity: 0.8;
+    }
+  }
+}
+===== End of File: components\faq-section\index.scss =====
+
+
+===== File: components\faq-section\index.tsx =====
+// components/faq-section/index.tsx
+import { useState, useCallback, memo } from 'react'
+import { View, Text } from '@tarojs/components'
+import type { FAQ } from '../../types'
+import './index.scss'
+
+interface FAQItemProps {
+  faq: FAQ
+  isOpen: boolean
+  onToggle: (id: number) => void
+}
+
+const FAQItem = memo(({ faq, isOpen, onToggle }: FAQItemProps) => {
+  const handleClick = useCallback(() => {
+    onToggle(faq.id)
+  }, [faq.id, onToggle])
+
+  return (
+    <View className={`faq-item ${isOpen ? 'faq-item--active' : ''}`}>
+      <View className='faq-item__header' onClick={handleClick}>
+        <View className='faq-item__main'>
+          <Text className='faq-item__question'>{faq.question}</Text>
+          {faq.category && (
+            <Text className='faq-item__category'>{faq.category}</Text>
+          )}
+        </View>
+        <View className='faq-item__arrow' />
+      </View>
+
+      <View className='faq-item__content'>
+        <Text className='faq-item__answer'>{faq.answer}</Text>
+      </View>
+    </View>
+  )
+})
+
+interface FAQSectionProps {
+  faqs: FAQ[]
+  title?: string
+  className?: string
+  defaultOpenIds?: number[]
+  onFAQOpen?: (id: number) => void
+  onFAQClose?: (id: number) => void
+}
+
+export const FAQSection = memo(({
+  faqs,
+  title = '常见问题',
+  className = '',
+  defaultOpenIds = [],
+  onFAQOpen,
+  onFAQClose
+}: FAQSectionProps) => {
+  const [openFAQs, setOpenFAQs] = useState<Set<number>>(() => 
+    new Set(defaultOpenIds)
+  )
+
+  const handleToggle = useCallback((id: number) => {
+    setOpenFAQs(prev => {
+      const newOpenFAQs = new Set(prev)
+      if (newOpenFAQs.has(id)) {
+        newOpenFAQs.delete(id)
+        onFAQClose?.(id)
+      } else {
+        newOpenFAQs.add(id)
+        onFAQOpen?.(id)
+      }
+      return newOpenFAQs
+    })
+  }, [onFAQOpen, onFAQClose])
+
+  if (!faqs?.length) return null
+
+  return (
+    <View className={`faq-section ${className}`}>
+      <Text className='faq-section__title'>{title}</Text>
+      <View className='faq-section__list'>
+        {faqs.map(faq => (
+          <FAQItem
+            key={faq.id}
+            faq={faq}
+            isOpen={openFAQs.has(faq.id)}
+            onToggle={handleToggle}
+          />
+        ))}
+      </View>
+    </View>
+  )
+})
+
+export default FAQSection
+===== End of File: components\faq-section\index.tsx =====
+
+
+===== File: components\image-comparison\index.scss =====
+@import "../../styles/custom-theme.scss";
+
+.image-comparison {
+  width: 100%;
+  background: $color-bg-base;
+  border-radius: $radius-lg;
+  overflow: hidden;
+
+  &__container {
+    position: relative;
+    display: flex;
+    gap: $spacing-sm;
+    padding: $spacing-sm;
+    background: $color-bg-dark;
+    min-height: 240px;
+  }
+
+  &__item {
+    flex: 1;
+    position: relative;
+    border-radius: $radius-base;
+    overflow: hidden;
+    box-shadow: $shadow-sm;
+    transition: transform $duration-base $ease-base;
+
+    &:active {
+      transform: scale(0.98);
+    }
+  }
+
+  &__image {
+    width: 100%;
+    height: 100%;
+    background: $color-bg-light;
+    transition: transform $duration-base $ease-base;
+
+    &:active {
+      transform: scale(1.02);
+    }
+  }
+
+  &__label {
+    position: absolute;
+    left: 50%;
+    bottom: $spacing-sm;
+    transform: translateX(-50%);
+    height: 44px;
+    padding: 0 $spacing-base;
+    background: rgba($color-black, 0.75);
+    backdrop-filter: blur(4px);
+    border-radius: $radius-full;
+    display: flex;
+    align-items: center;
+    gap: $spacing-xs;
+    color: $color-white;
+    font-size: $font-size-sm;
+    white-space: nowrap;
+  }
+
+  &__divider {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 32px;
+    height: 32px;
+    background: $color-brand;
+    border-radius: $radius-full;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 8px rgba($color-brand, 0.3);
+    z-index: 1;
+    transition: transform $duration-base $ease-base;
+
+    &:active {
+      transform: translate(-50%, -50%) scale(0.9);
+    }
+  }
+
+  &__desc {
+    display: block;
+    padding: $spacing-base;
+    font-size: $font-size-base;
+    color: $color-text-secondary;
+    line-height: $line-height-base;
+    text-align: center;
+  }
+
+  @media screen and (max-width: $breakpoint-sm) {
+    &__container {
+      min-height: 200px;
+      padding: $spacing-xs;
+      gap: $spacing-xs;
+    }
+
+    &__label {
+      height: 36px;
+      padding: 0 $spacing-sm;
+      font-size: $font-size-xs;
+      bottom: $spacing-xs;
+    }
+
+    &__divider {
+      width: 28px;
+      height: 28px;
+    }
+
+    &__desc {
+      padding: $spacing-sm;
+      font-size: $font-size-sm;
+    }
+  }
+}
+===== End of File: components\image-comparison\index.scss =====
+
+
+===== File: components\image-comparison\index.tsx =====
+import { View, Image, Text } from "@tarojs/components"
+import { AtIcon } from "taro-ui"
+import "./index.scss"
+
+export interface ImageComparisonProps {
+  beforeImage: string
+  afterImage: string
+  description?: string
+  beforeLabel?: string
+  afterLabel?: string
+  height?: number
+}
+
+export const ImageComparison = ({
+  beforeImage,
+  afterImage,
+  description = "",
+  beforeLabel = "施工前",
+  afterLabel = "施工后",
+  height = 400,
+}: ImageComparisonProps) => {
+  return (
+    <View className="image-comparison">
+      <View className="image-comparison__container" style={{ height: `${height}px` }}>
+        <View className="image-comparison__item">
+          <Image
+            className="image-comparison__image"
+            src={beforeImage || "/placeholder.svg"}
+            mode="aspectFill"
+            lazyLoad
+          />
+          <View className="image-comparison__label">
+            <AtIcon value="clock" size="12" color="#fff" />
+            <Text>{beforeLabel}</Text>
+          </View>
+        </View>
+
+        <View className="image-comparison__divider">
+          <AtIcon value="arrow-right" size="16" color="#fff" />
+        </View>
+
+        <View className="image-comparison__item">
+          <Image
+            className="image-comparison__image"
+            src={afterImage || "/placeholder.svg"}
+            mode="aspectFill"
+            lazyLoad
+          />
+          <View className="image-comparison__label">
+            <AtIcon value="check" size="12" color="#fff" />
+            <Text>{afterLabel}</Text>
+          </View>
+        </View>
+      </View>
+
+      {description && <Text className="image-comparison__desc">{description}</Text>}
+    </View>
+  )
+}
+===== End of File: components\image-comparison\index.tsx =====
+
+
+===== File: components\region-picker\index.scss =====
+// components/region-picker/index.scss
+@import "../../styles/custom-theme.scss";
+
+.region-picker {
+  width: 100%;
+
+  &__selector {
+    width: 100%;
+    height: $input-height;
+    padding: 0 $spacing-lg;
+    font-size: $font-size-base;
+    color: $color-text-base;
+    background: $color-bg-light;
+    border: 1px solid rgba($color-border-base, 0.5);
+    border-radius: $radius-lg;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    transition: all $duration-base $ease-out;
+
+    &:active {
+      opacity: 0.9;
+      transform: scale(0.995);
+    }
+
+    &:hover {
+      border-color: $color-brand-light;
+      background: lighten($color-bg-light, 2%);
+    }
+
+    &--error {
+      border-color: $color-error;
+      background: rgba($color-error, 0.02);
+    }
+  }
+
+  &__text {
+    flex: 1;
+    color: $color-text-base;
+    margin-right: $spacing-sm;
+    
+    &--placeholder {
+      color: rgba($color-text-placeholder, 0.8);
+    }
+  }
+
+  &__arrow {
+    width: 10px;
+    height: 10px;
+    border-right: 2px solid $color-border-dark;
+    border-bottom: 2px solid $color-border-dark;
+    transform: rotate(45deg);
+    flex-shrink: 0;
+    opacity: 0.6;
+  }
+}
+
+// 响应式适配
+@media screen and (max-width: $breakpoint-xs) {
+  .region-picker {
+    &__selector {
+      height: 88px;
+    }
+  }
+}
+===== End of File: components\region-picker\index.scss =====
+
+
+===== File: components\region-picker\index.tsx =====
+// components/region-picker/index.tsx
+import { View, Text, Picker } from '@tarojs/components'
+import type { RegionPickerProps } from './types'
+import type { BaseEventOrig } from '@tarojs/components/types/common'
+import type { PickerRegionProps } from '@tarojs/components/types/Picker'
+import './index.scss'
+
+export default function RegionPicker({
+  value = [],
+  onChange,
+  error = false,
+  onBlur,
+  disabled = false,
+  className = ''
+}: RegionPickerProps) {
+  // 获取显示文本
+  const getDisplayText = () => {
+    if (!value || value.length === 0) {
+      return '请选择所在地区'
+    }
+    return value.join(' ')
+  }
+
+  // 处理选择器变化
+  const handlePickerChange = (e: BaseEventOrig<{ value: string[] }>) => {
+    onChange(e.detail.value)
+  }
+
+  return (
+    <View className={`region-picker ${className}`}>
+      <Picker
+        mode='region'
+        value={value}
+        disabled={disabled}
+        onChange={handlePickerChange}
+      >
+        <View 
+          className={`region-picker__selector ${
+            error ? 'region-picker__selector--error' : ''
+          } ${disabled ? 'region-picker__selector--disabled' : ''}`}
+          onClick={onBlur} // 将onBlur改为onClick事件
+        >
+          <Text 
+            className={`region-picker__text ${
+              !value?.length ? 'region-picker__text--placeholder' : ''
+            }`}
+          >
+            {getDisplayText()}
+          </Text>
+          <View className='region-picker__arrow' />
+        </View>
+      </Picker>
+    </View>
+  )
+}
+===== End of File: components\region-picker\index.tsx =====
+
+
+===== File: components\region-picker\types.ts =====
+// components/region-picker/types.ts
+export interface RegionPickerProps {
+  /**
+   * 选择的地区值 [省, 市, 区]
+   */
+  value: string[]
+  
+  /**
+   * 值变化时的回调函数
+   * 注意：这里修改为直接接收 string[] 类型的参数
+   */
+  onChange: (value: string[]) => void
+  
+  /**
+   * 是否处于错误状态
+   */
+  error?: boolean
+  
+  /**
+   * 失焦/点击事件回调
+   */
+  onBlur?: () => void
+  
+  /**
+   * 是否禁用
+   */
+  disabled?: boolean
+  
+  /**
+   * 自定义类名
+   */
+  className?: string
+
+  /**
+   * 占位符文本
+   */
+  placeholder?: string
+}
+===== End of File: components\region-picker\types.ts =====
+
+
+===== File: components\search-bar\index.scss =====
+@import "../../styles/custom-theme.scss";
+
+.search-bar {
+  position: relative;
+  z-index: $z-index-float;
+  height: 80px;
+  background: $color-bg-base;
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  padding: $spacing-sm $spacing-lg;
+
+  &__input-wrap {
+    flex: 1;
+    height: 56px;
+    background: $color-bg-light;
+    border-radius: $radius-full;
+    padding: 0 $spacing-lg;
+    display: flex;
+    align-items: center;
+    position: relative;
+    transition: all $duration-base $ease-base;
+
+    &:hover {
+      background: $color-bg-dark;
+    }
+  }
+
+  &__icon {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0.6;
+    transition: opacity $duration-base $ease-base;
+  }
+
+  &__circle {
+    width: 12px;
+    height: 12px;
+    border: 1.5px solid $color-text-secondary;
+    border-radius: $radius-full;
+    transition: all $duration-base $ease-base;
+  }
+
+  &__line {
+    width: 7px;
+    height: 1.5px;
+    background: $color-text-secondary;
+    transform: rotate(45deg);
+    transform-origin: 0 50%;
+    margin: 8px 0 0 8px;
+    transition: all $duration-base $ease-base;
+  }
+
+  &__loading {
+    width: 20px;
+    height: 20px;
+    border: 2px solid rgba($color-brand, 0.3);
+    border-top-color: $color-brand;
+    border-radius: $radius-full;
+    animation: search-loading 0.8s $ease-base infinite;
+  }
+
+  &__input {
+    flex: 1;
+    height: 100%;
+    font-size: $font-size-base;
+    background: transparent;
+    padding: 0 $spacing-sm;
+    color: $color-text-base;
+    transition: all $duration-base $ease-base;
+
+    &:focus {
+      & + .search-bar__icon {
+        opacity: 0.8;
+
+        .search-bar__circle {
+          border-color: $color-brand;
+        }
+
+        .search-bar__line {
+          background: $color-brand;
+        }
+      }
+    }
+  }
+
+  &__placeholder {
+    color: $color-text-placeholder;
+  }
+
+  &__clear {
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0.7;
+    transition: all $duration-base $ease-base;
+
+    &:hover {
+      opacity: 0.9;
+    }
+
+    &:active {
+      opacity: 0.5;
+      transform: scale(0.95);
+    }
+  }
+
+  &__clear-icon {
+    width: 24px;
+    height: 24px;
+    border-radius: $radius-full;
+    background: $color-text-secondary;
+    position: relative;
+
+    &::before,
+    &::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 12px;
+      height: 2px;
+      background: $color-white;
+      transition: transform $duration-base $ease-base;
+    }
+
+    &::before {
+      transform: translate(-50%, -50%) rotate(45deg);
+    }
+
+    &::after {
+      transform: translate(-50%, -50%) rotate(-45deg);
+    }
+  }
+
+  &__action {
+    font-size: $font-size-base;
+    font-weight: $font-weight-medium;
+    color: $color-text-secondary;
+    height: 56px;
+    line-height: 56px;
+    padding: 0 $spacing-sm;
+    transition: all $duration-base $ease-base;
+
+    &:hover {
+      color: $color-brand;
+    }
+
+    &:active {
+      color: $color-brand-dark;
+      transform: scale(0.98);
+    }
+
+    &--active {
+      color: $color-brand;
+      font-weight: $font-weight-semibold;
+    }
+
+    &--disabled {
+      opacity: 0.5;
+      pointer-events: none;
+    }
+  }
+}
+
+@keyframes search-loading {
+  to {
+    transform: rotate(360deg);
+  }
+}
+===== End of File: components\search-bar\index.scss =====
+
+
+===== File: components\search-bar\index.tsx =====
+// components/search-bar/index.tsx
+import { useState, useCallback, memo } from 'react'
+import { View, Input } from '@tarojs/components'
+import { SearchBarProps } from '../../types'
+import './index.scss'
+
+export const SearchBar = memo(({
+  value,
+  placeholder = '搜索',
+  loading = false,
+  className = '',
+  onChange,
+  onSearch,
+  onFocus,
+  onBlur,
+  onClear
+}: SearchBarProps) => {
+  const [isFocused, setIsFocused] = useState(false)
+
+  const handleInput = useCallback((e: any) => {
+    onChange(e.detail.value)
+  }, [onChange])
+
+  const handleClear = useCallback(() => {
+    onChange('')
+    onClear?.()
+  }, [onChange, onClear])
+
+  const handleSearch = useCallback(() => {
+    if (!value.trim()) return
+    onSearch?.(value)
+  }, [value, onSearch])
+
+  const handleFocus = useCallback(() => {
+    setIsFocused(true)
+    onFocus?.()
+  }, [onFocus])
+
+  const handleBlur = useCallback(() => {
+    setIsFocused(false)
+    onBlur?.()
+  }, [onBlur])
+
+  return (
+    <View className={`search-bar ${isFocused ? 'search-bar--focused' : ''} ${loading ? 'search-bar--loading' : ''} ${className}`}>
+      <View className='search-bar__input-wrap'>
+        <View className='search-bar__icon'>
+          {loading ? (
+            <View className='search-bar__loading' />
+          ) : (
+            <>
+              <View className='search-bar__circle' />
+              <View className='search-bar__line' />
+            </>
+          )}
+        </View>
+
+        <Input
+          className='search-bar__input'
+          type='text'
+          value={value}
+          placeholder={placeholder}
+          placeholderClass='search-bar__placeholder'
+          onInput={handleInput}
+          onFocus={handleFocus}
+          onBlur={handleBlur}
+          confirmType='search'
+          onConfirm={handleSearch}
+          disabled={loading}
+        />
+
+        {value && !loading && (
+          <View className='search-bar__clear' onClick={handleClear}>
+            <View className='search-bar__clear-icon' />
+          </View>
+        )}
+      </View>
+
+      <View 
+        className={`search-bar__action ${value ? 'search-bar__action--active' : ''} ${loading ? 'search-bar__action--disabled' : ''}`}
+        onClick={handleSearch}
+      >
+        搜索
+      </View>
+    </View>
+  )
+})
+===== End of File: components\search-bar\index.tsx =====
+
+
+===== File: components\service-card\index.scss =====
+// components/service-card/index.scss
+@import "../../styles/custom-theme.scss";
+
+.service-card {
+  position: relative;
+  background: $color-bg-base;
+  border-radius: $radius-lg;
+  box-shadow: 0 4px 12px rgba($color-black, 0.04);
+  transition: all $duration-base $ease-base;
+
+  &__main {
+    padding: $spacing-xl $spacing-lg $spacing-lg;
+    position: relative;
+    transition: all $duration-base $ease-base;
+
+    &:active {
+      background: rgba($color-brand, 0.03);
+    }
+  }
+
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: $spacing-lg;
+  }
+
+  &__title-wrap {
+    flex: 1;
+    margin-right: $spacing-lg;
+  }
+
+  &__title {
+    font-size: $font-size-xl;
+    font-weight: $font-weight-semibold;
+    color: $color-text-title;
+    line-height: 1.4;
+    margin-bottom: $spacing-xs;
+  }
+
+  &__warranty {
+    display: inline-flex;
+    align-items: center;
+    height: 44px;
+    padding: 0 $spacing-base;
+    font-size: $font-size-base;
+    color: $color-brand;
+    background: linear-gradient(to right, rgba($color-brand, 0.08), rgba($color-brand, 0.05));
+    border-radius: $radius-full;
+    font-weight: $font-weight-medium;
+  }
+
+  &__price-wrap {
+    text-align: right;
+  }
+
+  &__price {
+    font-size: $font-size-xxl;
+    font-weight: $font-weight-bold;
+    color: $color-brand;
+    text-shadow: 0 2px 4px rgba($color-brand, 0.1);
+  }
+
+  &__unit {
+    font-size: $font-size-base;
+    color: $color-text-secondary;
+    margin-left: 2px;
+  }
+
+  &__features {
+    display: flex;
+    flex-wrap: wrap;
+    gap: $spacing-xs;
+    margin-bottom: $spacing-lg;
+  }
+
+  &__feature-tag {
+    height: 56px;
+    padding: 0 $spacing-base;
+    font-size: $font-size-sm;
+    color: $color-text-secondary;
+    background: $color-bg;
+    border-radius: $radius-full;
+    display: flex;
+    align-items: center;
+  }
+
+  &__desc {
+    font-size: $font-size-base;
+    color: $color-text-secondary;
+    line-height: 1.6;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    padding-right: $spacing-xl;
+  }
+
+  &__arrow {
+    position: absolute;
+    right: $spacing-lg;
+    top: 50%;
+    width: 10px;
+    height: 10px;
+    border-right: 2px solid rgba($color-text-secondary, 0.6);
+    border-bottom: 2px solid rgba($color-text-secondary, 0.6);
+    transform: translateY(-50%) rotate(45deg);
+    transition: all $duration-base $ease-base;
+  }
+
+  &__expand {
+    overflow: hidden;
+    max-height: 0;
+    opacity: 0;
+    transform: translateY(-12px);
+    transition: all 0.4s $ease-out;
+    border-top: 1px solid rgba($color-border-base, 0.6);
+  }
+
+  &__info {
+    display: flex;
+    gap: $spacing-base;
+    padding: $spacing-lg;
+  }
+
+  &__info-item {
+    flex: 1;
+    padding: $spacing-lg;
+    background: $color-bg;
+    border-radius: $radius-lg;
+    text-align: center;
+  }
+
+  &__info-label {
+    font-size: $font-size-sm;
+    color: $color-text-secondary;
+    margin-bottom: $spacing-xs;
+  }
+
+  &__info-value {
+    font-size: $font-size-lg;
+    color: $color-text-title;
+    font-weight: $font-weight-semibold;
+  }
+
+  &__process {
+    padding: $spacing-lg;
+    border-top: 1px solid rgba($color-border-base, 0.6);
+  }
+
+  &__process-title {
+    font-size: $font-size-base;
+    font-weight: $font-weight-semibold;
+    color: $color-text-title;
+    margin-bottom: $spacing-xl;
+  }
+
+  &__process-steps {
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+    padding: 0 $spacing-lg;
+
+    &::before {
+      content: '';
+      position: absolute;
+      top: 24px;
+      left: 60px;
+      right: 60px;
+      height: 1px;
+      background: linear-gradient(to right, 
+        transparent,
+        $color-border-base,
+        $color-border-base,
+        transparent
+      );
+    }
+  }
+
+  &__process-step {
+    position: relative;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    z-index: 1;
+  }
+
+  &__step-number {
+    width: 48px;
+    height: 48px;
+    background: linear-gradient(135deg, $color-brand, lighten($color-brand, 10%));
+    color: $color-white;
+    font-size: $font-size-base;
+    font-weight: $font-weight-semibold;
+    border-radius: $radius-full;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: $spacing-base;
+    box-shadow: 0 4px 12px rgba($color-brand, 0.15);
+  }
+
+  &__step-title {
+    font-size: $font-size-base;
+    font-weight: $font-weight-semibold;
+    color: $color-text-title;
+    margin-bottom: $spacing-xs;
+  }
+
+  &__step-desc {
+    font-size: $font-size-sm;
+    color: $color-text-secondary;
+    line-height: 1.5;
+  }
+
+  &__book {
+    margin: 0 $spacing-lg $spacing-lg;
+    height: 96px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: $font-size-lg;
+    font-weight: $font-weight-semibold;
+    color: $color-white;
+    background: linear-gradient(135deg, $color-brand, lighten($color-brand, 10%));
+    border-radius: $radius-lg;
+    box-shadow: 0 4px 12px rgba($color-brand, 0.15);
+    transition: all $duration-base $ease-base;
+
+    &:active {
+      transform: translateY(1px);
+      box-shadow: 0 2px 8px rgba($color-brand, 0.12);
+    }
+  }
+
+  // 展开状态
+  &--expanded {
+    box-shadow: 0 8px 24px rgba($color-black, 0.08);
+
+    .service-card__arrow {
+      transform: translateY(-50%) rotate(-135deg);
+      border-color: $color-brand;
+    }
+
+    .service-card__expand {
+      max-height: 2000px;
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .service-card__main {
+      background: rgba($color-brand, 0.03);
+    }
+  }
+
+  // 加载状态
+  &--loading {
+    min-height: 200px;
+    
+    .service-card__skeleton {
+      padding: $spacing-lg;
+    }
+
+    .service-card__skeleton-line {
+      height: 24px;
+      background: linear-gradient(
+        90deg,
+        $color-bg 0%,
+        lighten($color-bg, 2%) 50%,
+        $color-bg 100%
+      );
+      border-radius: $radius-base;
+      margin-bottom: $spacing-base;
+      animation: shimmer 1.5s infinite linear;
+      background-size: 200% 100%;
+
+      &:last-child {
+        width: 60%;
+        margin-bottom: 0;
+      }
+    }
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+===== End of File: components\service-card\index.scss =====
+
+
+===== File: components\service-card\index.tsx =====
+// components/service-card/index.tsx
+import { memo, useCallback } from 'react'
+import Taro from '@tarojs/taro'
+import { View, Text } from '@tarojs/components'
+import type { ServiceItem } from '../../types'
+import './index.scss'
+
+interface ServiceCardProps {
+  service?: ServiceItem
+  loading?: boolean
+  expanded?: boolean
+  className?: string
+  onToggle?: (id: number) => void
+  onBook?: (service: ServiceItem) => void
+}
+
+export const ServiceCard = memo(({
+  service,
+  loading = false,
+  expanded = false,
+  className = '',
+  onToggle
+}: ServiceCardProps) => {
+
+  const handleToggle = useCallback(() => {
+    if (service) {
+      onToggle?.(service.id)
+    }
+  }, [service, onToggle])
+
+   const handleBook= useCallback(() => {
+      Taro.switchTab({ url: '/pages/contact/index' })
+    }, [])
+  
+
+  // 加载状态
+  if (loading) {
+    return (
+      <View className='service-card service-card--loading'>
+        <View className='service-card__skeleton'>
+          <View className='service-card__skeleton-line' style='width: 60%' />
+          <View className='service-card__skeleton-line' style='width: 40%' />
+          <View className='service-card__skeleton-line' style='width: 90%' />
+        </View>
+      </View>
+    )
+  }
+
+  // 无数据状态
+  if (!service) return null
+
+  return (
+    <View className={`service-card ${expanded ? 'service-card--expanded' : ''} ${className}`}>
+      {/* 主要内容区 */}
+      <View className='service-card__main' onClick={handleToggle}>
+        {/* 头部信息 */}
+        <View className='service-card__header'>
+          <View className='service-card__title-wrap'>
+            <Text className='service-card__title'>{service.title}</Text>
+            {service.warranty && (
+              <Text className='service-card__warranty'>{service.warranty}</Text>
+            )}
+          </View>
+
+          <View className='service-card__price-wrap'>
+            <Text className='service-card__price'>¥{service.price}</Text>
+            <Text className='service-card__unit'>/{service.unit}</Text>
+          </View>
+        </View>
+
+        {/* 特性标签 */}
+        {service.features?.length > 0 && (
+          <View className='service-card__features'>
+            {service.features.map((feature, index) => (
+              <Text
+                key={`${service.id}-feature-${index}`}
+                className='service-card__feature-tag'
+              >
+                {feature}
+              </Text>
+            ))}
+          </View>
+        )}
+
+        {/* 描述文本 */}
+        <Text className='service-card__desc'>{service.description}</Text>
+        
+        {/* 展开指示器 */}
+        <View className='service-card__arrow' />
+      </View>
+
+      {/* 展开内容区 */}
+      <View className='service-card__expand'>
+        {/* 基本信息 */}
+        <View className='service-card__info'>
+          {service.estimatedDuration && (
+            <View className='service-card__info-item'>
+              <Text className='service-card__info-label'>预计工期</Text>
+              <Text className='service-card__info-value'>
+                {service.estimatedDuration}
+              </Text>
+            </View>
+          )}
+          
+          {(service.minArea || service.maxArea) && (
+            <View className='service-card__info-item'>
+              <Text className='service-card__info-label'>适用面积</Text>
+              <Text className='service-card__info-value'>
+                {service.minArea && service.maxArea
+                  ? `${service.minArea}-${service.maxArea}㎡`
+                  : service.minArea
+                    ? `≥${service.minArea}㎡`
+                    : `≤${service.maxArea}㎡`
+                }
+              </Text>
+            </View>
+          )}
+        </View>
+
+        {/* 服务流程 */}
+        {service.process?.length > 0 && (
+          <View className='service-card__process'>
+            <Text className='service-card__process-title'>服务流程</Text>
+            <View className='service-card__process-steps'>
+              {service.process.map((step, index) => (
+                <View
+                  key={`${service.id}-step-${index}`}
+                  className='service-card__process-step'
+                >
+                  <View className='service-card__step-number'>{index + 1}</View>
+                  <Text className='service-card__step-title'>{step.title}</Text>
+                  <Text className='service-card__step-desc'>{step.description}</Text>
+                </View>
+              ))}
+            </View>
+          </View>
+        )}
+
+        {/* 预约按钮 */}
+        <View className='service-card__book' onClick={handleBook}>
+          立即预约
+        </View>
+      </View>
+    </View>
+  )
+})
+
+export default ServiceCard
+===== End of File: components\service-card\index.tsx =====
+
+
+===== File: components\tab-bar\index.scss =====
+// components/tab-bar/index.scss
+@import "../../styles/custom-theme.scss";
+
+.tab-bar {
+  position: relative;
+  z-index: $z-index-float;
+  height: 80px;
+  display: flex;
+  background: $color-bg-base;
+  padding: 0 $spacing-lg;
+  border-bottom: 1px solid $color-border-base;
+
+  &__item {
+    flex: 1;
+    height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    transition: all $duration-base $ease-base;
+
+    &:hover {
+      .tab-bar__text {
+        color: $color-brand;
+      }
+    }
+
+    &:active {
+      .tab-bar__text {
+        transform: scale(0.98);
+      }
+    }
+
+    &--active {
+      .tab-bar__text {
+        color: $color-brand;
+        font-weight: $font-weight-semibold;
+      }
+
+      &::after {
+        content: '';
+        position: absolute;
+        left: 50%;
+        bottom: 0;
+        width: 20px;
+        height: 3px;
+        background: $color-brand;
+        border-radius: $radius-sm;
+        transform: translateX(-50%);
+      }
+    }
+  }
+
+  &__text {
+    font-size: $font-size-base;
+    color: $color-text-secondary;
+    transition: all $duration-base $ease-base;
+    padding: 0 $spacing-sm;
+    white-space: nowrap;
+    font-weight: $font-weight-medium;
+  }
+}
+===== End of File: components\tab-bar\index.scss =====
+
+
+===== File: components\tab-bar\index.tsx =====
+// components/tab-bar/index.tsx
+import { memo } from 'react'
+import { View, Text } from '@tarojs/components'
+import './index.scss'
+
+interface TabItem {
+  title: string
+  value: string | number
+}
+
+interface TabBarProps {
+  tabs: TabItem[]
+  activeTab: string | number
+  className?: string
+  onChange: (value: string | number) => void
+}
+
+export const TabBar = memo(({
+  tabs,
+  activeTab,
+  className = '',
+  onChange
+}: TabBarProps) => {
+  if (!tabs?.length) return null
+
+  return (
+    <View className={`tab-bar ${className}`}>
+      {tabs.map(tab => (
+        <View
+          key={tab.value}
+          className={`tab-bar__item ${activeTab === tab.value ? 'tab-bar__item--active' : ''}`}
+          onClick={() => onChange(tab.value)}
+        >
+          <Text className='tab-bar__text'>{tab.title}</Text>
+        </View>
+      ))}
+    </View>
+  )
+})
+
+export default TabBar
+===== End of File: components\tab-bar\index.tsx =====
+
+
+===== File: config\index.ts =====
+import type { Config } from '../types'
+
+export const config: Config = {
+    ui: {
+      banner: {
+        interval: 3000,
+        duration: 500
+      },
+      cases: {
+        interval: 4000,
+        duration: 500,
+        displayCount: 0,
+        cardHeight: 0
+      }
+    },
+    contact: {
+      phone: '400-888-8888',
+      wechat: 'waterproof888'
+    }
+}
+===== End of File: config\index.ts =====
+
+
+===== File: index.html =====
+<!-- @ts-nocheck -->
+<!DOCTYPE html>
+<html>
+<head>
+  <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+  <meta content="width=device-width,initial-scale=1,user-scalable=no" name="viewport">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-touch-fullscreen" content="yes">
+  <meta name="format-detection" content="telephone=no,address=no">
+  <meta name="apple-mobile-web-app-status-bar-style" content="white">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>waterproof-app</title>
+  <script><%= htmlWebpackPlugin.options.script %></script>
+</head>
+<body>
+  <div id="app"></div>
+</body>
+</html>
+===== End of File: index.html =====
+
+
+===== File: pages\cases\index.config.ts =====
+// pages/cases/index.config.ts
+export default {
+  navigationBarTitleText: '工程案例',
+  enablePullDownRefresh: true,
+  backgroundColor: '#f5f5f5',
+  backgroundTextStyle: 'dark',
+  navigationBarBackgroundColor: '#ffffff', 
+  navigationBarTextStyle: 'black'
+ }
+===== End of File: pages\cases\index.config.ts =====
+
+
+===== File: pages\cases\index.scss =====
+@import "../../styles/custom-theme.scss";
+
+.cases {
+  min-height: 100vh;
+  background: $color-bg;
+  
+  &__header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: $z-index-header;
+    background: $color-bg-base;
+    box-shadow: $shadow-sm;
+
+    &::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: -16px;
+      height: 16px;
+      background: linear-gradient($color-bg-base 0%, transparent 100%);
+      pointer-events: none;
+    }
+  }
+
+  &__content {
+    margin-top: 184px;
+    box-sizing: border-box;
+    height: calc(100vh - 184px);
+  }
+
+  &__wrapper {
+    margin: $spacing-base;
+    margin-top: $spacing-lg;
+  }
+
+  &__list {
+    display: grid;
+    gap: $spacing-lg;
+  }
+
+  &__item {
+    opacity: 0;
+    transform: translateY(20px);
+    animation: fadeInUp 0.4s $ease-out forwards;
+
+    @for $i from 1 through 10 {
+      &-#{$i} {
+        animation-delay: $i * 0.05s;
+      }
+    }
+  }
+
+  &__loading {
+    display: grid;
+    gap: $spacing-lg;
+  }
+
+  &__loading-more,
+  &__no-more {
+    text-align: center;
+    color: $color-text-secondary;
+    font-size: $font-size-sm;
+    margin: $spacing-xl 0;
+  }
+
+  &__empty {
+    margin: 80px $spacing-xl 0;
+    background: $color-bg-base;
+    border-radius: $radius-lg;
+    box-shadow: $shadow-sm;
+    min-height: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: $color-text-secondary;
+    font-size: $font-size-base;
+  }
+
+  &__safe-area {
+    height: env(safe-area-inset-bottom);
+  }
+
+  .case-card {
+    &--loading {
+      min-height: 480px;
+      pointer-events: none;
+    }
+
+    &__skeleton {
+      background: linear-gradient(
+        90deg,
+        $color-bg-light 0%,
+        lighten($color-bg-light, 2%) 50%,
+        $color-bg-light 100%
+      );
+      animation: shimmer 1.5s infinite linear;
+      background-size: 200% 100%;
+    }
+
+    &__title.case-card__skeleton {
+      height: 32px;
+      width: 80%;
+      margin-bottom: $spacing-base;
+      border-radius: $radius-base;
+    }
+
+    &__type.case-card__skeleton {
+      height: 32px;
+      width: 100px;
+      border-radius: $radius-full;
+    }
+
+    &__desc.case-card__skeleton {
+      height: 48px;
+      margin-bottom: $spacing-lg;
+      border-radius: $radius-base;
+    }
+
+    &__meta-item.case-card__skeleton {
+      height: 24px;
+      width: 80px;
+      border-radius: $radius-base;
+    }
+
+    &__image.case-card__skeleton {
+      width: 100%;
+      height: 100%;
+    }
+  }
+
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes shimmer {
+    0% {
+      background-position: -200% 0;
+    }
+    100% {
+      background-position: 200% 0;
+    }
+  }
+
+  @media screen and (min-width: $breakpoint-sm) {
+    &__list {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    &__loading {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media screen and (min-width: $breakpoint-md) {
+    &__content {
+      max-width: 1200px;
+      margin: 0 auto;
+      margin-top: 184px;
+    }
+
+    &__list {
+      grid-template-columns: repeat(3, 1fr);
+    }
+
+    &__loading {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    &__item {
+      animation: none;
+      opacity: 1;
+      transform: none;
+    }
+
+    .case-card__skeleton {
+      animation: none;
+    }
+  }
+}
+===== End of File: pages\cases\index.scss =====
+
+
+===== File: pages\cases\index.tsx =====
+import { useState, useCallback, useEffect, useRef } from "react"
+import { View, Text, ScrollView } from "@tarojs/components"
+import Taro, { useDidShow, useShareAppMessage } from "@tarojs/taro"
+import { SearchBar } from "../../components/search-bar"
+import { TabBar } from "../../components/tab-bar"
+import { CaseCard } from "../../components/case-card"
+import { CaseDetailModal } from "../../components/case-detail-modal"
+import { casesApi } from "../../services/cases/api"
+import { handleError } from "../../utils/error"
+import type { CaseData } from "../../components/case-card/types"
+import "./index.scss"
+
+const CASES_TYPES = [
+  { title: "全部", value: "all" },
+  { title: "地下防水", value: "地下防水" },
+  { title: "外墙防水", value: "外墙防水" },
+  { title: "屋面防水", value: "屋面防水" },
+]
+
+const PAGE_SIZE = 10
+
+export default function Cases() {
+  const [loading, setLoading] = useState(false)
+  const [refreshing, setRefreshing] = useState(false)
+  const [cases, setCases] = useState<CaseData[]>([])
+  const [currentType, setCurrentType] = useState<string | number>("all")
+  const [keyword, setKeyword] = useState("")
+  const [selectedCase, setSelectedCase] = useState<CaseData | null>(null)
+  const [showDetail, setShowDetail] = useState(false)
+  const [page, setPage] = useState(1)
+  const [hasMore, setHasMore] = useState(true)
+
+  const searchTimer = useRef<NodeJS.Timeout>()
+  const loadingRef = useRef(false)
+
+  useShareAppMessage(() => ({
+    title: "防水工程案例展示",
+    path: "/pages/cases/index",
+  }))
+
+  const loadCases = useCallback(
+    async (isRefresh = false) => {
+      if (loadingRef.current) return
+      loadingRef.current = true
+
+      try {
+        const currentPage = isRefresh ? 1 : page
+        !refreshing && setLoading(true)
+
+        const res = await casesApi.getCases({
+          type: currentType.toString(),
+          keyword,
+          page: currentPage,
+          pageSize: PAGE_SIZE,
+        })
+
+        setCases((prev) => (isRefresh ? res.data : [...prev, ...res.data]))
+        setHasMore(res.data.length === PAGE_SIZE)
+        isRefresh && setPage(1)
+      } catch (err) {
+        Taro.showToast({
+          title: handleError(err),
+          icon: "none",
+          duration: 2000,
+        })
+      } finally {
+        setLoading(false)
+        setRefreshing(false)
+        loadingRef.current = false
+      }
+    },
+    [currentType, keyword, page, refreshing],
+  )
+
+  useEffect(() => {
+    setPage(1)
+    loadCases(true)
+  }, [currentType, keyword, loadCases])
+
+  useDidShow(() => {
+    !loading && loadCases(true)
+  })
+
+  const handleSearch = useCallback(
+    (value: string) => {
+      setKeyword(value)
+      if (searchTimer.current) {
+        clearTimeout(searchTimer.current)
+      }
+      searchTimer.current = setTimeout(() => {
+        setPage(1)
+        loadCases(true)
+      }, 500)
+    },
+    [loadCases],
+  )
+
+  const handleRefresh = useCallback(async () => {
+    setRefreshing(true)
+    await loadCases(true)
+    Taro.stopPullDownRefresh()
+  }, [loadCases])
+
+  const handleReachBottom = useCallback(() => {
+    if (hasMore && !loading) {
+      setPage((prev) => prev + 1)
+      loadCases()
+    }
+  }, [hasMore, loading, loadCases])
+
+  const handleCaseClick = useCallback(async (id: number) => {
+    try {
+      setLoading(true)
+      const res = await casesApi.getCaseDetail(id)
+      setSelectedCase(res.data)
+      setShowDetail(true)
+    } catch (err) {
+      Taro.showToast({
+        title: handleError(err),
+        icon: "none",
+        duration: 2000,
+      })
+    } finally {
+      setLoading(false)
+    }
+  }, [])
+
+  const handleBook = useCallback(async (data: CaseData) => {
+    try {
+      await Taro.setStorage({
+        key: "selected_case",
+        data,
+      })
+      await Taro.switchTab({
+        url: "/pages/contact/index",
+      })
+    } catch (err) {
+      Taro.showToast({
+        title: handleError(err),
+        icon: "none",
+        duration: 2000,
+      })
+    }
+  }, [])
+
+  return (
+    <View className="cases">
+      <View className="cases__header">
+        <SearchBar value={keyword} placeholder="搜索工程案例" onChange={handleSearch} loading={loading} />
+        <TabBar tabs={CASES_TYPES} activeTab={currentType} onChange={(value) => setCurrentType(value)} />
+      </View>
+
+      <ScrollView
+        className="cases__content"
+        scrollY
+        onScrollToLower={handleReachBottom}
+        enableBackToTop
+        enhanced
+        bounces
+        showScrollbar={false}
+      >
+        <View className="cases__wrapper">
+          {loading && page === 1 ? (
+            <View className="cases__loading">
+              {[1, 2].map((i) => (
+                <View key={i} className="case-card case-card--loading">
+                  <View className="case-card__images">
+                    <View className="case-card__image case-card__skeleton" />
+                    <View className="case-card__image case-card__skeleton" />
+                  </View>
+                  <View className="case-card__content">
+                    <View className="case-card__header">
+                      <View className="case-card__title case-card__skeleton" />
+                      <View className="case-card__type case-card__skeleton" />
+                    </View>
+                    <View className="case-card__desc case-card__skeleton" />
+                    <View className="case-card__meta">
+                      <View className="case-card__meta-item case-card__skeleton" />
+                      <View className="case-card__meta-item case-card__skeleton" />
+                      <View className="case-card__meta-item case-card__skeleton" />
+                    </View>
+                  </View>
+                </View>
+              ))}
+            </View>
+          ) : cases.length > 0 ? (
+            <View className="cases__list">
+              {cases.map((item, index) => (
+                <View key={item.id} className={`cases__item cases__item-${index + 1}`}>
+                  <CaseCard data={item} onClick={() => handleCaseClick(item.id)} />
+                </View>
+              ))}
+            </View>
+          ) : (
+            <View className="cases__empty">
+              <Text>暂无相关案例</Text>
+            </View>
+          )}
+
+          {loading && page > 1 && (
+            <View className="cases__loading-more">
+              <Text>加载中...</Text>
+            </View>
+          )}
+
+          {!loading && !hasMore && cases.length > 0 && (
+            <View className="cases__no-more">
+              <Text>已经到底啦</Text>
+            </View>
+          )}
+        </View>
+      </ScrollView>
+
+      <CaseDetailModal
+        isOpen={showDetail}
+        data={selectedCase}
+        onClose={() => setShowDetail(false)}
+        onBook={handleBook}
+      />
+      <View className="cases__safe-area" />
+    </View>
+  )
+}
+===== End of File: pages\cases\index.tsx =====
+
+
+===== File: pages\contact\index.config.ts =====
+// pages/contact/index.config.ts
+export default {
+  navigationBarTitleText: '联系我们',
+  navigationBarBackgroundColor: '#ffffff',
+  navigationBarTextStyle: 'black',
+  backgroundColor: '#f1f5f9',
+  enablePullDownRefresh: false
+}
+===== End of File: pages\contact\index.config.ts =====
+
+
+===== File: pages\contact\index.scss =====
+// pages/contact/index.scss
+@import "../../styles/custom-theme.scss";
+
+.contact-page {
+  min-height: 100vh;
+  background: linear-gradient(180deg, 
+    darken($color-bg-light, 2%) 0%,
+    $color-bg 100%
+  );
+  padding: $spacing-lg;
+  box-sizing: border-box;
+
+  &__content {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-xl;
+  }
+
+  &__section {
+    background: $color-bg-base;
+    border-radius: $radius-lg;
+    box-shadow: $shadow-base;
+    overflow: hidden;
+    transform: translateY(0);
+    transition: all $duration-base $ease-base;
+
+    &:hover {
+      box-shadow: $shadow-lg;
+      transform: translateY(-2px);
+    }
+
+    &--booking {
+      background: linear-gradient(
+        135deg,
+        $color-bg-base 0%,
+        mix($color-bg-base, $color-brand, 95%) 100%
+      );
+    }
+
+    &--about {
+      background: linear-gradient(
+        135deg, 
+        $color-bg-base 0%,
+        mix($color-bg-base, $color-success, 95%) 100%
+      );
+    }
+  }
+
+  &__section-header {
+    padding: $spacing-xl $spacing-xl $spacing-lg;
+    border-bottom: 1px solid rgba($color-border-base, 0.1);
+  }
+
+  &__section-title {
+    font-size: $font-size-xl;
+    font-weight: $font-weight-bold;
+    color: $color-text-title;
+    margin-bottom: $spacing-xs;
+  }
+
+  &__section-subtitle {
+    font-size: $font-size-base;
+    color: $color-text-secondary;
+    opacity: 0.8;
+  }
+
+  @media screen and (min-width: $breakpoint-md) {
+    padding: $spacing-xl;
+
+    &__content {
+      display: grid;
+      grid-template-columns: 5fr 4fr;
+      gap: $spacing-xl;
+      align-items: start;
+    }
+
+    &__section {
+      margin: 0;
+
+      &--booking {
+        order: 1;
+      }
+
+      &--about {
+        order: 2;
+        position: sticky;
+        top: $spacing-xl;
+        max-height: calc(100vh - $spacing-xl * 2);
+        overflow: auto;
+
+        &::-webkit-scrollbar {
+          width: 4px;
+        }
+
+        &::-webkit-scrollbar-thumb {
+          background: rgba($color-border-base, 0.2);
+          border-radius: $radius-full;
+        }
+      }
+    }
+  }
+
+  @media screen and (max-width: $breakpoint-xs) {
+    padding: $spacing-base;
+
+    &__content {
+      gap: $spacing-lg;
+    }
+
+    &__section-header {
+      padding: $spacing-lg $spacing-lg $spacing-base;
+    }
+  }
+}
+===== End of File: pages\contact\index.scss =====
+
+
+===== File: pages\contact\index.tsx =====
+// pages/contact/index.tsx
+import { useState, useCallback, useEffect } from 'react'
+import { View } from "@tarojs/components"
+import { useShareAppMessage, showToast, showLoading, hideLoading } from "@tarojs/taro"
+import { AtLoadMore } from 'taro-ui'
+import AboutUs from "../../components/about-us"
+import BookingForm from "../../components/booking-form"
+import { contactApi } from "../../services/contact/api"
+import { handleError } from "../../utils/error"
+import type { AboutUsProps } from "../../components/about-us/types"
+import type { ServiceTypeOption, BookingFormData } from "../../components/booking-form/types"
+import "./index.scss"
+
+interface PageState {
+ submitting: boolean
+ loading: boolean
+ serviceTypes: ServiceTypeOption[]
+ contactInfo: AboutUsProps | null
+}
+
+export default function ContactPage() {
+ const [state, setState] = useState<PageState>({
+   submitting: false,
+   loading: true,
+   serviceTypes: [],
+   contactInfo: null
+ })
+
+ useShareAppMessage(() => ({
+   title: "专业防水工程服务 - 免费上门勘测",
+   path: "/pages/contact/index",
+   imageUrl: "../../assets/share/contact.png",
+ }))
+
+ useEffect(() => {
+   const initPage = async () => {
+     showLoading({ title: '加载中...' })
+     try {
+       const [typesRes, infoRes] = await Promise.all([
+         contactApi.getServiceTypes(),
+         contactApi.getContactInfo()
+       ])
+       setState(prev => ({
+         ...prev,
+         serviceTypes: typesRes.data,
+         contactInfo: infoRes.data,
+         loading: false
+       }))
+     } catch (error) {
+       showToast({ title: handleError(error), icon: 'none' })
+     } finally {
+       hideLoading()
+     }
+   }
+   initPage()
+ }, [])
+
+ const handleSubmit = useCallback(async (data: BookingFormData) => {
+   if(state.submitting) return
+   
+   try {
+     setState(prev => ({ ...prev, submitting: true }))
+     await contactApi.submitBooking(data)
+     showToast({ 
+       title: '预约成功,我们会尽快联系您',
+       icon: 'success',
+       duration: 2000
+     })
+   } catch (error) {
+     showToast({ 
+       title: handleError(error),
+       icon: 'none',
+       duration: 2000
+     })
+   } finally {
+     setState(prev => ({ ...prev, submitting: false }))
+   }
+ }, [state.submitting])
+
+ if (state.loading) {
+   return (
+     <View className="contact-page">
+       <AtLoadMore status="loading" />
+     </View>
+   )
+ }
+
+ return (
+   <View className="contact-page">
+     <View className="contact-page__content">
+       <View className="contact-page__section contact-page__section--booking">
+         <View className="contact-page__section-header">
+           <View className="contact-page__section-title">预约服务</View>
+           <View className="contact-page__section-subtitle">填写信息免费上门勘测</View>
+         </View>
+         <BookingForm 
+           loading={state.submitting}
+           serviceTypes={state.serviceTypes} 
+           onSubmit={handleSubmit}
+         />
+       </View>
+
+       {state.contactInfo && (
+         <View className="contact-page__section contact-page__section--about">
+           <View className="contact-page__section-header">
+             <View className="contact-page__section-title">关于我们</View>
+             <View className="contact-page__section-subtitle">专业防水服务十年</View>
+           </View>
+           <AboutUs {...state.contactInfo} />
+         </View>
+       )}
+     </View>
+   </View>
+ )
+}
+===== End of File: pages\contact\index.tsx =====
+
+
+===== File: pages\index\index.config.ts =====
+export default {
+  navigationBarTitleText: '防水服务',
+  enablePullDownRefresh: true,
+  backgroundColor: '#f5f5f5',
+  backgroundTextStyle: 'dark',
+  navigationBarBackgroundColor: '#ffffff',
+  navigationBarTextStyle: 'black'
+}
+===== End of File: pages\index\index.config.ts =====
+
+
+===== File: pages\index\index.scss =====
+@import "../../styles/custom-theme.scss";
+
+.index {
+ position: relative;
+ min-height: 100vh;
+ background: $color-bg;
+
+ /* Header区域 */
+ &__header {
+   position: relative;
+   z-index: $z-index-banner;
+   width: 100%;
+   height: 420px;
+   overflow: hidden;
+
+   .swiper {
+     width: 100%;
+     height: 100%;
+     
+     .swiper-item {
+       width: 100%;
+       height: 100%;
+       background: $color-bg-light;
+     }
+
+     .wx-swiper-dots {
+       bottom: $spacing-sm;
+       
+       .wx-swiper-dot {
+         width: 8px;
+         height: 8px;
+         border-radius: $radius-full;
+         transition: all $duration-base $ease-base;
+         
+         &.wx-swiper-dot-active {
+           width: 16px;
+         }
+       }
+     }
+   }
+ }
+
+ &__banner-item {
+   position: relative;
+   width: 100%;
+   height: 100%;
+   overflow: hidden;
+ }
+
+ &__banner-image {
+   width: 100%;
+   height: 100%;
+   object-fit: cover;
+   will-change: transform;
+ }
+
+ &__banner-text {
+   position: absolute;
+   left: 0;
+   right: 0;
+   bottom: 0;
+   z-index: $z-index-content;
+   padding: $spacing-xxl $spacing-xl $spacing-lg;
+   background: linear-gradient(
+     180deg,
+     transparent 0%,
+     rgba($color-black, 0.6) 30%,
+     rgba($color-black, 0.85) 100%
+   );
+ }
+
+ &__banner-title {
+   display: block;
+   font-size: $font-size-xxl;
+   font-weight: $font-weight-bold;
+   color: $color-white;
+   margin-bottom: $spacing-sm;
+ }
+
+ &__banner-subtitle {
+   display: block;
+   font-size: $font-size-base;
+   color: rgba($color-white, 0.95);
+ }
+
+ /* 内容区域 */
+ &__content {
+   position: relative;
+   z-index: $z-index-content;
+   padding: $spacing-base;
+   min-height: calc(100vh - 480px);
+ }
+
+ /* 服务介绍 */
+ &__service-intro {
+   margin-bottom: $spacing-sm;
+   padding: $spacing-xl;
+   background: $color-bg-base;
+   border-radius: $radius-lg;
+   box-shadow: $shadow-base;
+   min-height: 200px;
+ }
+
+ &__title {
+   font-size: $font-size-xl;
+   font-weight: $font-weight-bold;
+   color: $color-text-title;
+   margin-bottom: $spacing-xl;
+ }
+
+ &__btn-group {
+   display: flex;
+   gap: $spacing-base;
+
+   .at-button {
+     flex: 1;
+     height: 100px;
+     background-color: $color-brand;
+     color: $color-white;
+   }
+ }
+
+ /* 案例展示 */
+ &__cases {
+   margin-bottom: $spacing-sm;
+   padding: $spacing-xl;
+   background: $color-bg-base;
+   border-radius: $radius-lg;
+   box-shadow: $shadow-base;
+   min-height: 200px;
+ }
+
+ &__case-swiper {
+   min-height: 460px;
+   padding: $spacing-lg 0;
+ }
+
+ &__case-item {
+   height: 420px;
+   margin: 0 $spacing-sm;
+   background: $color-bg-base;
+   border-radius: $radius-lg;
+   overflow: hidden;
+   transform: scale(0.92);
+   transition: $transition-base;
+   box-shadow: $shadow-base;
+   will-change: transform;
+
+   &::after {
+     content: '';
+     position: absolute;
+     inset: 0;
+     background: rgba($color-black, 0.35);
+     opacity: 1;
+     transition: opacity $duration-base $ease-base;
+     will-change: opacity;
+     z-index: $z-index-overlay;
+   }
+
+   &--active {
+     transform: scale(1);
+     box-shadow: $shadow-lg;
+
+     &::after {
+       opacity: 0;
+     }
+   }
+ }
+
+ &__case-image {
+   width: 100%;
+   height: 240px;
+   object-fit: cover;
+   will-change: transform;
+ }
+
+ &__case-content {
+   position: relative;
+   z-index: $z-index-content;
+   padding: $spacing-lg;
+   background: $color-bg-base;
+ }
+
+ &__case-title {
+   display: -webkit-box;
+   -webkit-box-orient: vertical;
+   -webkit-line-clamp: 2;
+   overflow: hidden;
+   font-size: $font-size-lg;
+   font-weight: $font-weight-semibold;
+   color: $color-text-title;
+   margin-bottom: $spacing-sm;
+ }
+
+ &__case-desc {
+   display: -webkit-box;
+   -webkit-box-orient: vertical;
+   -webkit-line-clamp: 2;
+   overflow: hidden;
+   font-size: $font-size-base;
+   color: $color-text-secondary;
+ }
+
+ /* 优势展示 */
+ &__advantages {
+   padding: $spacing-xl;
+   background: $color-bg-base;
+   border-radius: $radius-lg;
+   box-shadow: $shadow-base;
+ }
+
+ &__advantages-grid {
+   display: grid;
+   grid-template-columns: repeat(2, 1fr);
+   grid-template-rows: repeat(2, 1fr);
+   gap: $spacing-base;
+   margin-bottom: $spacing-xl;
+ }
+
+ &__advantages-item {
+   aspect-ratio: 1;
+   padding: $spacing-base;
+   background: rgba($color-brand, 0.04);
+   border-radius: $radius-lg;
+   display: flex;
+   flex-direction: column;
+   align-items: center;
+   justify-content: center;
+   transition: transform $duration-fast $ease-base;
+
+   &:hover {
+     transform: translateY(-2px);
+   }
+ }
+
+ &__advantage-icon {
+   font-size: 48px;
+   margin-bottom: $spacing-sm;
+ }
+
+ &__advantage-value {
+   font-size: $font-size-xl;
+   font-weight: $font-weight-bold;
+   color: $color-brand;
+   margin-bottom: $spacing-xs;
+ }
+
+ &__advantage-label {
+   font-size: $font-size-base;
+   color: $color-text-secondary;
+ }
+
+ &__book-btn {
+   width: 100%;
+   height: 100px;
+    background-color: $color-brand;
+    color: $color-white;
+ }
+}
+
+/* 加载和错误状态 */
+.loading,
+.error {
+ min-height: 100vh;
+ display: flex;
+ flex-direction: column;
+ align-items: center;
+ justify-content: center;
+ gap: $spacing-xl;
+ color: $color-text-secondary;
+}
+
+/* 响应式 */
+@media screen and (max-width: $breakpoint-xs) {
+ .index {
+   &__header {
+     height: 360px;
+   }
+
+   &__content {
+     min-height: calc(100vh - 360px);
+     padding: $spacing-sm;
+   }
+   
+   &__advantages-grid {
+     gap: $spacing-sm;
+   }
+   
+   &__advantages-item {
+     padding: $spacing-sm;
+   }
+
+   &__advantage-icon {
+     font-size: 40px;
+   }
+
+   &__book-btn {
+     height: 88px;
+   }
+ }
+}
+===== End of File: pages\index\index.scss =====
+
+
+===== File: pages\index\index.tsx =====
+import { useEffect, useState, useCallback, useRef } from 'react'
+import { View, Text, Image, Swiper, SwiperItem } from '@tarojs/components'
+import type { SwiperProps } from '@tarojs/components'
+import { AtButton } from 'taro-ui'
+import Taro, { useDidShow } from '@tarojs/taro'
+import { api } from '../../services/index/api'
+import { config } from '../../config'
+import { handleError } from '../../utils/error'
+import { CaseDetailModal } from '../../components/case-detail-modal'
+import type { Banner, ServiceCase, ServiceAdvantage } from '../../types'
+import './index.scss'
+
+export default function Index() {
+  // 状态管理
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const [banners, setBanners] = useState<Banner[]>([])
+  const [cases, setCases] = useState<ServiceCase[]>([])
+  const [advantages, setAdvantages] = useState<ServiceAdvantage[]>([])
+  const [selectedCase, setSelectedCase] = useState<ServiceCase | null>(null)
+  const [showCaseModal, setShowCaseModal] = useState(false)
+  const [currentCaseIndex, setCurrentCaseIndex] = useState(0)
+
+  // Refs
+  const refreshing = useRef(false)
+  const mounted = useRef(false)
+
+  // 数据加载
+  const fetchData = useCallback(async (showLoading = true) => {
+    try {
+      if (showLoading) setLoading(true)
+      setError(null)
+
+      // 并行获取数据
+      const [bannerRes, caseRes, advantageRes] = await Promise.all([
+        api.getBanners(),
+        api.getCases(),
+        api.getAdvantages()
+      ])
+
+      if (mounted.current) {
+        setBanners(bannerRes.data)
+        setCases(caseRes.data)
+        setAdvantages(advantageRes.data)
+      }
+    } catch (err) {
+      if (mounted.current) {
+        setError(handleError(err))
+      }
+    } finally {
+      if (showLoading && mounted.current) {
+        setLoading(false)
+      }
+      refreshing.current = false
+    }
+  }, [])
+
+  // 初始化
+  useEffect(() => {
+    mounted.current = true
+    fetchData()
+    return () => {
+      mounted.current = false
+    }
+  }, [fetchData])
+
+  // 页面显示时刷新
+  useDidShow(() => {
+    if (!refreshing.current) {
+      fetchData(false)
+    }
+  })
+
+  // 下拉刷新
+  const handleRefresh = useCallback(async () => {
+    if (refreshing.current) return
+    refreshing.current = true
+    
+    try {
+      await fetchData(false)
+      Taro.showToast({ title: '刷新成功', icon: 'success' })
+    } catch (error) {
+      Taro.showToast({
+        title: handleError(error),
+        icon: 'none'
+      })
+    } finally {
+      Taro.stopPullDownRefresh()
+    }
+  }, [fetchData])
+
+  // 电话咨询
+  const handleCall = useCallback(() => {
+    Taro.makePhoneCall({
+      phoneNumber: config.contact.phone
+    }).catch(err => {
+      if (!err.errMsg?.includes('cancel')) {
+        Taro.showToast({ title: '拨号失败', icon: 'none' })
+      }
+    })
+  }, [])
+
+  // 复制微信号
+  const handleWechat = useCallback(() => {
+    Taro.setClipboardData({
+      data: config.contact.wechat,
+      success: () => {
+        Taro.showToast({
+          title: '微信号已复制',
+          icon: 'none'
+        })
+      }
+    })
+  }, [])
+
+  // 查看案例详情
+  const handleCaseClick = useCallback((caseItem: ServiceCase) => {
+    setSelectedCase(caseItem)
+    setShowCaseModal(true)
+  }, [])
+
+  // 预约按钮
+  const handleBooking = useCallback(() => {
+    Taro.switchTab({ url: '/pages/contact/index' })
+  }, [])
+
+  // 案例滑动
+  const handleCaseChange: SwiperProps['onChange'] = useCallback((e) => {
+    setCurrentCaseIndex(e.detail.current)
+  }, [])
+
+  // 加载状态
+  if (loading) {
+    return (
+      <View className='loading'>
+        <Text>加载中...</Text>
+      </View>
+    )
+  }
+
+  // 错误状态
+  if (error) {
+    return (
+      <View className='error'>
+        <Text>{error}</Text>
+        <AtButton type='primary' onClick={handleRefresh}>重试</AtButton>
+      </View>
+    )
+  }
+
+  return (
+    <View className='index'>
+      {/* Banner区域 */}
+      <View className='index__header'>
+        <Swiper
+          className='swiper'
+          circular
+          autoplay
+          interval={3000}
+          duration={500}
+          indicatorDots
+          indicatorColor='rgba(255, 255, 255, 0.4)'
+          indicatorActiveColor='#ffffff'
+        >
+          {banners.map(banner => (
+            <SwiperItem key={banner.id} className='swiper-item'>
+              <View className='index__banner-item'>
+                <Image 
+                  src={banner.imageUrl}
+                  className='index__banner-image'
+                  mode='aspectFill'
+                  lazyLoad
+                />
+                <View className='index__banner-text'>
+                  <Text className='index__banner-title'>{banner.title}</Text>
+                  <Text className='index__banner-subtitle'>{banner.subtitle}</Text>
+                </View>
+              </View>
+            </SwiperItem>
+          ))}
+        </Swiper>
+      </View>
+
+      <View className='index__content'>
+        {/* 服务介绍 */}
+        <View className='index__service-intro'>
+          <View className='index__title'>专业防水服务</View>
+          <View className='index__btn-group'>
+            <AtButton type='primary' onClick={handleCall}>📞电话咨询</AtButton>
+            <AtButton type='secondary' onClick={handleWechat}>💬微信咨询</AtButton>
+          </View>
+        </View>
+
+        {/* 案例展示 */}
+        <View className='index__cases'>
+          <View className='index__title'>精选案例</View>
+          <Swiper
+            className='index__case-swiper'
+            circular
+            autoplay={!showCaseModal}
+            interval={4000}
+            duration={500}
+            previousMargin='30px'
+            nextMargin='30px'
+            onChange={handleCaseChange}
+          >
+            {cases.map((item, index) => (
+              <SwiperItem key={item.id}>
+                <View 
+                  className={`index__case-item ${
+                    index === currentCaseIndex ? 'index__case-item--active' : ''
+                  }`}
+                  onClick={() => handleCaseClick(item)}
+                >
+                  <Image 
+                    src={item.imageUrl}
+                    className='index__case-image'
+                    mode='aspectFill'
+                    lazyLoad
+                  />
+                  <View className='index__case-content'>
+                    <Text className='index__case-title'>{item.title}</Text>
+                    <Text className='index__case-desc'>{item.description}</Text>
+                  </View>
+                </View>
+              </SwiperItem>
+            ))}
+          </Swiper>
+        </View>
+
+        {/* 服务优势 */}
+        <View className='index__advantages'>
+          <View className='index__title'>我们的优势</View>
+          <View className='index__advantages-grid'>
+            {advantages.map(item => (
+              <View key={item.id} className='index__advantages-item'>
+                <Text className='index__advantage-icon'>{item.icon}</Text>
+                <Text className='index__advantage-value'>{item.value}</Text>
+                <Text className='index__advantage-label'>{item.label}</Text>
+              </View>
+            ))}
+          </View>
+          <AtButton 
+            type='primary'
+            className='index__book-btn'
+            onClick={handleBooking}
+          >
+            快速预约
+          </AtButton>
+        </View>
+      </View>
+
+      {/* 案例详情弹窗 */}
+      <CaseDetailModal
+        isOpen={showCaseModal}
+        onClose={() => setShowCaseModal(false)}
+        data={selectedCase}
+      />
+    </View>
+  )
+}
+===== End of File: pages\index\index.tsx =====
+
+
+===== File: pages\project\index.config.ts =====
+// pages/project/index.config.ts
+export default {
+  navigationBarTitleText: '防水服务',
+  enablePullDownRefresh: true,
+  backgroundColor: '#f5f5f5',
+  backgroundTextStyle: 'dark',
+  navigationBarBackgroundColor: '#ffffff',
+  navigationBarTextStyle: 'black'
+}
+===== End of File: pages\project\index.config.ts =====
+
+
+===== File: pages\project\index.scss =====
+// pages/project/index.scss
+@import "../../styles/custom-theme.scss";
+
+.project {
+ position: relative;
+ background: $color-bg;
+
+ &__header {
+   position: fixed;
+   top: 0;
+   left: 0;
+   right: 0;
+   background: $color-bg-base;
+   z-index: $z-index-header;
+   box-shadow: 0 1px 2px rgba($color-black, 0.04);
+ }
+
+ &__content {
+   padding-top: 176px;
+   min-height: 100vh;
+ }
+
+ &__services {
+   padding: $spacing-xl $spacing-lg $spacing-lg;
+ }
+
+ &__list {
+   display: flex;
+   flex-direction: column;
+   gap: $spacing-lg;
+   margin-bottom: $spacing-xl;
+ }
+
+ &__list-item {
+   opacity: 0;
+   transform: translateY(20px);
+   animation: fadeInUp 0.4s $ease-out forwards;
+
+   @for $i from 1 through 10 {
+     &-#{$i} {
+       animation-delay: $i * 0.05s;
+     }
+   }
+ }
+
+ &__empty {
+   height: 240px;
+   display: flex;
+   flex-direction: column;
+   align-items: center;
+   justify-content: center;
+   background: $color-bg-base;
+   border-radius: $radius-lg;
+   margin: $spacing-xs;
+   animation: fadeIn 0.3s $ease-base;
+
+   &-icon {
+     font-size: 48px;
+     margin-bottom: $spacing-base;
+     color: rgba($color-text-secondary, 0.5);
+   }
+
+   &-text {
+     font-size: $font-size-base;
+     color: $color-text-secondary;
+   }
+ }
+
+ &__faq {
+   padding: 0 $spacing-lg $spacing-xl;
+   animation: fadeIn 0.5s $ease-base;
+ }
+
+ &__skeleton {
+   display: flex;
+   flex-direction: column;
+   gap: $spacing-base;
+   min-height: 600px;
+   padding: $spacing-xs;
+ }
+
+ &__skeleton-item {
+   height: 200px;
+   background: $color-bg-base;
+   border-radius: $radius-lg;
+   overflow: hidden;
+   position: relative;
+   
+   &::after {
+     content: '';
+     position: absolute;
+     top: 0;
+     left: 0;
+     right: 0;
+     height: 100%;
+     background: linear-gradient(
+       90deg,
+       transparent 0%,
+       rgba($color-white, 0.08) 50%,
+       transparent 100%
+     );
+     animation: shimmer 1.5s infinite linear;
+     background-size: 200% 100%;
+   }
+ }
+}
+
+// 确保底部安全区域
+.taro_page {
+ padding-bottom: constant(safe-area-inset-bottom);
+ padding-bottom: env(safe-area-inset-bottom);
+}
+
+@keyframes fadeInUp {
+ from {
+   opacity: 0;
+   transform: translateY(20px);
+ }
+ to {
+   opacity: 1;
+   transform: translateY(0);
+ }
+}
+
+@keyframes fadeIn {
+ from {
+   opacity: 0;
+ }
+ to {
+   opacity: 1;
+ }
+}
+
+@keyframes shimmer {
+ to {
+   background-position: -200% 0;
+ }
+}
+===== End of File: pages\project\index.scss =====
+
+
+===== File: pages\project\index.tsx =====
+// pages/project/index.tsx
+import { useCallback, useEffect, useRef, useState } from 'react'
+import { View } from '@tarojs/components'
+import Taro, { useDidShow } from '@tarojs/taro'
+import { SearchBar } from '../../components/search-bar'
+import { TabBar } from '../../components/tab-bar'
+import { ServiceCard } from '../../components/service-card'
+import { FAQSection } from '../../components/faq-section'
+import { projectApi } from '../../services/project/api'
+import { handleError } from '../../utils/error'
+import type { ServiceItem, FAQ, ServiceType } from '../../types'
+import './index.scss'
+
+const TABS = [
+  { title: '全部', value: 'all' },
+  { title: '家庭防水', value: 'home' },
+  { title: '室外防水', value: 'outdoor' },
+  { title: '工业防水', value: 'industrial' }
+]
+
+export default function ProjectPage() {
+  // 页面状态
+  const [services, setServices] = useState<ServiceItem[]>([])
+  const [faqs, setFaqs] = useState<FAQ[]>([])
+  const [loading, setLoading] = useState(false)
+  
+  // UI状态
+  const [currentTab, setCurrentTab] = useState<ServiceType>('all')
+  const [searchValue, setSearchValue] = useState('')
+  const [expandedId, setExpandedId] = useState<number | null>(null)
+
+  // 防抖定时器
+  const searchTimer = useRef<NodeJS.Timeout>()
+
+  // 加载服务列表
+  const loadServices = useCallback(async () => {
+    try {
+      setLoading(true)
+      const keyword = searchValue.trim()
+      
+      const response = await (keyword 
+        ? projectApi.searchServices(keyword, currentTab)
+        : projectApi.getServicesByType(currentTab)
+      )
+
+      setServices(response.data)
+    } catch (err) {
+      Taro.showToast({
+        title: handleError(err),
+        icon: 'none'
+      })
+      setServices([])
+    } finally {
+      setLoading(false)
+    }
+  }, [currentTab, searchValue])
+
+  // 加载FAQ
+  const loadFaqs = useCallback(async () => {
+    try {
+      const response = await projectApi.getFaqs()
+      setFaqs(response.data)
+    } catch (err) {
+      console.error('加载FAQ失败:', err)
+    }
+  }, [])
+
+  // 搜索变化处理
+  const handleSearchChange = useCallback((value: string) => {
+    setSearchValue(value)
+    
+    if (searchTimer.current) {
+      clearTimeout(searchTimer.current)
+    }
+
+    searchTimer.current = setTimeout(() => {
+      loadServices()
+    }, 300)
+  }, [loadServices])
+
+  // 搜索按钮点击
+  const handleSearch = useCallback(() => {
+    if (searchTimer.current) {
+      clearTimeout(searchTimer.current)
+    }
+    loadServices()
+  }, [loadServices])
+
+  // Tab切换处理
+  const handleTabChange = useCallback((value: string | number) => {
+    setCurrentTab(value as ServiceType)
+    setSearchValue('') // 清空搜索内容
+    setExpandedId(null) // 重置展开状态
+    
+    // 切换分类立即加载
+    if (searchTimer.current) {
+      clearTimeout(searchTimer.current)
+    }
+    loadServices()
+  }, [loadServices])
+
+  // 展开/收起处理
+  const handleToggle = useCallback((id: number) => {
+    setExpandedId(prev => prev === id ? null : id)
+  }, [])
+
+  // 预约处理
+  const handleBook = useCallback(async (service: ServiceItem) => {
+    try {
+      await Taro.setStorage({
+        key: 'selected_service',
+        data: service
+      })
+      await Taro.navigateTo({
+        url: '/pages/contact/index'
+      })
+    } catch {
+      Taro.showToast({
+        title: '预约失败，请重试',
+        icon: 'none'
+      })
+    }
+  }, [])
+
+  // 初始化加载
+  useEffect(() => {
+    loadServices()
+    loadFaqs()
+  }, [loadServices, loadFaqs])
+
+  // 处理返回刷新
+  useDidShow(() => {
+    loadServices()
+  })
+
+  // 清理定时器
+  useEffect(() => {
+    return () => {
+      if (searchTimer.current) {
+        clearTimeout(searchTimer.current)
+      }
+    }
+  }, [])
+
+  return (
+    <View className='project'>
+      <View className='project__header'>
+        <SearchBar
+          value={searchValue}
+          placeholder={`搜索${currentTab === 'all' ? '' : TABS.find(tab => tab.value === currentTab)?.title}服务`}
+          loading={loading}
+          onChange={handleSearchChange}
+          onSearch={handleSearch}
+          onClear={() => handleSearchChange('')}
+        />
+        <TabBar
+          tabs={TABS}
+          activeTab={currentTab}
+          onChange={handleTabChange}
+        />
+      </View>
+
+      <View className='project__content'>
+        <View className='project__services'>
+          {loading ? (
+            <View className='project__skeleton'>
+              {Array(3).fill(null).map((_, index) => (
+                <ServiceCard key={index} loading />
+              ))}
+            </View>
+          ) : services.length ? (
+            <View className='project__list'>
+              {services.map(service => (
+                <ServiceCard
+                  key={service.id}
+                  service={service}
+                  expanded={expandedId === service.id}
+                  onToggle={handleToggle}
+                  onBook={handleBook}
+                />
+              ))}
+            </View>
+          ) : (
+            <View className='project__empty'>
+              {searchValue ? '未找到相关服务' : '暂无服务内容'}
+            </View>
+          )}
+        </View>
+
+        {faqs.length > 0 && (
+          <View className='project__faq'>
+            <FAQSection faqs={faqs} />
+          </View>
+        )}
+      </View>
+    </View>
+  )
+}
+===== End of File: pages\project\index.tsx =====
+
+
+===== File: services\cases\api.ts =====
+// services/cases/api.ts
+import type {ApiResponse } from '../../types'
+import type { CaseData } from '../../components/case-card/types'
+import { AppError } from '../../utils/error'
+import { mockCases } from './mock-data'
+
+interface GetCasesParams {
+  type?: string
+  keyword?: string
+  page?: number
+  pageSize?: number
+}
+
+export const casesApi = {
+  async getCases(params: GetCasesParams = {}): Promise<ApiResponse<CaseData[]>> {
+    await new Promise(resolve => setTimeout(resolve, 500))
+    let cases = [...mockCases]
+
+    // 类型筛选
+    if (params.type && params.type !== 'all') {
+      cases = cases.filter(item => item.type === params.type)
+    }
+
+    // 关键词搜索
+    if (params.keyword) {
+      const keyword = params.keyword.toLowerCase()
+      cases = cases.filter(item => 
+        item.title.toLowerCase().includes(keyword) ||
+        item.description.toLowerCase().includes(keyword) ||
+        item.type.toLowerCase().includes(keyword)
+      )
+    }
+
+    // 分页
+    const page = params.page || 1
+    const pageSize = params.pageSize || 10
+    const start = (page - 1) * pageSize
+    const end = start + pageSize
+    const data = cases.slice(start, end)
+    
+    return {
+      code: 0,
+      message: 'success',
+      data
+    }
+  },
+
+  async getCaseDetail(id: number): Promise<ApiResponse<CaseData>> {
+    await new Promise(resolve => setTimeout(resolve, 500))
+    const caseItem = mockCases.find(item => item.id === id)
+    
+    if (!caseItem) {
+      throw new AppError(404, '案例不存在')
+    }
+
+    return {
+      code: 0,
+      message: 'success',
+      data: caseItem
+    }
+  }
+}
+===== End of File: services\cases\api.ts =====
+
+
+===== File: services\cases\mock-data.ts =====
+import type { CaseData } from '../../components/case-card/types'
+
+// 使用相对路径引用图片
+const IMAGES = {
+    BEFORE: require('../../assets/case/case_before.png'),
+    AFTER: require('../../assets/case/case_after.png'),
+    DETAIL: require('../../assets/case/case_detail.png')
+  }
+
+export const mockCases: CaseData[] = [
+  {
+    id: 1,
+    title: '某小区地下车库防水工程',
+    type: '地下防水',
+    description: '解决地下车库长期渗水问题，采用双重防水层设计，彻底解决渗漏',
+    beforeImage: IMAGES.BEFORE,
+    afterImage: IMAGES.AFTER,
+    area: '2000㎡',
+    location: '北京市朝阳区',
+    date: '2024-01',
+    duration: '15天',
+    solution: '1. 采用环保型双组份聚氨酯防水涂料\n2. 加强型SBS改性沥青防水卷材\n3. 设计科学的排水系统\n4. HDPE防水板加固保护',
+    process: [
+      '现场勘察检测',
+      '基层处理找平',
+      '防水材料施工',
+      '排水系统安装',
+      '细部节点处理',
+      '养护及验收'
+    ],
+    images: [
+      {
+        beforeImage: IMAGES.DETAIL,
+        afterImage: IMAGES.DETAIL,
+        description: '车库出入口渗漏点修复'
+      },
+      {
+        beforeImage: IMAGES.DETAIL,
+        afterImage: IMAGES.DETAIL,
+        description: '顶板裂缝渗水处理'
+      }
+    ]
+  },
+  {
+    id: 2,
+    title: '高层住宅外墙防水施工',
+    type: '外墙防水',
+    description: '针对高层建筑外墙渗水、保温层受损等问题进行系统性修复',
+    beforeImage: IMAGES.BEFORE,
+    afterImage: IMAGES.AFTER,
+    area: '3500㎡',
+    location: '上海市浦东新区',
+    date: '2024-02',
+    duration: '20天',
+    solution: '1. 外墙裂缝修补\n2. 防水涂料喷涂\n3. 保温层修复\n4. 装饰面层施工',
+    process: [
+      '外墙清洗除锈',
+      '裂缝修补加固',
+      '防水层施工',
+      '保温层修复',
+      '面层装饰施工',
+      '整体验收'
+    ],
+    images: [
+      {
+        beforeImage: IMAGES.DETAIL,
+        afterImage: IMAGES.DETAIL,
+        description: '外墙裂缝修补'
+      },
+      {
+        beforeImage: IMAGES.DETAIL,
+        afterImage: IMAGES.DETAIL,
+        description: '窗户周边防水处理'
+      }
+    ]
+  },
+  {
+    id: 3,
+    title: '工业厂房屋面防水工程',
+    type: '屋面防水',
+    description: '大型工业厂房屋面防水改造，解决漏雨、保温等综合问题',
+    beforeImage: IMAGES.BEFORE,
+    afterImage: IMAGES.AFTER,
+    area: '5000㎡',
+    location: '广州市番禺区',
+    date: '2024-03',
+    duration: '25天',
+    solution: '1. 原有防水层清理\n2. 基层找平整修\n3. 专业防水卷材铺设\n4. 保温隔热层施工',
+    process: [
+      '屋面清理除锈',
+      '基层修复找平',
+      '防水卷材铺设',
+      '节点细部处理',
+      '保温层施工',
+      '总体验收'
+    ],
+    images: [
+      {
+        beforeImage: IMAGES.DETAIL,
+        afterImage: IMAGES.DETAIL,
+        description: '屋面防水层铺设'
+      },
+      {
+        beforeImage: IMAGES.DETAIL,
+        afterImage: IMAGES.DETAIL,
+        description: '天窗周边防水处理'
+      }
+    ]
+  },
+  {
+    id: 4,
+    title: '地下室防水堵漏工程',
+    type: '地下防水',
+    description: '商业大厦地下室渗水治理，采用综合防水方案确保干爽',
+    beforeImage: IMAGES.BEFORE,
+    afterImage: IMAGES.AFTER,
+    area: '1800㎡',
+    location: '深圳市南山区',
+    date: '2024-03',
+    duration: '18天',
+    solution: '1. 渗漏点定位处理\n2. 注浆防水施工\n3. 防水层铺设\n4. 排水系统优化',
+    process: [
+      '渗漏点检测',
+      '注浆堵漏',
+      '防水层施工',
+      '排水沟改造',
+      '细部防水',
+      '效果验收'
+    ],
+    images: [
+      {
+        beforeImage: IMAGES.DETAIL,
+        afterImage: IMAGES.DETAIL,
+        description: '地下室墙面防水'
+      },
+      {
+        beforeImage: IMAGES.DETAIL,
+        afterImage: IMAGES.DETAIL,
+        description: '电梯井防水处理'
+      }
+    ]
+  },
+  {
+    id: 5,
+    title: '屋顶花园防水工程',
+    type: '屋面防水',
+    description: '别墅屋顶花园防水改造，确保绿化环境与建筑防水性能',
+    beforeImage: IMAGES.BEFORE,
+    afterImage: IMAGES.AFTER,
+    area: '300㎡',
+    location: '杭州市西湖区',
+    date: '2024-04',
+    duration: '12天',
+    solution: '1. 种植屋面系统设计\n2. 防根穿刺层施工\n3. 排水系统优化\n4. 种植土改良',
+    process: [
+      '原有层清理',
+      '防水层施工',
+      '隔根层铺设',
+      '排水层施工',
+      '种植土铺设',
+      '绿化验收'
+    ],
+    images: [
+      {
+        beforeImage: IMAGES.DETAIL,
+        afterImage: IMAGES.DETAIL,
+        description: '屋顶防水层施工'
+      },
+      {
+        beforeImage: IMAGES.DETAIL,
+        afterImage: IMAGES.DETAIL,
+        description: '排水系统安装'
+      }
+    ]
+  },
+  {
+    id: 6,
+    title: '游泳池防水维修工程',
+    type: '特种防水',
+    description: '大型室外游泳池防水层老化修复，提升防水性能',
+    beforeImage: IMAGES.BEFORE,
+    afterImage: IMAGES.AFTER,
+    area: '800㎡',
+    location: '成都市武侯区',
+    date: '2024-04',
+    duration: '16天',
+    solution: '1. 专业防水涂料施工\n2. 环保型防水材料\n3. 接缝处理加强\n4. 防滑层施工',
+    process: [
+      '池体清理',
+      '裂缝修补',
+      '防水层施工',
+      '细部处理',
+      '防滑层施工',
+      '蓄水试验'
+    ],
+    images: [
+      {
+        beforeImage: IMAGES.DETAIL,
+        afterImage: IMAGES.DETAIL,
+        description: '池体防水施工'
+      },
+      {
+        beforeImage: IMAGES.DETAIL,
+        afterImage: IMAGES.DETAIL,
+        description: '防滑层处理'
+      }
+    ]
+  }
+]
+===== End of File: services\cases\mock-data.ts =====
+
+
+===== File: services\contact\api.ts =====
+// services/contact-api.ts
+import { ServiceTypeOption, BookingFormData } from '../../components/booking-form/types'
+import { AboutUsProps } from '../../components/about-us/types'
+import { ApiResponse } from '../../types'
+import { AppError } from '../../utils/error'
+import { mockServiceTypes, mockContactInfo } from './mock-data'
+
+const mockRequest = async <T>(data: T): Promise<ApiResponse<T>> => {
+    await new Promise(resolve => setTimeout(resolve, 500))
+    return { code: 0, message: 'success', data }
+  }
+  
+  export const contactApi = {
+    getServiceTypes(): Promise<ApiResponse<ServiceTypeOption[]>> {
+      return mockRequest(mockServiceTypes)
+    },
+  
+    getContactInfo(): Promise<ApiResponse<AboutUsProps>> {
+      return mockRequest(mockContactInfo)
+    },
+  
+    submitBooking(data: BookingFormData): Promise<ApiResponse<{id: number}>> {
+      if(!data.name?.trim()) throw new AppError(400, '请输入姓名')
+      if(!/^1[3-9]\d{9}$/.test(data.phone)) throw new AppError(400, '请输入正确的手机号')
+      if(!data.area?.trim()) throw new AppError(400, '请输入施工面积')
+      if(!data.serviceType) throw new AppError(400, '请选择服务类型')
+      if(!data.region?.length) throw new AppError(400, '请选择所在地区')
+      if(!data.address?.trim()) throw new AppError(400, '请输入详细地址')
+  
+      return mockRequest({ id: Date.now() })
+    }
+  }
+===== End of File: services\contact\api.ts =====
+
+
+===== File: services\contact\mock-data.ts =====
+// services/contact-mock-data.ts
+import type { ServiceTypeOption } from '../../components/booking-form/types'
+import type { AboutUsProps } from '../../components/about-us/types'
+export const mockServiceTypes: ServiceTypeOption[] = [
+    {
+      label: "卫生间防水",
+      value: "bathroom"
+    },
+    {
+      label: "房屋防水",
+      value: "house"
+    },
+    {
+      label: "外墙防水",
+      value: "wall"
+    },
+    {
+      label: "地下室防水", 
+      value: "basement"
+    },
+    {
+      label: "阳台防水",
+      value: "balcony"
+    },
+    {
+      label: "屋顶防水",
+      value: "roof"
+    }
+  ]
+
+export const mockContactInfo: AboutUsProps = {
+  description: "我们是专业从事建筑防水工程的专业服务公司，拥有十年以上从业经验，为商业和住宅客户提供全方位的防水解决方案。我们的团队持有专业资质证书，采用优质材料，确保施工质量。",
+  phone: "1234567890",
+  wechat: "company_waterproof",
+  businessHours: "09:00-18:00",
+  address: "北京市朝阳区xx路xx号"
+}
+===== End of File: services\contact\mock-data.ts =====
+
+
+===== File: services\index\api.ts =====
+import type { Banner, ServiceCase, ServiceAdvantage, ApiResponse } from '../../types'
+import { AppError } from '../../utils/error'
+import { mockBanners, mockCases, mockAdvantages } from './mock-data'
+
+async function mockRequest<T>(data: T, delay = 500): Promise<T> {
+  await new Promise(resolve => setTimeout(resolve, delay))
+  return data
+}
+
+export const api = {
+  getBanners(): Promise<ApiResponse<Banner[]>> {
+    return mockRequest({ code: 0, message: 'success', data: mockBanners })
+  },
+
+  getCases(): Promise<ApiResponse<ServiceCase[]>> {
+    return mockRequest({ code: 0, message: 'success', data: mockCases })
+  },
+
+  getCaseDetail(id: number): Promise<ApiResponse<ServiceCase>> {
+    const caseItem = mockCases.find(item => item.id === id)
+    if (!caseItem) {
+      throw new AppError(404, '案例不存在')
+    }
+    return mockRequest({ code: 0, message: 'success', data: caseItem })
+  },
+
+  getAdvantages(): Promise<ApiResponse<ServiceAdvantage[]>> {
+    return mockRequest({ code: 0, message: 'success', data: mockAdvantages })
+  }
+}
+===== End of File: services\index\api.ts =====
+
+
+===== File: services\index\mock-data.ts =====
+import type { Banner, ServiceCase, ServiceAdvantage } from '../../types'
+
+export const mockBanners: Banner[] = [
+  {
+    id: 1,
+    title: '品质服务保障',
+    subtitle: '十年质保 终身维护',
+    imageUrl: require('../../assets/banner/banner1.png')
+  },
+  {
+    id: 2,
+    title: '专业防水服务',
+    subtitle: '一站式解决您的渗漏问题',
+    imageUrl: require('../../assets/banner/banner2.png')
+  }
+]
+
+export const mockCases: ServiceCase[] = [
+  {
+    id: 1,
+    title: '地铁站防水工程',
+    description: '为北京新建地铁站提供防水保护',
+    imageUrl: require('../../assets/case/case1.png'),
+    content: '本项目是为北京市政新建地铁站提供的整体防水解决方案。采用了最新的防水材料和工艺，确保地铁站在使用寿命内不会出现渗漏问题。项目包括防水设计、材料选型、施工和验收等全过程服务。',
+    type: '基础设施',
+    date: '2024-01-06',
+    views: 1280
+  },
+  {
+    id: 2,
+    title: '商业建筑防水工程',
+    description: '为上海某商业建筑提供全面防水解决方案',
+    imageUrl: require('../../assets/case/case2.png'),
+    content: '该项目是为上海某大型商业综合体提供的防水维护服务。主要解决了建筑外墙渗水、地下车库渗漏等问题。采用了环保型防水材料，确保了防水效果的同时也保护了环境。',
+    type: '商业建筑',
+    date: '2024-01-05',
+    views: 960
+  },
+  {
+    id: 3,
+    title: '住宅小区防水工程',
+    description: '为广州某高档住宅小区提供屋面防水服务',
+    imageUrl: require('../../assets/case/case2.png'),
+    content: '本项目为广州某高档住宅小区提供整体屋面防水服务。采用了先进的防水技术和材料，解决了房屋渗漏问题，提高了居民的生活质量。项目获得了业主的一致好评。',
+    type: '住宅建筑',
+    date: '2024-01-04',
+    views: 756
+  }
+]
+
+export const mockAdvantages: ServiceAdvantage[] = [
+  {
+    id: 1,
+    icon: '🏅',
+    value: '100+',
+    label: '专业认证'
+  },
+  {
+    id: 2,
+    icon: '⏱️',
+    value: '30分钟',
+    label: '快速响应'
+  },
+  {
+    id: 3,
+    icon: '📊',
+    value: '1000+',
+    label: '成功案例'
+  },
+  {
+    id: 4,
+    icon: '😊',
+    value: '99%',
+    label: '客户满意'
+  }
+]
+===== End of File: services\index\mock-data.ts =====
+
+
+===== File: services\project\api.ts =====
+// services/project-api.ts
+import type { ServiceType, ServiceItem, FAQ, ApiResponse, SearchOptions } from '../../types'
+import { AppError } from '../../utils/error'
+import { mockServices, mockFaqs } from './mock-data'
+
+/**
+ * 模拟异步请求
+ */
+const mockRequest = async <T>(data: T): Promise<ApiResponse<T>> => {
+  await new Promise(resolve => setTimeout(resolve, 500))
+  return {
+    code: 0,
+    message: 'success',
+    data
+  }
+}
+
+/**
+ * 搜索相关度评分
+ */
+const calculateRelevanceScore = (service: ServiceItem, keyword: string): number => {
+  let score = 0
+  const lowerKeyword = keyword.toLowerCase()
+
+  // 标题匹配权重最高
+  if (service.title.toLowerCase().includes(lowerKeyword)) {
+    score += 10
+  }
+  
+  // 描述匹配次之
+  if (service.description.toLowerCase().includes(lowerKeyword)) {
+    score += 5
+  }
+  
+  // 特性匹配
+  service.features?.forEach(feature => {
+    if (feature.toLowerCase().includes(lowerKeyword)) {
+      score += 3
+    }
+  })
+
+  // 工期和面积信息匹配
+  if (service.estimatedDuration?.toLowerCase().includes(lowerKeyword)) {
+    score += 2
+  }
+
+  return score
+}
+
+export const projectApi = {
+  /**
+   * 获取服务列表
+   */
+  async getServicesByType(type: ServiceType): Promise<ApiResponse<ServiceItem[]>> {
+    try {
+      const filtered = type === 'all' 
+        ? mockServices 
+        : mockServices.filter(service => service.type === type)
+
+      return mockRequest(filtered)
+    } catch (error) {
+      throw new AppError(500, '获取服务列表失败')
+    }
+  },
+
+  /**
+   * 搜索服务
+   */
+  async searchServices(
+    keyword: string,
+    type: ServiceType = 'all',
+    options: SearchOptions = {}
+  ): Promise<ApiResponse<ServiceItem[]>> {
+    try {
+      // 预处理关键词
+      const processedKeyword = keyword.trim().toLowerCase()
+      
+      // 空关键词时返回分类列表
+      if (!processedKeyword) {
+        return this.getServicesByType(type)
+      }
+
+      // 先按类型过滤
+      let filtered = type === 'all' 
+        ? mockServices 
+        : mockServices.filter(service => service.type === type)
+
+      // 搜索过滤
+      filtered = filtered.filter(service => {
+        const searchFields = [
+          service.title,
+          service.description,
+          ...(service.features || []),
+          service.warranty || '',
+          service.estimatedDuration || '',
+        ].map(field => field.toLowerCase())
+
+        return searchFields.some(field => field.includes(processedKeyword))
+      })
+
+      // 计算相关度得分并排序
+      if (options.sortBy === 'relevance') {
+        filtered.sort((a, b) => {
+          const scoreA = calculateRelevanceScore(a, processedKeyword)
+          const scoreB = calculateRelevanceScore(b, processedKeyword)
+          return scoreB - scoreA
+        })
+      }
+
+      // 价格筛选
+      if (options.minPrice !== undefined || options.maxPrice !== undefined) {
+        filtered = filtered.filter(service => {
+          const price = service.price
+          return (options.minPrice === undefined || price >= options.minPrice) &&
+                 (options.maxPrice === undefined || price <= options.maxPrice)
+        })
+      }
+
+      // 按价格排序
+      if (options.sortBy === 'price') {
+        filtered.sort((a, b) => 
+          options.sortOrder === 'desc' ? b.price - a.price : a.price - b.price
+        )
+      }
+
+      return mockRequest(filtered)
+    } catch (error) {
+      throw new AppError(500, '搜索服务失败')
+    }
+  },
+
+  /**
+   * 获取服务详情
+   */
+  async getServiceDetail(id: number): Promise<ApiResponse<ServiceItem>> {
+    try {
+      const service = mockServices.find(s => s.id === id)
+      if (!service) {
+        throw new AppError(404, '服务不存在')
+      }
+      return mockRequest(service)
+    } catch (error) {
+      if (error instanceof AppError) {
+        throw error
+      }
+      throw new AppError(500, '获取服务详情失败')
+    }
+  },
+
+  /**
+   * 获取FAQ列表
+   */
+  async getFaqs(): Promise<ApiResponse<FAQ[]>> {
+    try {
+      return mockRequest(mockFaqs)
+    } catch (error) {
+      throw new AppError(500, '获取FAQ列表失败')
+    }
+  }
+}
+===== End of File: services\project\api.ts =====
+
+
+===== File: services\project\mock-data.ts =====
+// services/project-mock-data.ts
+import type { ServiceItem, FAQ } from '../../types'
+
+export const mockServices: ServiceItem[] = [
+  {
+    id: 1,
+    title: '卫生间防水',
+    price: 100,
+    unit: '平米起',
+    type: 'home',
+    description: '专业卫生间防水施工，解决渗漏问题',
+    features: ['耐候耐磨', '持久防护', '无缝施工'],
+    process: [
+      { step: 1, title: '问题诊断', description: '专业检测漏水原因' },
+      { step: 2, title: '制定方案', description: '根据具体情况定制解决方案' },
+      { step: 3, title: '规范施工', description: '按标准流程进行施工' },
+      { step: 4, title: '成效检验', description: '严格验收确保效果' }
+    ],
+    estimatedDuration: '1-2天',
+    minArea: 1,
+    maxArea: 20,
+    warranty: '十年质保'
+  },
+  {
+    id: 2,
+    title: '外墙防水',
+    price: 150,
+    unit: '平米起',
+    type: 'outdoor',
+    description: '全方位外墙防水，根治渗漏难题',
+    features: ['高空作业', '全面防护', '防紫外线'],
+    process: [
+      { step: 1, title: '现场勘察', description: '专业评估渗漏范围' },
+      { step: 2, title: '方案设计', description: '定制专业解决方案' },
+      { step: 3, title: '精细施工', description: '标准化施工流程' },
+      { step: 4, title: '质量验收', description: '多重检验标准' }
+    ],
+    estimatedDuration: '3-5天',
+    minArea: 50,
+    maxArea: 1000,
+    warranty: '五年质保'
+  },
+  {
+    id: 3,
+    title: '地下室防水',
+    price: 200,
+    unit: '平米起',
+    type: 'industrial',
+    description: '专业地下室防水工程，彻底解决渗水问题',
+    features: ['防积水', '耐腐蚀', '抗压防渗'],
+    process: [
+      { step: 1, title: '渗漏检测', description: '全面排查隐患' },
+      { step: 2, title: '工程设计', description: '系统解决方案' },
+      { step: 3, title: '专业施工', description: '工艺流程标准化' },
+      { step: 4, title: '竣工验收', description: '确保施工质量' }
+    ],
+    estimatedDuration: '5-7天',
+    minArea: 100,
+    maxArea: 2000,
+    warranty: '八年质保'
+  }
+]
+
+export const mockFaqs: FAQ[] = [
+  {
+    id: 1,
+    question: '防水工程需要多久才能完工？',
+    answer: '工期取决于面积和施工难度，一般小面积(20㎡内)1-2天，大面积3-7天。',
+    category: '施工周期'
+  },
+  {
+    id: 2,
+    question: '防水材料有哪些品牌可以选择？',
+    answer: '我们使用国际知名品牌防水材料，包括东方雨虹、科顺等，可根据需求选择。',
+    category: '材料选择'
+  },
+  {
+    id: 3,
+    question: '施工后多久可以正常使用？',
+    answer: '一般建议24-48小时后可以正常使用，具体时间视材料和天气情况而定。',
+    category: '使用说明'
+  },
+  {
+    id: 4,
+    question: '防水工程的质保期是多久？',
+    answer: '根据不同项目提供5-10年不等的质保服务，具体以合同约定为准。',
+    category: '售后保障'
+  }
+]
+===== End of File: services\project\mock-data.ts =====
+
+
+===== File: styles\custom-theme.scss =====
+/* custom-theme.scss */
+@import "~taro-ui/dist/style/index.scss";
+
+/* Z-index Management */
+$z-index-modal: 1000;
+$z-index-popup: 900;
+$z-index-mask: 800;
+$z-index-navigation: 100;
+$z-index-header: 90; 
+$z-index-footer: 90;
+$z-index-float: 80;
+$z-index-dropdown: 70;
+$z-index-sticky: 60;
+$z-index-banner: 50;
+$z-index-fixed: 40;
+$z-index-backdrop: 30;
+$z-index-overlay: 20;
+$z-index-content: 1;
+$z-index-base: -1;
+
+/* Brand Colors */
+$color-brand: #2563eb; 
+$color-brand-light: #60a5fa;
+$color-brand-dark: #1d4ed8;
+$color-brand-disabled: #bfdbfe;
+
+/* Function Colors */
+$color-success: #22c55e;                    
+$color-error: #ef4444;                      
+$color-warning: #f59e0b;                    
+$color-info: #3b82f6;                      
+
+/* Status Colors */
+$color-success-light: #86efac;
+$color-success-dark: #16a34a;
+$color-success-disabled: #bbf7d0;
+
+$color-error-light: #fca5a5;
+$color-error-dark: #dc2626;
+$color-error-disabled: #fecaca;
+
+$color-warning-light: #fcd34d;
+$color-warning-dark: #d97706;
+$color-warning-disabled: #fde68a;
+
+/* Basic Colors */
+$color-black: #000000;
+$color-white: #ffffff;
+
+/* Text Colors */
+$color-text-base: #1e293b;                  
+$color-text-base-inverse: #ffffff;          
+$color-text-secondary: #475569;             
+$color-text-placeholder: #94a3b8;           
+$color-text-disabled: #cbd5e1;              
+$color-text-title: #0f172a;                 
+$color-text-paragraph: #334155;             
+
+/* Background Colors */
+$color-bg: #f1f5f9;                      
+$color-bg-base: #ffffff;                    
+$color-bg-light: #f8fafc;                   
+$color-bg-dark: #e2e8f0;                  
+
+/* Border Colors */
+$color-border-base: #cbd5e1;             
+$color-border-light: #e2e8f0;
+$color-border-split: #cbd5e1;            
+$color-border-dark: #94a3b8;             
+
+/* Component Size */
+$size-xs: 20px;
+$size-sm: 24px;
+$size-base: 28px;
+$size-lg: 32px;
+$size-xl: 36px;
+
+/* Font Size */
+$font-size-xs: 20px;
+$font-size-sm: 24px;
+$font-size-base: 28px;
+$font-size-lg: 32px;
+$font-size-xl: 36px;
+$font-size-xxl: 40px;
+
+/* Font Weight */
+$font-weight-light: 300;
+$font-weight-normal: 400;
+$font-weight-medium: 500;
+$font-weight-semibold: 600;
+$font-weight-bold: 700;
+
+/* Line Height */
+$line-height-compact: 1.2;
+$line-height-base: 1.5;
+$line-height-loose: 1.8;
+
+/* Spacing */
+$spacing-xxs: 4px;
+$spacing-xs: 8px;
+$spacing-sm: 12px;
+$spacing-base: 16px;
+$spacing-lg: 24px;
+$spacing-xl: 32px;
+$spacing-xxl: 48px;
+
+/* Border Radius */
+$radius-none: 0;
+$radius-sm: 4px;
+$radius-base: 8px;
+$radius-lg: 12px;
+$radius-xl: 16px;
+$radius-full: 9999px;
+
+/* Shadows */
+$shadow-none: none;
+$shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+$shadow-base: 0 2px 8px rgba(0, 0, 0, 0.08);
+$shadow-lg: 0 4px 12px rgba(0, 0, 0, 0.1);
+$shadow-xl: 0 8px 16px rgba(0, 0, 0, 0.12);
+
+/* Animation Duration */
+$duration-fast: 150ms;
+$duration-base: 300ms;
+$duration-slow: 450ms;
+
+/* Animation Timing Functions */
+$ease-base: cubic-bezier(0.4, 0, 0.2, 1);
+$ease-in: cubic-bezier(0.4, 0, 1, 1);
+$ease-out: cubic-bezier(0, 0, 0.2, 1);
+$ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+
+/* Breakpoints */
+$breakpoint-xs: 375px;
+$breakpoint-sm: 576px;
+$breakpoint-md: 768px;
+
+/* Layout */
+$header-height: 88px;
+$tab-bar-height: 98px;
+$input-height: 88px;
+$button-height: 88px;
+
+/* Component Specific */
+$card-padding: 24px;
+$card-radius: $radius-lg;
+$card-shadow: $shadow-base;
+
+$modal-radius: $radius-lg;
+$modal-shadow: $shadow-lg;
+
+$button-radius: $radius-base;
+$input-radius: $radius-base;
+
+/* Overlay */
+$mask-bg: rgba(0, 0, 0, 0.4);
+$backdrop-filter: blur(8px);
+
+/* Transition */
+$transition-base: all $duration-base $ease-base;
+$transition-fade: opacity $duration-base $ease-base;
+$transition-slide: transform $duration-base $ease-base;
+
+/* Component Override */
+$at-button-height: $button-height;
+$at-input-height: $input-height;
+
+$breakpoint-md:768px
+===== End of File: styles\custom-theme.scss =====
+
+
+===== File: types\index.ts =====
+// types/index.ts
+
+// API 基础类型
+export interface ApiResponse<T> {
+  code: number
+  message: string
+  data: T
+}
+
+// 分页相关
+export interface PaginationParams {
+  page: number
+  pageSize: number
+}
+
+export interface PaginatedResponse<T> extends ApiResponse<T> {
+  pagination: {
+    total: number
+    totalPages: number
+    currentPage: number
+    pageSize: number
+  }
+}
+
+//主页
+
+// Banner相关
+export interface Banner {
+  id: number
+  title: string
+  subtitle: string
+  imageUrl: string
+}
+
+// 服务案例相关
+export interface ServiceCase {
+  id: number
+  title: string
+  description: string
+  imageUrl: string
+  content?: string
+  type: string
+  date: string
+  views: number
+}
+
+// 服务优势相关
+export interface ServiceAdvantage {
+  id: number
+  icon: string
+  value: string
+  label: string
+}
+
+// 服务类型
+export type ServiceType = 'all' | 'home' | 'outdoor' | 'industrial'
+
+export interface ProcessStep {
+  step: number
+  title: string
+  description: string
+  status?: 'pending' | 'processing' | 'completed' | 'error'
+}
+
+export interface ServiceItem {
+  id: number
+  title: string
+  price: number
+  unit: string
+  type: ServiceType
+  description: string
+  features: string[]
+  process: ProcessStep[]
+  estimatedDuration?: string
+  minArea?: number
+  maxArea?: number
+  warranty?: string
+  imageUrl?: string
+  updatedAt?: string
+  createdAt?: string
+}
+
+// 搜索相关
+export interface SearchOptions {
+  sortBy?: 'relevance' | 'price' | 'createdAt'
+  sortOrder?: 'asc' | 'desc'
+  minPrice?: number
+  maxPrice?: number
+  minArea?: number
+  maxArea?: number
+}
+
+// FAQ 相关
+export interface FAQ {
+  id: number
+  question: string
+  answer: string
+  category: string
+  order?: number
+  isHot?: boolean
+}
+
+// 组件 Props 类型
+export interface SearchBarProps {
+  value: string
+  placeholder?: string
+  className?: string
+  loading?: boolean
+  delay?: number
+  maxLength?: number
+  showAction?: boolean
+  actionText?: string
+  onChange: (value: string) => void
+  onSearch?: (value: string) => void
+  onFocus?: () => void
+  onBlur?: () => void
+  onClear?: () => void
+}
+
+export interface ServiceCardProps {
+  service: ServiceItem
+  expanded?: boolean
+  loading?: boolean
+  className?: string
+  showAction?: boolean
+  onToggle?: (id: number) => void
+  onBook?: (service: ServiceItem) => void
+}
+
+export interface FAQSectionProps {
+  faqs: FAQ[]
+  title?: string
+  className?: string
+  emptyText?: string
+  onFAQClick?: (faq: FAQ) => void
+}
+
+// 状态管理类型
+export interface ProjectPageState {
+  loading: boolean
+  services: ServiceItem[]
+  faqs: FAQ[]
+  searchValue: string
+  currentTab: number
+  expandedService: number | null
+  error: string | null
+  initialized: boolean
+  searchHistory: string[]
+  filter: SearchOptions
+}
+
+// 通用组件类型
+export interface LoadingProps {
+  size?: 'small' | 'normal' | 'large'
+  color?: string
+  className?: string
+  text?: string
+}
+
+export interface EmptyProps {
+  text?: string
+  image?: string
+  className?: string
+  children?: React.ReactNode
+}
+
+export interface ErrorProps {
+  text?: string
+  code?: number
+  className?: string
+  onRetry?: () => void
+}
+
+// 错误相关
+export interface AppErrorType extends Error {
+  code: number
+  details?: any
+}
+
+// Tab 相关
+export interface TabItem {
+  title: string
+  value: ServiceType
+  badge?: number | string
+}
+
+export interface TabsProps {
+  items: TabItem[]
+  value: string | number
+  className?: string
+  onChange: (value: string | number) => void
+}
+
+// 过滤器相关
+export interface FilterOption {
+  label: string
+  value: string | number
+  disabled?: boolean
+}
+
+export interface FilterGroupProps {
+  title: string
+  options: FilterOption[]
+  value: string | number | (string | number)[]
+  multiple?: boolean
+  className?: string
+  onChange: (value: string | number | (string | number)[]) => void
+}
+
+// 业务类型
+export interface ServiceBooking {
+  id: number
+  serviceId: number
+  userId: string
+  status: 'pending' | 'confirmed' | 'cancelled' | 'completed'
+  area?: number
+  address?: string
+  contactName: string
+  contactPhone: string
+  appointmentTime?: string
+  remark?: string
+  createdAt: string
+}
+
+export interface ServiceComment {
+  id: number
+  serviceId: number
+  userId: string
+  rating: number
+  content: string
+  images?: string[]
+  reply?: string
+  createdAt: string
+}
+
+// 配置类型
+export interface ProjectConfig {
+  searchDebounceDelay: number
+  maxSearchHistory: number
+  defaultPageSize: number
+  imageBaseUrl: string
+  priceUnit: string
+  areaUnit: string
+}
+
+export interface Config {
+  ui: {
+  banner: {
+  interval: number
+  duration: number
+  }
+  cases: {
+  interval: number
+  duration: number
+  displayCount: number
+  cardHeight: number
+  }
+  }
+  contact: {
+  phone: string
+  wechat: string
+  }
+  }
+
+
+  // 预约表单数据类型
+export interface BookingFormData {
+  area: string            // 施工面积
+  region: string[]        // 地区信息
+  address: string         // 详细地址
+  name: string           // 联系人
+  phone: string          // 联系电话
+  remark: string         // 备注说明
+}
+===== End of File: types\index.ts =====
+
+
+===== File: utils\error.ts =====
+// utils/error.ts
+
+// 自定义应用错误类
+export class AppError extends Error {
+  constructor(
+    public code: number,
+    message: string
+  ) {
+    super(message)
+    this.name = 'AppError'
+  }
+}
+
+// 类型保护：判断是否为 AppError
+export function isAppError(error: unknown): error is AppError {
+  return error instanceof AppError
+}
+
+// 通用错误处理函数
+export function handleError(error: unknown): string {
+  // 如果是应用自定义错误
+  if (isAppError(error)) {
+    return error.message
+  }
+
+  // 如果是标准 Error 对象
+  if (error instanceof Error) {
+    return error.message
+  }
+
+  // 其他未知错误类型
+  return '操作失败，请稍后重试'
+}
+
+// 业务错误码映射
+export const ErrorCodeMap: Record<number, string> = {
+  400: '请求参数错误',
+  401: '未登录或登录已过期',
+  403: '没有操作权限',
+  404: '请求的资源不存在',
+  500: '服务器内部错误',
+  502: '网关错误',
+  503: '服务不可用',
+  504: '网关超时'
+}
+
+// HTTP 错误处理
+export function handleHttpError(code: number): string {
+  return ErrorCodeMap[code] || '网络请求失败，请稍后重试'
+}
+
+// 表单错误处理
+export function handleFormError(error: unknown): { 
+  [key: string]: string 
+} {
+  if (isAppError(error)) {
+    try {
+      // 尝试解析错误信息是否为 JSON 格式的字段错误
+      const fieldsError = JSON.parse(error.message)
+      if (typeof fieldsError === 'object') {
+        return fieldsError
+      }
+    } catch {
+      // 解析失败则返回通用错误
+      return { _error: error.message }
+    }
+  }
+  return { _error: handleError(error) }
+}
+
+// 网络错误判断
+export function isNetworkError(error: unknown): boolean {
+  if (error instanceof Error) {
+    return error.message.toLowerCase().includes('network') || 
+           error.message.toLowerCase().includes('timeout') ||
+           error.message.toLowerCase().includes('connection')
+  }
+  return false
+}
+
+// 超时错误判断
+export function isTimeoutError(error: unknown): boolean {
+  if (error instanceof Error) {
+    return error.message.toLowerCase().includes('timeout')
+  }
+  return false
+}
+
+// 创建业务错误
+export function createBusinessError(code: number, message: string): AppError {
+  return new AppError(code, message)
+}
+
+// 包装异步错误处理
+export async function wrapAsyncError<T>(
+  promise: Promise<T>,
+  errorMessage?: string
+): Promise<T> {
+  try {
+    return await promise
+  } catch (error) {
+    throw new AppError(
+      isAppError(error) ? error.code : 500,
+      errorMessage || handleError(error)
+    )
+  }
+}
+
+// 错误提示格式化
+export function formatErrorMessage(error: unknown): string {
+  if (isAppError(error)) {
+    const code = error.code
+    const message = error.message
+    return `${message}${code ? ` (${code})` : ''}`
+  }
+  return handleError(error)
+}
+===== End of File: utils\error.ts =====
+
